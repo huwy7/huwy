@@ -1,0 +1,186 @@
+---
+import '../styles/tokens.css';
+import '../styles/schriften.css';
+import '../styles/global.css';
+
+interface Props {
+  titel: string;
+  beschreibung?: string;
+}
+
+const { titel, beschreibung } = Astro.props;
+const jahr = new Date().getFullYear();
+
+// TODO_NAME, TODO_MAIL, TODO_INSTAGRAM: Platzhalter (CLAUDE.md Abschnitt 2).
+// TODO_INSTAGRAM ist in CLAUDE.md nicht aufgeführt, wird aber in Spezifikation
+// 6.1/6.4 gebraucht — Wert liefert der Betreiber.
+const name = 'TODO_NAME';
+
+const navLinks = [
+  { href: '/', text: 'Serien' },
+  { href: '/ueber', text: 'Über' },
+  { href: '/kontakt', text: 'Kontakt' },
+];
+
+const fussLinks = [
+  { href: 'mailto:TODO_MAIL', text: 'Mail' },
+  { href: 'TODO_INSTAGRAM', text: 'Instagram' },
+  { href: '/impressum', text: 'Impressum' },
+  { href: '/datenschutz', text: 'Datenschutz' },
+];
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{titel}</title>
+    {beschreibung && <meta name="description" content={beschreibung} />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
+
+    <header class="kopf">
+      <a class="wortmarke" href="/">{name}</a>
+      <nav class="navigation" aria-label="Hauptnavigation">
+        {
+          navLinks.map((link, i) => (
+            <>
+              {i > 0 && (
+                <span class="trenner" aria-hidden="true">
+                  ·
+                </span>
+              )}
+              <a href={link.href}>{link.text}</a>
+            </>
+          ))
+        }
+      </nav>
+    </header>
+
+    <main id="hauptinhalt" class="inhalt">
+      <slot />
+    </main>
+
+    <footer class="fuss">
+      <nav class="fuss-links" aria-label="Kontakt und Rechtliches">
+        {
+          fussLinks.map((link, i) => (
+            <>
+              {i > 0 && (
+                <span class="trenner" aria-hidden="true">
+                  ·
+                </span>
+              )}
+              <a href={link.href}>{link.text}</a>
+            </>
+          ))
+        }
+      </nav>
+      <p class="fuss-copy">© {name}, {jahr}</p>
+    </footer>
+
+    <style>
+      /* Skip-Link: sitzt oberhalb des Viewports, wird bei Fokus sichtbar. */
+      .skip-link {
+        position: absolute;
+        left: var(--abstand-8);
+        top: calc(-1 * var(--header-hoehe));
+        z-index: 1;
+        background-color: var(--farbe-hintergrund);
+        color: var(--farbe-text);
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-14);
+        font-variant-ligatures: none;
+        padding: var(--abstand-8) var(--abstand-16);
+      }
+      .skip-link:focus {
+        top: var(--abstand-8);
+      }
+
+      /* --- Header (Spezifikation 6.1) --- */
+      .kopf {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--abstand-16);
+        min-height: var(--header-hoehe);
+        max-width: var(--container);
+        margin-inline: auto;
+        padding-inline: var(--rand);
+      }
+
+      .wortmarke {
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-15);
+        font-weight: var(--gewicht-500);
+        line-height: var(--zeilenhoehe-1-2);
+        font-variant-ligatures: none;
+        text-decoration: none;
+      }
+
+      .navigation {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--abstand-16);
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-14);
+        font-weight: var(--gewicht-400);
+        line-height: var(--zeilenhoehe-1-2);
+        font-variant-ligatures: none;
+      }
+
+      .trenner {
+        color: var(--farbe-text-leise);
+      }
+
+      /* --- Inhalt --- */
+      .inhalt {
+        flex: 1 0 auto;
+        max-width: var(--container);
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: var(--rand);
+        padding-block-start: var(--abstand-48);
+      }
+
+      /* --- Fusszeile (Spezifikation 6.1) --- */
+      .fuss {
+        flex-shrink: 0;
+        max-width: var(--container);
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: var(--rand);
+        margin-block-start: var(--abstand-64);
+        border-top: var(--linie-staerke) solid var(--farbe-linie);
+        padding-block-start: var(--abstand-32);
+        padding-block-end: var(--abstand-64);
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-12);
+        font-weight: var(--gewicht-400);
+        line-height: var(--zeilenhoehe-1-5);
+        color: var(--farbe-text-leise);
+        font-variant-ligatures: none;
+      }
+
+      .fuss-links {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--abstand-16);
+        margin-block-end: var(--abstand-8);
+      }
+
+      /* Fusszeilen-Links tragen die leise Meta-Farbe (Spezifikation 3.4),
+         bleiben aber unterstrichen (Spezifikation 2). */
+      .fuss a {
+        color: var(--farbe-text-leise);
+      }
+    </style>
+  </body>
+</html>

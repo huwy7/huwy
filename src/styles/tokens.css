@@ -58,4 +58,11 @@
      CSS erlaubt keine Custom Property in der Media-Query-Bedingung; die 768px
      müssen dort wörtlich stehen. Dieser Token ist die dokumentierte Quelle. */
   --breakpoint: 768px;
+
+  /* --- 6/9. Layout, Linien, Fokus ---
+     Werte aus Spezifikation Abschnitt 6 (Seiten) und 9 (Barrierefreiheit). */
+  --header-hoehe: 80px; /* 6.1 Header */
+  --linie-staerke: 1px; /* 6.1 Trennlinie über der Fusszeile */
+  --fokus-breite: 2px; /* 9 Fokusring */
+  --fokus-offset: 3px; /* 9 Fokusring */
 }

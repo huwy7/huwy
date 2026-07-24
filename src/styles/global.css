@@ -1,0 +1,76 @@
+/*
+  global.css — Reset und Basistypografie.
+  Nur wirklich Globales. Alle Werte über Custom Properties aus tokens.css.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Sticky-Footer-Layout: Fusszeile sitzt am Seitenende, auch bei leeren Seiten.
+   Kein position: sticky — der Header bleibt statisch (Spezifikation 6.1). */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--farbe-hintergrund);
+  color: var(--farbe-text);
+  font-family: var(--schrift-text);
+  font-size: var(--groesse-16);
+  font-weight: var(--gewicht-400);
+  line-height: var(--zeilenhoehe-1-6);
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Überschriften erben Grösse und Zeilenhöhe; konkrete Werte setzen die Seiten
+   und Komponenten. Gewicht bleibt 400 — Schnitt 600/700 ist verboten (3.4). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: var(--gewicht-400);
+  line-height: inherit;
+}
+
+/* Links: schwarz und unterstrichen, keine Akzentfarbe (Spezifikation 2). */
+a {
+  color: var(--farbe-text);
+  text-decoration: underline;
+}
+
+/* Sichtbarer Fokusring (Spezifikation 9). */
+:focus-visible {
+  outline: var(--fokus-breite) solid var(--farbe-text);
+  outline-offset: var(--fokus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import Basis from '../layouts/Basis.astro';
+import Bild from '../components/Bild.astro';
 
 // Sortierung nach reihenfolge (Spezifikation 7), nicht nach Jahr/alphabetisch.
 const serien = (await getCollection('serien')).sort(
@@ -19,14 +19,12 @@ const serien = (await getCollection('serien')).sort(
       serien.map((serie, i) => (
         <li class="serien-eintrag">
           <a class="serien-link" href={`/serien/${serie.id}`}>
-            <Image
+            <Bild
               class="vorschau-bild"
               src={serie.data.titelbild}
               alt={serie.data.titelbildAlt}
-              width={1200}
-              height={800}
-              fit="cover"
-              position="center"
+              breite={1200}
+              hoehe={800}
               densities={[1, 2]}
               loading={i === 0 ? 'eager' : 'lazy'}
               fetchpriority={i === 0 ? 'high' : undefined}
@@ -60,12 +58,8 @@ const serien = (await getCollection('serien')).sort(
     color: var(--farbe-text);
   }
 
-  /* Vorschaubild: 3:2 (serverseitig zugeschnitten), volle Containerbreite. */
-  .vorschau-bild {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+  /* Vorschaubild (.vorschau-bild) steht global — das <img> kommt aus der
+     Bild-Komponente. 3:2 serverseitig zugeschnitten, volle Containerbreite. */
 
   /* 32px zwischen Bild und Beschriftung (Spezifikation 6.1). */
   .serien-meta {

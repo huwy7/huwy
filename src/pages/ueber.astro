@@ -1,7 +1,17 @@
 ---
-import { Image } from 'astro:assets';
 import Basis from '../layouts/Basis.astro';
+import Bild from '../components/Bild.astro';
 import portrait from '../assets/portrait.png';
+
+// JSON-LD Person (Spezifikation 10). Werte sind Platzhalter bis TODO_* vorliegt.
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'TODO_NAME',
+  url: 'https://TODO_DOMAIN',
+  email: 'TODO_MAIL',
+  sameAs: ['TODO_INSTAGRAM'],
+};
 ---
 
 <!-- /ueber (Spezifikation 6.3). Ab 768px zweispaltig: links Text, rechts
@@ -22,7 +32,7 @@ import portrait from '../assets/portrait.png';
     </div>
 
     <div class="ueber-portrait">
-      <Image
+      <Bild
         src={portrait}
         alt="Platzhalterbild – Portrait"
         widths={[400, 640, 960, 1280]}
@@ -31,6 +41,8 @@ import portrait from '../assets/portrait.png';
       />
     </div>
   </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(personLd)} is:inline />
 </Basis>
 
 <style>

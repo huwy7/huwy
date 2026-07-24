@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import Basis from '../../layouts/Basis.astro';
+import Bild from '../../components/Bild.astro';
 
 export async function getStaticPaths() {
   const serien = (await getCollection('serien')).sort(
@@ -16,10 +17,32 @@ export async function getStaticPaths() {
 
 const { serie, naechste } = Astro.props;
 const { Content } = await render(serie);
+
+// meta description aus dem Einleitungstext (Spezifikation 10).
+const beschreibung = (serie.body ?? '')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .slice(0, 160);
+
+// Open-Graph-Bild: Titelbild auf 1200×630 zugeschnitten (Spezifikation 10).
+const og = await getImage({
+  src: serie.data.titelbild,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  position: 'center',
+  format: 'jpeg',
+  quality: 80,
+});
 ---
 
 <!-- Serienseite (Spezifikation 6.2). Header-Abstand 64px, Bildnormierung 5.1. -->
-<Basis titel={`${serie.data.titel} — TODO_NAME`} abstandOben="var(--abstand-64)">
+<Basis
+  titel={`${serie.data.titel} — TODO_NAME`}
+  beschreibung={beschreibung}
+  ogBild={og.src}
+  abstandOben="var(--abstand-64)"
+>
   <article class="serie">
     <h1 class="serie-titel">{serie.data.titel}</h1>
     <p class="serie-jahr">{serie.data.jahr}</p>
@@ -31,14 +54,13 @@ const { Content } = await render(serie);
     <div class="serie-bilder">
       {
         serie.data.bilder.map((bild) => (
-          <Image
+          <Bild
             class="serie-bild"
             src={bild.datei}
             alt={bild.alt}
             widths={[640, 960, 1280, 1600, 2000]}
             sizes="100vw"
             loading="lazy"
-            decoding="async"
           />
         ))
       }
@@ -77,23 +99,16 @@ const { Content } = await render(serie);
     max-width: var(--textbreite);
   }
 
-  /* 12vh zwischen Einleitung und Bildern (Spezifikation 6.2). */
+  /* 12vh zwischen Einleitung und Bildern; 12vh zwischen den Bildern selbst
+     (Spezifikation 6.2). Spaltenlayout mit gap, damit der <picture>-Wrapper der
+     Bild-Komponente den Abstand nicht bricht. Zentriert die höhennormierten
+     Bilder (Höhennormierung selbst steht global, .serie-bild). */
   .serie-bilder {
     margin-block-start: var(--rhythmus-block);
-  }
-
-  /* Höhennormierung (Spezifikation 5.1): jedes Bild gleich hoch. */
-  .serie-bild {
-    display: block;
-    max-height: var(--bild-max-hoehe);
-    width: auto;
-    max-width: 100%;
-    margin-inline: auto;
-  }
-
-  /* 12vh zwischen den Bildern (Spezifikation 6.2). */
-  .serie-bild + .serie-bild {
-    margin-block-start: var(--rhythmus-block);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--rhythmus-block);
   }
 
   /* 12vh vor „Nächste Serie". */
@@ -109,14 +124,10 @@ const { Content } = await render(serie);
     color: var(--farbe-text);
   }
 
-  /* Mobile: volle Breite statt Höhennormierung, 48px zwischen Bildern. */
+  /* Mobile: 48px zwischen Bildern (volle Breite regelt .serie-bild global). */
   @media (max-width: 768px) {
-    .serie-bild {
-      max-height: none;
-      width: 100%;
-    }
-    .serie-bild + .serie-bild {
-      margin-block-start: var(--abstand-48);
+    .serie-bilder {
+      gap: var(--abstand-48);
     }
   }
 </style>

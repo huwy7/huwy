@@ -1,0 +1,74 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+// Ein responsives Bild als <picture> mit AVIF + WebP und JPEG als Fallback
+// (Spezifikation 5.4). Qualität je Format getrennt (5.3): AVIF 65, WebP 80.
+// Zwei Modi:
+//   - responsiv (widths + sizes): Seitenverhältnis bleibt erhalten
+//   - Crop (breite + hoehe + densities): fester Zuschnitt, z. B. 3:2-Vorschau
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'auto';
+  sizes?: string;
+  widths?: number[];
+  breite?: number;
+  hoehe?: number;
+  densities?: number[];
+}
+
+const {
+  src,
+  alt,
+  class: klasse,
+  loading = 'lazy',
+  fetchpriority,
+  sizes,
+  widths,
+  breite,
+  hoehe,
+  densities,
+} = Astro.props;
+
+// Qualitätsstufen — siehe docs/bilder-pipeline.md.
+const QUALITAET = { avif: 65, webp: 80, jpeg: 80 };
+
+const cropModus = typeof breite === 'number' && typeof hoehe === 'number';
+
+// Keine Breiten anfragen, die grösser als die Quelle sind (kein Upscaling).
+const gefiltert = widths?.filter((w) => w <= src.width);
+const echteWidths = widths ? (gefiltert && gefiltert.length ? gefiltert : [src.width]) : undefined;
+
+const basis = cropModus
+  ? { src, width: breite, height: hoehe, fit: 'cover' as const, position: 'center' as const, densities }
+  : { src, widths: echteWidths };
+
+const avif = await getImage({ ...basis, format: 'avif', quality: QUALITAET.avif });
+const webp = await getImage({ ...basis, format: 'webp', quality: QUALITAET.webp });
+const jpeg = await getImage({ ...basis, format: 'jpeg', quality: QUALITAET.jpeg });
+
+// Breite/Höhe explizit ins Markup, damit kein Layout-Shift entsteht (5.4).
+const maxW = cropModus ? breite! : Math.max(...(echteWidths ?? [src.width]));
+const w = cropModus ? breite! : maxW;
+const h = cropModus ? hoehe! : Math.round((src.height * maxW) / src.width);
+---
+
+<picture>
+  <source type="image/avif" srcset={avif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" srcset={webp.srcSet.attribute} sizes={sizes} />
+  <img
+    src={jpeg.src}
+    srcset={jpeg.srcSet.attribute}
+    sizes={sizes}
+    width={w}
+    height={h}
+    alt={alt}
+    class={klasse}
+    loading={loading}
+    decoding="async"
+    fetchpriority={fetchpriority}
+  />
+</picture>

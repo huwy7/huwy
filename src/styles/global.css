@@ -39,6 +39,42 @@ svg {
   max-width: 100%;
 }
 
+/* <picture> soll keine eigene Box bilden — das <img> nimmt am Layout des
+   Elternelements teil (Zentrierung, Grid/Flex bleiben unverändert). */
+picture {
+  display: contents;
+}
+
+/* <source> nicht als Layout-Element behandeln: sonst würden sie durch
+   display: contents zu zusätzlichen Flex-Items und verdreifachten den gap.
+   Die Formatauswahl des <picture> bleibt davon unberührt. */
+picture > source {
+  display: none;
+}
+
+/* Bildrollen. Das <img> wird von der Bild-Komponente gerendert; die Regeln
+   stehen deshalb global (Astro-scoped-Styles einer Seite erreichen es nicht). */
+
+/* Höhennormierung der Serienbilder (Spezifikation 5.1): jedes Bild gleich hoch. */
+.serie-bild {
+  max-height: var(--bild-max-hoehe);
+  width: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Mobile: volle Breite statt Höhennormierung (Spezifikation 5.1). */
+  .serie-bild {
+    max-height: none;
+    width: 100%;
+  }
+}
+
+/* Vorschaubild der Startseite: volle Containerbreite (Spezifikation 6.1). */
+.vorschau-bild {
+  width: 100%;
+}
+
 /* Höhe aus dem Seitenverhältnis, nicht aus dem height-Attribut (sonst
    verzerren die width/height-Attribute das Bild bei responsiver Breite). */
 img {

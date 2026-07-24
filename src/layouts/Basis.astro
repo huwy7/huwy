@@ -6,9 +6,18 @@ import '../styles/global.css';
 interface Props {
   titel: string;
   beschreibung?: string;
+  // Abstände als Token-Referenzen (kein roher Wert). Vorgabe: 48px oben
+  // (Startseite, 6.1), 64px unten. Serienseite überschreibt oben mit 64px.
+  abstandOben?: string;
+  abstandUnten?: string;
 }
 
-const { titel, beschreibung } = Astro.props;
+const {
+  titel,
+  beschreibung,
+  abstandOben = 'var(--abstand-48)',
+  abstandUnten = 'var(--abstand-64)',
+} = Astro.props;
 const jahr = new Date().getFullYear();
 
 // TODO_NAME, TODO_MAIL, TODO_INSTAGRAM: Platzhalter (CLAUDE.md Abschnitt 2).
@@ -61,11 +70,11 @@ const fussLinks = [
       </nav>
     </header>
 
-    <main id="hauptinhalt" class="inhalt">
+    <main id="hauptinhalt" class="inhalt" style={`padding-block-start: ${abstandOben};`}>
       <slot />
     </main>
 
-    <footer class="fuss">
+    <footer class="fuss" style={`margin-block-start: ${abstandUnten};`}>
       <nav class="fuss-links" aria-label="Kontakt und Rechtliches">
         {
           fussLinks.map((link, i) => (
@@ -146,7 +155,7 @@ const fussLinks = [
         width: 100%;
         margin-inline: auto;
         padding-inline: var(--rand);
-        padding-block-start: var(--abstand-48);
+        /* padding-block-start wird per Prop abstandOben inline gesetzt. */
       }
 
       /* --- Fusszeile (Spezifikation 6.1) --- */
@@ -156,7 +165,7 @@ const fussLinks = [
         width: 100%;
         margin-inline: auto;
         padding-inline: var(--rand);
-        margin-block-start: var(--abstand-64);
+        /* margin-block-start wird per Prop abstandUnten inline gesetzt. */
         border-top: var(--linie-staerke) solid var(--farbe-linie);
         padding-block-start: var(--abstand-32);
         padding-block-end: var(--abstand-64);

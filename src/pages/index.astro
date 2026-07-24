@@ -1,10 +1,86 @@
 ---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Basis from '../layouts/Basis.astro';
+
+// Sortierung nach reihenfolge (Spezifikation 7), nicht nach Jahr/alphabetisch.
+const serien = (await getCollection('serien')).sort(
+  (a, b) => a.data.reihenfolge - b.data.reihenfolge,
+);
 ---
 
-<!-- Leere Hülle (Build-Plan Phase 1). Serien, Vorschaubilder und die
-     Startseiten-Liste kommen in Phase 3. Die h1 trägt dann den Namen visuell
-     versteckt — das erste sichtbare Element ist dann ein Bild (Spezifikation 6.1). -->
-<Basis titel="TODO_NAME">
-  <h1>TODO_NAME</h1>
+<!-- Startseite (Spezifikation 6.1). Erstes sichtbares Element unter dem Header
+     ist ein Bild; die h1 trägt den Namen nur für Screenreader. -->
+<Basis titel="TODO_NAME" abstandUnten="var(--rhythmus-serie)">
+  <h1 class="visuell-versteckt">TODO_NAME</h1>
+
+  <ul class="serien-liste">
+    {
+      serien.map((serie, i) => (
+        <li class="serien-eintrag">
+          <a class="serien-link" href={`/serien/${serie.id}`}>
+            <Image
+              class="vorschau-bild"
+              src={serie.data.titelbild}
+              alt={serie.data.titelbildAlt}
+              width={1200}
+              height={800}
+              fit="cover"
+              position="center"
+              densities={[1, 2]}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+            />
+            <span class="serien-meta">
+              <span class="serien-titel">{serie.data.titel}</span>
+              <span class="serien-jahr">{serie.data.jahr}</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </Basis>
+
+<style>
+  .serien-liste {
+    list-style: none;
+  }
+
+  /* Abstand zwischen Serien: 15vh (Spezifikation 6.1). */
+  .serien-eintrag + .serien-eintrag {
+    margin-block-start: var(--rhythmus-serie);
+  }
+
+  /* Ganze Karte ist ein Navigationslink — nicht unterstrichen, der Fokusring
+     macht ihn sichtbar. */
+  .serien-link {
+    display: block;
+    text-decoration: none;
+    color: var(--farbe-text);
+  }
+
+  /* Vorschaubild: 3:2 (serverseitig zugeschnitten), volle Containerbreite. */
+  .vorschau-bild {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* 32px zwischen Bild und Beschriftung (Spezifikation 6.1). */
+  .serien-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-8);
+    margin-block-start: var(--abstand-32);
+    font-family: var(--schrift-mono);
+    font-size: var(--groesse-14);
+    font-weight: var(--gewicht-400);
+    line-height: var(--zeilenhoehe-1-4);
+    font-variant-ligatures: none;
+  }
+
+  .serien-jahr {
+    color: var(--farbe-text-leise);
+  }
+</style>

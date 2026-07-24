@@ -74,12 +74,14 @@ eigenmächtig ersetzen.
 3. **Jedes Bild läuft über `astro:assets`.** Nie ein rohes `<img src="/foto.jpg">`.
 4. **Jedes Bild braucht ein `alt`.** Leeres `alt=""` nur bei rein dekorativen Bildern —
    in diesem Projekt existieren keine.
-5. **Keine Effekte auf Bildern.** Kein Hover-Zoom, kein Schatten, kein Rahmen, kein
-   `border-radius`, kein Filter, kein Ken-Burns-Effekt, kein Fade-in beim Scrollen.
-   Insbesondere kein `filter: grayscale()`, `contrast()` oder `sepia()` — die Bilder
-   sind bereits schwarzweiss, die Seite verändert sie nicht. Diese Regel bleibt auch
-   mit dem invertierten Cursor bestehen: über Fotos wird der Cursor ausgeblendet und
-   der native Zeiger übernimmt, damit kein Bild invertiert oder verändert wird.
+5. **Keine dauerhaften Effekte auf Bildern — eine Ausnahme.** Kein Hover-Zoom, kein
+   Schatten, kein Rahmen, kein `border-radius`, kein Ken-Burns-Effekt, kein Fade-in
+   beim Scrollen, kein dauerhafter Filter (`grayscale()`, `contrast()`, `sepia()`) —
+   die Bilder sind bereits schwarzweiss. **Einzige Ausnahme:** Beim Hovern invertiert
+   das Bild unter dem Zeiger kurzzeitig (`filter: invert(1)`) als Teil des
+   Cursor-Effekts (Abschnitt 4a). Nur mit JavaScript und feinem Zeiger; ohne
+   JavaScript bleiben die Bilder unangetastet. Die Invertierung ist bewusst und
+   temporär — kein dauerhafter Farbstich.
 6. **Der raue Ton kommt aus den Bildern, nicht aus dem Layout.** Die Seite ist
    weiss, ruhig und diszipliniert. Der einzige gestalterische Bruch ist die
    Monospace für Beschriftungen (Spezifikation 3.1). Diesen Bruch nicht an weiteren
@@ -103,19 +105,23 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
 
 **Was gebaut wird**
 
-- Ein kleiner Kreis folgt dem Zeiger und ersetzt ihn. `mix-blend-mode: difference`
-  invertiert ihn gegen den Untergrund (schwarz auf Weiss, weiss auf Dunkel).
+- Ein kleiner Kreis folgt dem Zeiger mit weichem Nachlauf und ersetzt ihn.
+  `mix-blend-mode: difference` invertiert ihn gegen den Untergrund (schwarz auf
+  Weiss, weiss auf Dunkel).
 - Interaktive Elemente (Links, Navigation) invertieren beim Hover ihre Farben —
   das ist reines CSS und funktioniert auch ohne JavaScript. Der Cursor vergrössert
   sich zusätzlich über ihnen.
+- Über Fotos schrumpft der Ball zu einem kleinen Punkt, und das Bild unter dem
+  Zeiger invertiert kurz (`filter: invert(1)`) — angelehnt an die Referenzseite.
 
 **Guardrails (verbindlich)**
 
 - **Progressive Enhancement.** Ohne JavaScript ist die Seite vollständig und
   unverändert bedienbar; der Cursor ist optional. Kein Framework, keine Astro-Island —
   ein einzelnes Vanilla-Skript, das das Element selbst erzeugt.
-- **Nie über den Fotos** (Regel 5 bleibt): über Bildern wird der Cursor ausgeblendet
-  und der native Zeiger übernimmt. Kein Bild wird invertiert oder verändert.
+- **Über Fotos** (Regel 5, Ausnahme): der grosse Ball schrumpft zu einem kleinen
+  Punkt, das Bild unter dem Zeiger invertiert kurz (`filter: invert(1)`). Nur mit
+  JavaScript und feinem Zeiger — ohne JavaScript bleiben die Bilder unangetastet.
 - **Nur bei feinem Zeiger** (`pointer: fine`). Auf Touch-Geräten passiert nichts,
   der native Zeiger wird dort nie versteckt.
 - **`prefers-reduced-motion`:** kein Nachlauf/Lerp, der Cursor folgt sofort.

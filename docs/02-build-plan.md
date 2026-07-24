@@ -71,7 +71,8 @@ Jede Phase enthält einen fertigen Prompt zum Einfügen in Claude Code.
 - [ ] Abstände: 15vh zwischen Serien auf der Startseite, 12vh zwischen Bildern auf
       der Serienseite, 48px auf Mobile
 - [ ] „Nächste Serie" verlinkt zyklisch, die letzte Serie zeigt auf die erste
-- [ ] Kein Hover-Effekt auf Bildern, kein Lightbox
+- [ ] Kein Hover-Effekt auf Bildern ausser der bewussten Cursor-Invertierung
+      (`filter: invert(1)` beim Hover, CLAUDE.md 4a/5), kein Lightbox
 - [ ] Ausgelieferte Seite enthält kein clientseitiges JavaScript ausser dem
       Cursor-Skript (Progressive Enhancement, CLAUDE.md 4a)
 
@@ -105,7 +106,8 @@ Jede Phase enthält einen fertigen Prompt zum Einfügen in Claude Code.
       glattgebügelt — im direkten Vergleich zur Quelldatei geprüft
 - [ ] Gewählte Qualitätsstufen samt Begründung im Repo dokumentiert
 - [ ] Befund zu Monochrom-Kodierung und AVIF-Korn-Synthese berichtet
-- [ ] Kein `filter` auf irgendeinem Bild im gesamten CSS
+- [ ] Kein `filter` auf Bildern ausser der bewussten Hover-Invertierung des
+      Cursor-Effekts (`filter: invert(1)`, CLAUDE.md 4a/5)
 - [ ] Jedes `<img>` hat `width`, `height`, `alt`
 - [ ] Erstes Bild der Startseite `eager` und `fetchpriority="high"`, alle anderen `lazy`
 - [ ] Kein ausgeliefertes Bild über 700 KB

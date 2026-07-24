@@ -76,6 +76,7 @@
   /* --- 4a. Invertierter Cursor (bewusste Ausnahme, siehe CLAUDE.md) --- */
   --cursor-groesse: 24px;
   --cursor-skala-aktiv: 1.8; /* Vergrösserung über interaktiven Elementen */
+  --cursor-skala-bild: 0.28; /* kleiner Punkt über Fotos */
   --cursor-skala-druck: 0.7; /* beim Klicken */
   --cursor-uebergang: 200ms; /* weicher Übergang der Grösse */
   --z-cursor: 9999;

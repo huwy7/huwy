@@ -235,13 +235,14 @@ const fussLinks = [
             cursor.classList.add('cursor--sichtbar');
           }
           const ziel = e.target instanceof Element ? e.target : null;
-          // Über Fotos: Cursor aus, nativer Zeiger übernimmt (Regel 5).
-          wurzel.classList.toggle('cursor-ueber-bild', !!(ziel && ziel.closest('img, picture')));
-          // Über interaktiven Elementen vergrössern.
-          cursor.classList.toggle(
-            'cursor--aktiv',
-            !!(ziel && ziel.closest('a, button, [role="button"], input, label, summary')),
+          const ueberBild = !!(ziel && ziel.closest('img, picture'));
+          const interaktiv = !!(
+            ziel && ziel.closest('a, button, [role="button"], input, label, summary')
           );
+          // Über Fotos: Ball schrumpft zum Punkt, das Bild invertiert (per CSS).
+          cursor.classList.toggle('cursor--auf-bild', ueberBild);
+          // Über interaktiven Elementen (aber nicht über Fotos) vergrössern.
+          cursor.classList.toggle('cursor--aktiv', interaktiv && !ueberBild);
           if (reduziert.matches) {
             istX = zielX;
             istY = zielY;
@@ -257,9 +258,10 @@ const fussLinks = [
         // Weicher Nachlauf; bei reduzierter Bewegung folgt der Cursor sofort.
         if (!reduziert.matches) {
           const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
+          const nachlauf = 0.15; // kleiner = weicherer, längerer Nachlauf
           const schritt = () => {
-            istX = lerp(istX, zielX, 0.2);
-            istY = lerp(istY, zielY, 0.2);
+            istX = lerp(istX, zielX, nachlauf);
+            istY = lerp(istY, zielY, nachlauf);
             platziere();
             requestAnimationFrame(schritt);
           };

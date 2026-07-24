@@ -58,6 +58,33 @@ h6 {
   line-height: inherit;
 }
 
+/* Seitentitel der Text- und Infoseiten (mono, wie ein Serientitel). Die
+   Spezifikation legt für diese Seiten keine eigene Grösse fest — bewusst am
+   Serientitel Serienseite orientiert (22px, Mobile 19px). */
+.seiten-titel {
+  font-family: var(--schrift-mono);
+  font-size: var(--groesse-22);
+  font-weight: var(--gewicht-400);
+  line-height: var(--zeilenhoehe-1-3);
+  font-variant-ligatures: none;
+  margin-block-end: var(--abstand-32);
+}
+
+@media (max-width: 768px) {
+  .seiten-titel {
+    font-size: var(--groesse-19);
+  }
+}
+
+/* Fliesstext: linksbündig, höchstens 60ch breit (Spezifikation 3.5). */
+.fliesstext {
+  max-width: var(--textbreite);
+}
+
+.fliesstext p + p {
+  margin-block-start: var(--abstand-16);
+}
+
 /* Links: schwarz und unterstrichen, keine Akzentfarbe (Spezifikation 2). */
 a {
   color: var(--farbe-text);

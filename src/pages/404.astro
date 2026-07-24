@@ -2,8 +2,10 @@
 import Basis from '../layouts/Basis.astro';
 ---
 
-<!-- Leere Hülle (Build-Plan Phase 1). Ein Satz und ein Link zurück zur
-     Startseite kommen in Phase 4 (Spezifikation 6.6). -->
+<!-- /404 (Spezifikation 6.6). Ein Satz, ein Link zurück zur Startseite. -->
 <Basis titel="Seite nicht gefunden — TODO_NAME">
-  <h1>Seite nicht gefunden</h1>
+  <h1 class="seiten-titel">Seite nicht gefunden</h1>
+  <div class="fliesstext">
+    <p>Diese Seite gibt es nicht. <a href="/">Zurück zur Startseite</a></p>
+  </div>
 </Basis>

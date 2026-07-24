@@ -1,9 +1,67 @@
 ---
+import { Image } from 'astro:assets';
 import Basis from '../layouts/Basis.astro';
+import portrait from '../assets/portrait.png';
 ---
 
-<!-- Leere Hülle (Build-Plan Phase 1). Zweispaltiges Layout mit Portrait und
-     Text kommt in Phase 4 (Spezifikation 6.3). -->
+<!-- /ueber (Spezifikation 6.3). Ab 768px zweispaltig: links Text, rechts
+     Portrait. Darunter 768px: Portrait oben, Text darunter. Der Text ist ein
+     Platzhalter und wird vom Betreiber ersetzt. -->
 <Basis titel="Über — TODO_NAME">
-  <h1>Über</h1>
+  <div class="ueber">
+    <div class="ueber-text">
+      <h1 class="seiten-titel">Über</h1>
+      <div class="fliesstext">
+        <p>
+          Platzhaltertext für die Über-Seite. Zwei bis vier Sätze über die
+          Fotografin oder den Fotografen, linksbündig und auf 60 Zeichen Breite
+          begrenzt.
+        </p>
+        <p>Dieser Text wird durch den echten Über-Text ersetzt, sobald er vorliegt.</p>
+      </div>
+    </div>
+
+    <div class="ueber-portrait">
+      <Image
+        src={portrait}
+        alt="Platzhalterbild – Portrait"
+        widths={[400, 640, 960, 1280]}
+        sizes="(min-width: 768px) 40vw, 100vw"
+        loading="eager"
+      />
+    </div>
+  </div>
 </Basis>
+
+<style>
+  /* Mobile: eine Spalte, Portrait oben (Spezifikation 6.3). */
+  .ueber {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-32);
+  }
+
+  .ueber-portrait {
+    order: -1;
+  }
+
+  .ueber-portrait :global(img) {
+    width: 100%;
+  }
+
+  /* Ab 768px: zwei Spalten, links Text (60ch), rechts Portrait. */
+  @media (min-width: 768px) {
+    .ueber {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--abstand-48);
+    }
+    .ueber-text {
+      flex: 0 1 var(--textbreite);
+    }
+    .ueber-portrait {
+      order: 0;
+      flex: 1 1 0;
+    }
+  }
+</style>

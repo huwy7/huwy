@@ -1,0 +1,50 @@
+# Sveltia CMS — Konfiguration gegen die Collection aus Spezifikation 7.
+#
+# ACHTUNG (Build-Plan Phase 6): Der GitHub-Backend braucht einen OAuth-Vermittler.
+# Das aktuelle Verfahren konnte aus der Bau-Umgebung nicht gegen die Sveltia-Doku
+# verifiziert werden (Doku nicht erreichbar). Vor dem Live-Gang die aktuelle
+# Sveltia-Dokumentation zum GitHub-Backend prüfen und den OAuth-Schritt einrichten
+# (GitHub-OAuth-App + Vermittler). Siehe docs/cms.md.
+
+backend:
+  name: github
+  repo: huwy7/huwy # TODO: bei Bedarf auf die produktive Repo anpassen
+  branch: main
+  # base_url / auth_endpoint des OAuth-Vermittlers hier ergänzen, sobald der
+  # Vermittler nach aktueller Sveltia-Doku eingerichtet ist.
+
+# Fallback-Medienordner; die eigentliche Ablage regelt die Collection pro Serie.
+media_folder: src/assets/serien
+public_folder: /src/assets/serien
+
+collections:
+  - name: serien
+    label: Serien
+    label_singular: Serie
+    folder: src/content/serien
+    create: true
+    slug: '{{slug}}'
+    # Bilder pro Serie relativ zur Markdown-Datei — passt zu astro:assets, das die
+    # Bildpfade relativ zur Content-Datei auflöst (Spezifikation 8).
+    media_folder: '../../assets/serien/{{slug}}'
+    public_folder: '../../assets/serien/{{slug}}'
+    fields:
+      - { name: titel, label: Titel, widget: string }
+      - { name: jahr, label: Jahr, widget: number, value_type: int }
+      - {
+          name: reihenfolge,
+          label: Reihenfolge (Sortierung Startseite),
+          widget: number,
+          value_type: int,
+        }
+      - { name: titelbild, label: Titelbild (3:2), widget: image }
+      - { name: titelbildAlt, label: Titelbild — Alt-Text, widget: string }
+      - name: bilder
+        label: Bilder
+        label_singular: Bild
+        widget: list
+        min: 1
+        fields:
+          - { name: datei, label: Datei, widget: image }
+          - { name: alt, label: Alt-Text, widget: string }
+      - { name: body, label: Einleitungstext, widget: markdown }

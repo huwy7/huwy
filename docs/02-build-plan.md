@@ -72,7 +72,8 @@ Jede Phase enthält einen fertigen Prompt zum Einfügen in Claude Code.
       der Serienseite, 48px auf Mobile
 - [ ] „Nächste Serie" verlinkt zyklisch, die letzte Serie zeigt auf die erste
 - [ ] Kein Hover-Effekt auf Bildern, kein Lightbox
-- [ ] Ausgelieferte Seite enthält kein clientseitiges JavaScript
+- [ ] Ausgelieferte Seite enthält kein clientseitiges JavaScript ausser dem
+      Cursor-Skript (Progressive Enhancement, CLAUDE.md 4a)
 
 ---
 
@@ -144,6 +145,7 @@ Jede Phase enthält einen fertigen Prompt zum Einfügen in Claude Code.
 - [ ] Impressum und Datenschutzerklärung mit echten Texten gefüllt
 - [ ] `sitemap.xml` erreichbar und vollständig
 - [ ] Seite ohne JavaScript im Browser aufgerufen — sie muss vollständig funktionieren
+      (der invertierte Cursor aus CLAUDE.md 4a ist optionale Progressive Enhancement)
 
 ---
 

@@ -66,16 +66,20 @@ eigenmächtig ersetzen.
 
 1. **Keine neue Dependency ohne Rückfrage.** Ausnahmen: nichts. Auch keine
    Utility-Bibliothek, kein Icon-Paket, kein Animationsframework, kein Lightbox-Plugin.
-2. **Kein React, Vue, Svelte, Solid.** Keine Astro-Islands. Die ausgelieferte Seite
-   enthält kein clientseitiges JavaScript, ausser dort, wo diese Doku es ausdrücklich
-   erlaubt (aktuell: nirgends).
+2. **Kein React, Vue, Svelte, Solid, keine Astro-Islands.** Die ausgelieferte Seite
+   enthält grundsätzlich kein clientseitiges JavaScript. **Einzige erlaubte Ausnahme:**
+   ein einzelnes, framework-freies Vanilla-Skript für den invertierten Cursor
+   (Abschnitt 4a). Es ist reine Progressive Enhancement — ohne JavaScript funktioniert
+   die Seite vollständig und unverändert.
 3. **Jedes Bild läuft über `astro:assets`.** Nie ein rohes `<img src="/foto.jpg">`.
 4. **Jedes Bild braucht ein `alt`.** Leeres `alt=""` nur bei rein dekorativen Bildern —
    in diesem Projekt existieren keine.
 5. **Keine Effekte auf Bildern.** Kein Hover-Zoom, kein Schatten, kein Rahmen, kein
    `border-radius`, kein Filter, kein Ken-Burns-Effekt, kein Fade-in beim Scrollen.
    Insbesondere kein `filter: grayscale()`, `contrast()` oder `sepia()` — die Bilder
-   sind bereits schwarzweiss, die Seite verändert sie nicht.
+   sind bereits schwarzweiss, die Seite verändert sie nicht. Diese Regel bleibt auch
+   mit dem invertierten Cursor bestehen: über Fotos wird der Cursor ausgeblendet und
+   der native Zeiger übernimmt, damit kein Bild invertiert oder verändert wird.
 6. **Der raue Ton kommt aus den Bildern, nicht aus dem Layout.** Die Seite ist
    weiss, ruhig und diszipliniert. Der einzige gestalterische Bruch ist die
    Monospace für Beschriftungen (Spezifikation 3.1). Diesen Bruch nicht an weiteren
@@ -88,6 +92,36 @@ eigenmächtig ersetzen.
 10. **Kein Rechtsklick-Blocker, kein `user-select: none`, kein Wasserzeichen-Overlay.**
 11. **Bildwirkung vor Dateigrösse.** Wird ein Performance-Budget gerissen, ist die
     Antwort eine kleinere Ausgangsauflösung, niemals stärkere Kompression.
+
+---
+
+## 4a. Invertierter Cursor (bewusste Ausnahme)
+
+Bewusste Entscheidung des Betreibers, die Doktrin aus Regel 2 punktuell zu lockern.
+Der invertierte Cursor ist die **einzige** erlaubte Stelle mit clientseitigem
+JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt.
+
+**Was gebaut wird**
+
+- Ein kleiner Kreis folgt dem Zeiger und ersetzt ihn. `mix-blend-mode: difference`
+  invertiert ihn gegen den Untergrund (schwarz auf Weiss, weiss auf Dunkel).
+- Interaktive Elemente (Links, Navigation) invertieren beim Hover ihre Farben —
+  das ist reines CSS und funktioniert auch ohne JavaScript. Der Cursor vergrössert
+  sich zusätzlich über ihnen.
+
+**Guardrails (verbindlich)**
+
+- **Progressive Enhancement.** Ohne JavaScript ist die Seite vollständig und
+  unverändert bedienbar; der Cursor ist optional. Kein Framework, keine Astro-Island —
+  ein einzelnes Vanilla-Skript, das das Element selbst erzeugt.
+- **Nie über den Fotos** (Regel 5 bleibt): über Bildern wird der Cursor ausgeblendet
+  und der native Zeiger übernimmt. Kein Bild wird invertiert oder verändert.
+- **Nur bei feinem Zeiger** (`pointer: fine`). Auf Touch-Geräten passiert nichts,
+  der native Zeiger wird dort nie versteckt.
+- **`prefers-reduced-motion`:** kein Nachlauf/Lerp, der Cursor folgt sofort.
+- Regel 10 bleibt: kein `user-select: none`, kein Rechtsklick-Blocker.
+- Der native Zeiger wird nur versteckt, solange JavaScript aktiv und der Zeiger fein
+  ist.
 
 ---
 

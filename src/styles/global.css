@@ -64,6 +64,18 @@ a {
   text-decoration: underline;
 }
 
+/* Invertierender Hover auf Textlinks (CLAUDE.md 4a) — reines CSS, ohne JS.
+   Nur mit feinem Zeiger, damit auf Touch kein klebriger :hover-Zustand bleibt.
+   Vorschaukarten (.serien-link) und Wortmarke sind ausgenommen; die Bilder
+   bleiben unangetastet (Regel 5). */
+@media (hover: hover) and (pointer: fine) {
+  a:hover:not(.serien-link):not(.wortmarke) {
+    background-color: var(--farbe-text);
+    color: var(--farbe-hintergrund);
+    text-decoration: none;
+  }
+}
+
 /* Sichtbarer Fokusring (Spezifikation 9). */
 :focus-visible {
   outline: var(--fokus-breite) solid var(--farbe-text);
@@ -82,6 +94,58 @@ a {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* --- Invertierter Cursor (CLAUDE.md 4a) ---
+   Das Element wird per JavaScript erzeugt; ohne JS existiert es nicht und der
+   native Zeiger bleibt unangetastet. */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.cursor--sichtbar {
+  opacity: 1;
+}
+
+.cursor__punkt {
+  display: block;
+  width: var(--cursor-groesse);
+  height: var(--cursor-groesse);
+  margin-left: calc(var(--cursor-groesse) / -2);
+  margin-top: calc(var(--cursor-groesse) / -2);
+  border-radius: 50%; /* Kreis, kein Bild — Regel 5 betrifft nur Bilder */
+  background-color: var(--farbe-hintergrund);
+  mix-blend-mode: difference; /* invertiert gegen den Untergrund */
+  transition: transform var(--cursor-uebergang) ease;
+}
+
+.cursor--aktiv .cursor__punkt {
+  transform: scale(var(--cursor-skala-aktiv));
+}
+
+.cursor--druck .cursor__punkt {
+  transform: scale(var(--cursor-skala-druck));
+}
+
+/* Nativen Zeiger nur verstecken, solange das Cursor-Skript aktiv ist. */
+html.cursor-aktiv,
+html.cursor-aktiv * {
+  cursor: none;
+}
+
+/* Über Fotos: Cursor aus, nativer Zeiger übernimmt (Regel 5 bleibt). */
+html.cursor-ueber-bild .cursor {
+  opacity: 0;
+}
+
+html.cursor-aktiv.cursor-ueber-bild :is(img, picture) {
+  cursor: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

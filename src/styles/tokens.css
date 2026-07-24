@@ -72,4 +72,11 @@
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */
   --rhythmus-block: 12vh; /* 6.2 Abstand zwischen Blöcken/Bildern der Serienseite */
+
+  /* --- 4a. Invertierter Cursor (bewusste Ausnahme, siehe CLAUDE.md) --- */
+  --cursor-groesse: 24px;
+  --cursor-skala-aktiv: 1.8; /* Vergrösserung über interaktiven Elementen */
+  --cursor-skala-druck: 0.7; /* beim Klicken */
+  --cursor-uebergang: 200ms; /* weicher Übergang der Grösse */
+  --z-cursor: 9999;
 }

@@ -191,5 +191,81 @@ const fussLinks = [
         color: var(--farbe-text-leise);
       }
     </style>
+
+    <script>
+      // Invertierter Cursor — Progressive Enhancement (CLAUDE.md 4a).
+      // Einziges clientseitiges Skript. Ohne JavaScript passiert nichts.
+      const feinerZeiger = window.matchMedia('(pointer: fine)');
+      if (feinerZeiger.matches) {
+        const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const wurzel = document.documentElement;
+
+        const cursor = document.createElement('div');
+        cursor.className = 'cursor';
+        cursor.setAttribute('aria-hidden', 'true');
+        const punkt = document.createElement('span');
+        punkt.className = 'cursor__punkt';
+        cursor.appendChild(punkt);
+        document.body.appendChild(cursor);
+        wurzel.classList.add('cursor-aktiv');
+
+        let zielX = window.innerWidth / 2;
+        let zielY = window.innerHeight / 2;
+        let istX = zielX;
+        let istY = zielY;
+        let sichtbar = false;
+
+        const platziere = () => {
+          cursor.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;
+        };
+
+        const verstecke = () => {
+          sichtbar = false;
+          cursor.classList.remove('cursor--sichtbar');
+        };
+
+        window.addEventListener('pointermove', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          zielX = e.clientX;
+          zielY = e.clientY;
+          if (!sichtbar) {
+            sichtbar = true;
+            istX = zielX;
+            istY = zielY;
+            cursor.classList.add('cursor--sichtbar');
+          }
+          const ziel = e.target instanceof Element ? e.target : null;
+          // Über Fotos: Cursor aus, nativer Zeiger übernimmt (Regel 5).
+          wurzel.classList.toggle('cursor-ueber-bild', !!(ziel && ziel.closest('img, picture')));
+          // Über interaktiven Elementen vergrössern.
+          cursor.classList.toggle(
+            'cursor--aktiv',
+            !!(ziel && ziel.closest('a, button, [role="button"], input, label, summary')),
+          );
+          if (reduziert.matches) {
+            istX = zielX;
+            istY = zielY;
+            platziere();
+          }
+        });
+
+        window.addEventListener('pointerdown', () => cursor.classList.add('cursor--druck'));
+        window.addEventListener('pointerup', () => cursor.classList.remove('cursor--druck'));
+        document.addEventListener('mouseleave', verstecke);
+        window.addEventListener('blur', verstecke);
+
+        // Weicher Nachlauf; bei reduzierter Bewegung folgt der Cursor sofort.
+        if (!reduziert.matches) {
+          const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
+          const schritt = () => {
+            istX = lerp(istX, zielX, 0.2);
+            istY = lerp(istY, zielY, 0.2);
+            platziere();
+            requestAnimationFrame(schritt);
+          };
+          requestAnimationFrame(schritt);
+        }
+      }
+    </script>
   </body>
 </html>

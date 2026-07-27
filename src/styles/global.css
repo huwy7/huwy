@@ -85,9 +85,25 @@ picture > source {
   }
 }
 
-/* Vorschaubild der Startseite: volle Containerbreite (Spezifikation 6.1). */
+/* Vorschaubild der Startseite: das Bild gibt sein Seitenverhältnis selbst vor
+   (kein fester Zuschnitt mehr — maximale Freiheit beim Upload). Querformat nutzt
+   die volle Breite, Hochformat wird durch die Höhe begrenzt und zentriert, damit
+   jedes Titelbild ganz sichtbar bleibt. Der weisse Rahmen legt sich um das jeweils
+   entstehende Bild. */
 .vorschau-bild {
-  width: 100%;
+  max-width: 100%;
+  max-height: var(--vorschau-max-hoehe);
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
+
+@media (max-width: 768px) {
+  /* Mobile: volle Breite, Höhe folgt dem Bild. */
+  .vorschau-bild {
+    max-height: none;
+    width: 100%;
+  }
 }
 
 /* Weisses Passepartout um jedes Bild (bewusste Entscheidung, CLAUDE.md 1a):

@@ -72,6 +72,7 @@
   --textbreite: 60ch; /* 3.5 Zeilenlänge Fliesstext */
   --rahmen-breite: 16px; /* weisses Passepartout um jedes Bild */
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
+  --vorschau-max-hoehe: 72vh; /* Deckel für Titelbilder der Startseite (Hochformat) */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */
   --rhythmus-block: 12vh; /* 6.2 Abstand zwischen Blöcken/Bildern der Serienseite */
 

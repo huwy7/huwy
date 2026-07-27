@@ -33,7 +33,12 @@ collections:
           widget: number,
           value_type: int,
         }
-      - { name: titelbild, label: Titelbild (3:2), widget: image }
+      - {
+          name: titelbild,
+          label: Titelbild,
+          widget: image,
+          hint: "Beliebiges Format — quer, hoch oder quadratisch. Das Bild gibt sein Seitenverhältnis selbst vor, es wird nicht zugeschnitten.",
+        }
       - { name: titelbildAlt, label: Titelbild — Alt-Text, widget: string }
       - name: bilder
         label: Bilder
@@ -41,6 +46,11 @@ collections:
         widget: list
         min: 1
         fields:
-          - { name: datei, label: Datei, widget: image }
+          - {
+              name: datei,
+              label: Datei,
+              widget: image,
+              hint: "Beliebiges Format — jedes Bild behält sein eigenes Seitenverhältnis.",
+            }
           - { name: alt, label: Alt-Text, widget: string }
       - { name: body, label: Einleitungstext, widget: markdown }

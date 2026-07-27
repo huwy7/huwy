@@ -15,10 +15,15 @@ Damit werden AVIF und WebP ausgeliefert, JPEG als Fallback (Spezifikation 5.4).
 
 Zwei Modi:
 
-- **responsiv** (`widths` + `sizes`): Seitenverhältnis bleibt erhalten
-  (Serienbilder, Portrait).
-- **Crop** (`breite` + `hoehe` + `densities`): fester Zuschnitt, für die
-  3:2-Vorschau der Startseite (Spezifikation 5.2).
+- **responsiv** (`widths` + `sizes`): Seitenverhältnis bleibt erhalten. Wird für
+  **alle** Bilder verwendet — Serienbilder wie Titelbilder der Startseite. Jedes
+  Bild gibt sein Seitenverhältnis selbst vor (quer, hoch oder quadratisch); nichts
+  wird zugeschnitten. Hochformat-Titelbilder werden auf der Startseite über die
+  Höhe gedeckelt (`--vorschau-max-hoehe`) und zentriert.
+- **Crop** (`breite` + `hoehe` + `densities`): fester Zuschnitt. Auf der Seite
+  selbst nicht mehr im Einsatz; der Modus bleibt in `Bild.astro` erhalten, das
+  Open-Graph-Vorschaubild (1200×630) erzeugt die Serienseite direkt über
+  `getImage`.
 
 `srcset`-Breiten: 640, 960, 1280, 1600, 2000 (Spezifikation 5.4). Breiten über
 der Quellauflösung werden herausgefiltert (kein Upscaling).

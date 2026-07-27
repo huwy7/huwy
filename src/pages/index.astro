@@ -23,9 +23,8 @@ const serien = (await getCollection('serien')).sort(
               class="vorschau-bild"
               src={serie.data.titelbild}
               alt={serie.data.titelbildAlt}
-              breite={1200}
-              hoehe={800}
-              densities={[1, 2]}
+              widths={[640, 960, 1280, 1600, 2000]}
+              sizes="(max-width: 768px) 100vw, 1088px"
               loading={i === 0 ? 'eager' : 'lazy'}
               fetchpriority={i === 0 ? 'high' : undefined}
             />
@@ -59,7 +58,8 @@ const serien = (await getCollection('serien')).sort(
   }
 
   /* Vorschaubild (.vorschau-bild) steht global — das <img> kommt aus der
-     Bild-Komponente. 3:2 serverseitig zugeschnitten, volle Containerbreite. */
+     Bild-Komponente. Kein Zuschnitt: das Titelbild behält sein eigenes
+     Seitenverhältnis (Höhe gedeckelt, siehe global.css). */
 
   /* 32px zwischen Bild und Beschriftung (Spezifikation 6.1). */
   .serien-meta {

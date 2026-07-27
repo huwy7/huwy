@@ -167,10 +167,11 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
   sich zusätzlich über ihnen.
 - Über Fotos schrumpft der Ball zu einem kleinen Punkt, und das Bild unter dem
   Zeiger invertiert kurz (`filter: invert(1)`) — angelehnt an die Referenzseite.
-- Auf Touch-Geräten (kein Cursor) hinterlässt die Berührung einen invertierenden
-  Schweif: eine transparente Schicht mit `backdrop-filter: invert(1)` (keine
-  Füllfarbe), per Maske entlang der Bewegung freigegeben, interpoliert (glatt),
-  mit Nachlauf und schnellem Verblassen.
+- Auf Touch-Geräten (kein Cursor) invertiert die Berührung den Untergrund: eine
+  transparente Schicht mit `backdrop-filter: invert(1)` (keine Füllfarbe), per
+  Maske als **hart abgegrenzter Kreis** freigegeben, der mit der Bewegung zur
+  Kapsel wird (länger mit der Bewegung) und beim Stoppen hart zurückweicht —
+  kein weicher Verlauf, kein Verblassen (raw/industrial).
 
 **Guardrails (verbindlich)**
 

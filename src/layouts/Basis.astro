@@ -266,11 +266,15 @@ const name = 'TODO_NAME';
             laeuft = false;
             return;
           }
+          // Hart abgegrenzte Kreise (raw/industrial): solide bis zum Radius,
+          // dann harte Kante — kein weicher Verlauf, keine Alpha-Verblassung.
+          // Überlappende, interpolierte Kreise ergeben eine harte Kapsel, die
+          // mit der Bewegung länger wird und beim Stoppen hart zurückweicht.
           const maske = punkte
-            .map((p) => {
-              const a = Math.max(0, 1 - (jetzt - p.t) / DAUER);
-              return `radial-gradient(circle ${RADIUS}px at ${p.x}px ${p.y}px, rgba(0,0,0,${a.toFixed(3)}) 0%, rgba(0,0,0,0) 70%)`;
-            })
+            .map(
+              (p) =>
+                `radial-gradient(circle ${RADIUS}px at ${p.x}px ${p.y}px, #000 0%, #000 100%, rgba(0,0,0,0) 100%)`,
+            )
             .join(', ');
           setzeMaske(maske);
           requestAnimationFrame(bauen);

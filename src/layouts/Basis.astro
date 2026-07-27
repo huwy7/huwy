@@ -2,6 +2,8 @@
 import '../styles/tokens.css';
 import '../styles/schriften.css';
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import torBild from '../assets/tor.jpeg';
 
 interface Props {
   titel: string;
@@ -11,6 +13,13 @@ interface Props {
 }
 
 const { titel, beschreibung, ogBild } = Astro.props;
+
+// Hintergrund des Zugangs-Tors: das raue Schwarzweiss-Foto (grain, düster —
+// CLAUDE.md 1a) füllt den Bildschirm formatunabhängig (cover). Optimiert über
+// astro:assets zu AVIF/WebP; per image-set wählt der Browser das kleinste Format.
+const torAvif = await getImage({ src: torBild, format: 'avif', quality: 62 });
+const torWebp = await getImage({ src: torBild, format: 'webp', quality: 80 });
+const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url("${torWebp.src}") type("image/webp"))`;
 
 // Absolute URLs für Kanonik und Open Graph.
 const kanonisch = new URL(Astro.url.pathname, Astro.site);
@@ -53,7 +62,7 @@ const name = 'TODO_NAME';
   <body>
     <!-- Zugangs-Tor (Platzhalter). ACHTUNG: kein echter Schutz auf einer statischen
          Seite — nur eine sichtbare Sperre gegen zufällige Besucher. Siehe docs. -->
-    <div id="tor">
+    <div id="tor" style={`--tor-bg: ${torHintergrund}`}>
       <form id="tor-form" autocomplete="off">
         <input id="tor-code" type="password" autocomplete="off" aria-label="Zugangscode" />
       </form>
@@ -75,7 +84,11 @@ const name = 'TODO_NAME';
         padding-block: var(--abstand-64);
       }
 
-      /* Zugangs-Tor (Platzhalter, weiss mit Eingabefeld mittig). Feinschliff folgt. */
+      /* Zugangs-Tor: das raue Schwarzweiss-Foto füllt den Bildschirm (cover),
+         formatunabhängig zentriert. Darüber ein weicher, mittiger Dunkel-Schleier,
+         damit das Eingabefeld auch über hellen Bildpartien (Zähne) lesbar bleibt —
+         der Rand des Fotos bleibt kräftig. Fällt image-set aus, greift die
+         near-black Grundfarbe. */
       #tor {
         position: fixed;
         inset: 0;
@@ -84,6 +97,17 @@ const name = 'TODO_NAME';
         align-items: center;
         justify-content: center;
         background-color: var(--farbe-hintergrund);
+        background-image:
+          radial-gradient(
+            ellipse at center,
+            rgba(0, 0, 0, 0.62) 0%,
+            rgba(0, 0, 0, 0.2) 45%,
+            rgba(0, 0, 0, 0) 72%
+          ),
+          var(--tor-bg);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
       html[data-tor='auf'] #tor {
         display: none;

@@ -53,9 +53,12 @@ const name = 'TODO_NAME';
     <meta name="twitter:card" content={ogBildAbsolut ? 'summary_large_image' : 'summary'} />
 
     <script is:inline>
-      // Zugangs-Tor: schon freigeschaltet? Dann sofort ausblenden (kein Aufblitzen).
+      // Zugangs-Tor: in dieser Sitzung schon freigeschaltet? Dann sofort ausblenden
+      // (kein Aufblitzen). sessionStorage statt localStorage — die Freischaltung gilt
+      // nur für den aktuellen Besuch (Tab/Sitzung). Bei jedem neuen Aufruf der Seite
+      // wird der Code wieder verlangt.
       try {
-        if (localStorage.getItem('tor') === 'auf') document.documentElement.dataset.tor = 'auf';
+        if (sessionStorage.getItem('tor') === 'auf') document.documentElement.dataset.tor = 'auf';
       } catch (e) {}
     </script>
   </head>
@@ -151,7 +154,10 @@ const name = 'TODO_NAME';
         if (!torCode) return;
         if ((await sha256(torCode.value)) === TOR_HASH) {
           try {
-            localStorage.setItem('tor', 'auf');
+            // Nur für den aktuellen Besuch merken (sessionStorage) — beim nächsten
+            // Aufruf der Seite ist der Code erneut nötig. Erlaubt aber das Navigieren
+            // zwischen Start- und Serienseiten innerhalb desselben Besuchs.
+            sessionStorage.setItem('tor', 'auf');
           } catch (err) {}
           document.documentElement.dataset.tor = 'auf';
         } else {

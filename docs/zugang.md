@@ -2,9 +2,13 @@
 
 ## Aktueller Stand (Platzhalter)
 
-Auf jeder Seite liegt ein weisses Tor mit einem Eingabefeld. Erst nach Eingabe des
-Codes wird der Inhalt sichtbar; die Freischaltung merkt sich der Browser
-(`localStorage`). Code ist als SHA-256-Hash im Skript hinterlegt (`Basis.astro`).
+Auf jeder Seite liegt ein Tor mit einem Eingabefeld. Erst nach Eingabe des
+Codes wird der Inhalt sichtbar; die Freischaltung merkt sich der Browser nur für
+den **aktuellen Besuch** (`sessionStorage`). Bei jedem neuen Aufruf der Seite
+(neuer Tab, Browser geschlossen und wieder geöffnet) wird der Code erneut
+verlangt — innerhalb eines Besuchs kann man aber zwischen Start- und Serienseiten
+wechseln, ohne ihn erneut einzugeben. Code ist als SHA-256-Hash im Skript
+hinterlegt (`Basis.astro`).
 
 **Platzhalter-Code:** `sesam`. Zum Ändern: neuen SHA-256-Hash bilden und `TOR_HASH`
 in `src/layouts/Basis.astro` ersetzen (oder mir den gewünschten Code sagen, ich

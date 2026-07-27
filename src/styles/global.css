@@ -75,6 +75,18 @@ picture > source {
   width: 100%;
 }
 
+/* Weisses Passepartout um jedes Bild (bewusste Entscheidung, CLAUDE.md 1a):
+   hebt das Bild vom Hintergrund ab. Der Rahmen umschliesst das Bild, der
+   Bildinhalt selbst bleibt unverändert. Die feine Linie macht ihn auch auf
+   weissem Grund sichtbar; auf dunklem Grund wirkt das weisse Passepartout. */
+.serie-bild,
+.vorschau-bild {
+  box-sizing: border-box;
+  background-color: var(--farbe-hintergrund);
+  padding: var(--rahmen-breite);
+  border: var(--linie-staerke) solid var(--farbe-linie);
+}
+
 /* Höhe aus dem Seitenverhältnis, nicht aus dem height-Attribut (sonst
    verzerren die width/height-Attribute das Bild bei responsiver Breite). */
 img {

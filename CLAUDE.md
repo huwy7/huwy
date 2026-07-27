@@ -62,6 +62,17 @@ Konkret:
 - **Nichts Dekoratives, nichts Liebliches.** Reduktion, Härte, Rohheit,
   industrielle/techno Kälte.
 
+**Gilt ausdrücklich NICHT für die Bilder.** Die Mood-/Stil-Vorgaben beschreiben
+Seite und Interaktion, **nicht** die Fotos. Die Bilder sind die eigenen, vom
+Betreiber **vor dem Hochladen selbst bearbeiteten Originale** und werden
+**unverändert** übernommen — kein Effekt, kein Filter, keine Stil-Verarbeitung,
+kein Korn-Overlay, keine Anpassung an die Mood. Einzige, bewusst gewollte und nur
+**temporäre** Ausnahme: die interaktive Invertierung unter Cursor/Touch
+(Abschnitt 4a). Damit die dunklen, körnigen Bilder sich vom Hintergrund abheben,
+liegt ein **weisser Rahmen (Passepartout)** um jedes Bild — der Rahmen ist Chrome
+*um* das Bild, kein Eingriff *in* den Bildinhalt (auch kein Polaroid-/Filmrand,
+der bleibt Nicht-Ziel).
+
 > **Offene Spannung — bewusst festhalten:** Die frühere Doktrin beschreibt die
 > Seite als „weiss, ruhig, diszipliniert"; der raue Ton kam absichtlich nur aus
 > den Bildern (Spezifikation 1, Regel 6). Diese düstere Richtung legt nahe, dass
@@ -115,10 +126,12 @@ eigenmächtig ersetzen.
 3. **Jedes Bild läuft über `astro:assets`.** Nie ein rohes `<img src="/foto.jpg">`.
 4. **Jedes Bild braucht ein `alt`.** Leeres `alt=""` nur bei rein dekorativen Bildern —
    in diesem Projekt existieren keine.
-5. **Keine dauerhaften Effekte auf Bildern — eine Ausnahme.** Kein Hover-Zoom, kein
-   Schatten, kein Rahmen, kein `border-radius`, kein Ken-Burns-Effekt, kein Fade-in
+5. **Keine dauerhaften Effekte auf dem Bildinhalt — eine Ausnahme.** Kein Hover-Zoom,
+   kein Schatten, kein `border-radius`, kein Ken-Burns-Effekt, kein Fade-in
    beim Scrollen, kein dauerhafter Filter (`grayscale()`, `contrast()`, `sepia()`) —
-   die Bilder sind bereits schwarzweiss. **Einzige Ausnahme:** Beim Hovern invertiert
+   die Bilder sind bereits so, wie der Betreiber sie hochlädt. (Der weisse
+   Passepartout-Rahmen aus Abschnitt 1a ist gewollt: er umschliesst das Bild, ohne
+   den Bildinhalt anzutasten.) **Einzige Ausnahme:** Beim Hovern invertiert
    das Bild unter dem Zeiger kurzzeitig (`filter: invert(1)`) als Teil des
    Cursor-Effekts (Abschnitt 4a). Nur mit JavaScript und feinem Zeiger; ohne
    JavaScript bleiben die Bilder unangetastet. Die Invertierung ist bewusst und

@@ -69,6 +69,7 @@
   /* --- 3.5 / 5.1 / 6. Zeilenlänge, Bildnormierung, vertikaler Rhythmus ---
      Vertikale Abstände zwischen grossen Blöcken in vh (Spezifikation 4). */
   --textbreite: 60ch; /* 3.5 Zeilenlänge Fliesstext */
+  --rahmen-breite: 16px; /* weisses Passepartout um jedes Bild */
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */
   --rhythmus-block: 12vh; /* 6.2 Abstand zwischen Blöcken/Bildern der Serienseite */

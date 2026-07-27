@@ -102,6 +102,8 @@ const name = 'TODO_NAME';
         caret-color: var(--farbe-text);
         font-variant-ligatures: none;
       }
+      /* Der Touch-Schweif (.spur / .spur__punkt) steht in global.css — die
+         Punkte werden per JS erzeugt und tragen kein Astro-Scope-Attribut. */
     </style>
 
     <script>
@@ -210,6 +212,48 @@ const name = 'TODO_NAME';
           };
           requestAnimationFrame(schritt);
         }
+      }
+    </script>
+
+    <script>
+      // Invertierter Touch-Schweif — für Touch-Geräte (kein Cursor dort).
+      // Bei Berührung/Bewegung entstehen invertierende Punkte, die schnell
+      // verblassen und der Bewegung als Schweif nachziehen. Reine Zutat.
+      const touchGeraet =
+        window.matchMedia('(pointer: coarse)').matches ||
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0;
+      const spurReduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      if (touchGeraet && !spurReduziert.matches) {
+        const schicht = document.createElement('div');
+        schicht.className = 'spur';
+        schicht.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(schicht);
+
+        const tupfen = (x: number, y: number) => {
+          const punkt = document.createElement('span');
+          punkt.className = 'spur__punkt';
+          punkt.style.left = `${x}px`;
+          punkt.style.top = `${y}px`;
+          punkt.addEventListener('animationend', () => punkt.remove());
+          schicht.appendChild(punkt);
+        };
+
+        let letzteZeit = 0;
+        const beruehrung = (e: TouchEvent) => {
+          const jetzt = performance.now();
+          if (jetzt - letzteZeit < 16) return; // drosseln (~60/s)
+          letzteZeit = jetzt;
+          for (let i = 0; i < e.touches.length; i++) {
+            const t = e.touches[i];
+            tupfen(t.clientX, t.clientY);
+          }
+        };
+
+        // passive: true — Scrollen wird nicht blockiert.
+        window.addEventListener('touchstart', beruehrung, { passive: true });
+        window.addEventListener('touchmove', beruehrung, { passive: true });
       }
     </script>
   </body>

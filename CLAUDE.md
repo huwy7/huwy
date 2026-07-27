@@ -125,6 +125,9 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
   sich zusätzlich über ihnen.
 - Über Fotos schrumpft der Ball zu einem kleinen Punkt, und das Bild unter dem
   Zeiger invertiert kurz (`filter: invert(1)`) — angelehnt an die Referenzseite.
+- Auf Touch-Geräten (kein Cursor) hinterlässt die Berührung einen kurz
+  invertierenden Schweif (`mix-blend-mode: difference`), der der Bewegung mit
+  leichtem Nachlauf folgt und schnell verblasst.
 
 **Guardrails (verbindlich)**
 

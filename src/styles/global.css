@@ -214,6 +214,39 @@ html.cursor-aktiv img:hover {
   filter: invert(1);
 }
 
+/* --- Invertierter Touch-Schweif (CLAUDE.md 4a) ---
+   Punkte werden per JavaScript erzeugt (nur auf Touch-Geräten) und tragen kein
+   Astro-Scope-Attribut — die Regeln stehen deshalb global. */
+.spur {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-spur);
+  pointer-events: none;
+}
+
+.spur__punkt {
+  position: absolute;
+  width: var(--spur-groesse);
+  height: var(--spur-groesse);
+  margin-left: calc(var(--spur-groesse) / -2);
+  margin-top: calc(var(--spur-groesse) / -2);
+  border-radius: 50%;
+  background-color: var(--farbe-hintergrund);
+  mix-blend-mode: difference; /* invertiert die berührte Stelle */
+  animation: spur-verblassen var(--spur-dauer) ease-out forwards;
+}
+
+@keyframes spur-verblassen {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

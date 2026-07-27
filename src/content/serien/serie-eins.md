@@ -1,22 +1,18 @@
 ---
-# Platzhalter-Serie (Build-Plan Phase 2). Titel und Jahr durch TODO_SERIEN
-# ersetzen; graue Platzhalterbilder durch echte Aufnahmen ersetzen.
-titel: "Beispielserie eins"
+titel: Beispielserie eins
 jahr: 2023
 reihenfolge: 1
-titelbild: ../../assets/serien/serie-eins/titel.png
-titelbildAlt: "Platzhalterbild – Querformat 3:2"
+titelbild: ../../assets/serien/serie-eins/_DSF7108.jpeg
+titelbildAlt: Platzhalterbild – Querformat 3:2
 bilder:
-  - datei: ../../assets/serien/serie-eins/01-quer.png
-    alt: "Platzhalterbild – Querformat 3:2"
-  - datei: ../../assets/serien/serie-eins/02-hoch.png
-    alt: "Platzhalterbild – Hochformat 2:3"
-  - datei: ../../assets/serien/serie-eins/03-quadrat.png
-    alt: "Platzhalterbild – Quadrat 1:1"
-  - datei: ../../assets/serien/serie-eins/04-hoch.png
-    alt: "Platzhalterbild – Hochformat 2:3"
-  - datei: ../../assets/serien/serie-eins/05-quer.png
-    alt: "Platzhalterbild – Querformat 3:2"
+  - datei: ../../assets/serien/serie-eins/_DSF7107.jpeg
+    alt: tr
+  - datei: ../../assets/serien/serie-eins/_DSF7120.jpeg
+    alt: t
+  - datei: ../../assets/serien/serie-eins/_DSF7112.jpeg
+    alt: g
+  - datei: ../../assets/serien/serie-eins/_DSF7108.jpeg
+    alt: t
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

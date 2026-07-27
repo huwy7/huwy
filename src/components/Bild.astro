@@ -9,7 +9,8 @@ import type { ImageMetadata } from 'astro';
 //   - Crop (breite + hoehe + densities): fester Zuschnitt, z. B. 3:2-Vorschau
 interface Props {
   src: ImageMetadata;
-  alt: string;
+  // Alt-Text optional (CLAUDE.md Regel 4): fehlt er, wird alt="" ausgegeben.
+  alt?: string;
   class?: string;
   loading?: 'eager' | 'lazy';
   fetchpriority?: 'high' | 'auto';
@@ -22,7 +23,7 @@ interface Props {
 
 const {
   src,
-  alt,
+  alt = '',
   class: klasse,
   loading = 'lazy',
   fetchpriority,

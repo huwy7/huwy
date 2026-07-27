@@ -15,12 +15,14 @@ const serien = defineCollection({
       jahr: z.number().int(),
       reihenfolge: z.number().int(), // Sortierung auf der Startseite
       titelbild: image(),
-      titelbildAlt: z.string(),
+      // Alt-Text ist optional (Entscheidung des Betreibers): leer = kein Problem,
+      // gefüllt = wird als alt ausgegeben. Siehe CLAUDE.md Regel 4.
+      titelbildAlt: z.string().optional(),
       bilder: z
         .array(
           z.object({
             datei: image(),
-            alt: z.string(),
+            alt: z.string().optional(),
           }),
         )
         .min(1),

@@ -126,8 +126,14 @@ eigenmächtig ersetzen.
    (Abschnitt 4a). Es ist reine Progressive Enhancement — ohne JavaScript funktioniert
    die Seite vollständig und unverändert.
 3. **Jedes Bild läuft über `astro:assets`.** Nie ein rohes `<img src="/foto.jpg">`.
-4. **Jedes Bild braucht ein `alt`.** Leeres `alt=""` nur bei rein dekorativen Bildern —
-   in diesem Projekt existieren keine.
+4. **Alt-Text ist optional (Entscheidung des Betreibers).** Das `alt`-Feld ist
+   **kein Pflichtfeld** mehr — weder im CMS noch im Schema. Ist es gefüllt, wird der
+   Text als `alt` ausgegeben; ist es leer, rendert das Bild mit `alt=""`. Jedes Bild
+   trägt also weiterhin ein `alt`-Attribut (nie gar keins), aber der Inhalt darf
+   leer bleiben. Das lockert bewusst die frühere Doktrin („jedes Bild braucht einen
+   gefüllten Alt-Text") zugunsten von Aufwand/Flexibilität beim Upload; der
+   Zugänglichkeits-Nachteil (fehlende Bildbeschreibung für Screenreader) ist dem
+   Betreiber bekannt und in Kauf genommen.
 5. **Keine dauerhaften Effekte auf dem Bildinhalt — eine Ausnahme.** Kein Hover-Zoom,
    kein Schatten, kein `border-radius`, kein Ken-Burns-Effekt, kein Fade-in
    beim Scrollen, kein dauerhafter Filter (`grayscale()`, `contrast()`, `sepia()`) —

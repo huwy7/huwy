@@ -39,7 +39,13 @@ collections:
           widget: image,
           hint: "Beliebiges Format — quer, hoch oder quadratisch. Das Bild gibt sein Seitenverhältnis selbst vor, es wird nicht zugeschnitten.",
         }
-      - { name: titelbildAlt, label: Titelbild — Alt-Text, widget: string }
+      - {
+          name: titelbildAlt,
+          label: Titelbild — Alt-Text (optional),
+          widget: string,
+          required: false,
+          hint: "Optional. Leer lassen ist in Ordnung; wenn gefüllt, wird der Text als Bildbeschreibung ausgegeben.",
+        }
       - name: bilder
         label: Bilder
         label_singular: Bild
@@ -52,5 +58,11 @@ collections:
               widget: image,
               hint: "Beliebiges Format — jedes Bild behält sein eigenes Seitenverhältnis.",
             }
-          - { name: alt, label: Alt-Text, widget: string }
+          - {
+              name: alt,
+              label: Alt-Text (optional),
+              widget: string,
+              required: false,
+              hint: "Optional. Leer lassen ist in Ordnung; wenn gefüllt, wird der Text als Bildbeschreibung ausgegeben.",
+            }
       - { name: body, label: Einleitungstext, widget: markdown }

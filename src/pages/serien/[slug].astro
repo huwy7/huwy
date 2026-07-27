@@ -37,12 +37,7 @@ const og = await getImage({
 ---
 
 <!-- Serienseite (Spezifikation 6.2). Header-Abstand 64px, Bildnormierung 5.1. -->
-<Basis
-  titel={`${serie.data.titel} — TODO_NAME`}
-  beschreibung={beschreibung}
-  ogBild={og.src}
-  abstandOben="var(--abstand-64)"
->
+<Basis titel={`${serie.data.titel} — TODO_NAME`} beschreibung={beschreibung} ogBild={og.src}>
   <article class="serie">
     <h1 class="serie-titel">{serie.data.titel}</h1>
     <p class="serie-jahr">{serie.data.jahr}</p>

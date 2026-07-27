@@ -10,7 +10,14 @@ Ein Fotografie-Portfolio. Eine Person, drei Bildserien, rund 30 Bilder. Statisch
 Website, deutschsprachig, keine Anwendungslogik.
 
 **Das einzige Ziel der Seite:** Besucher sehen die Bilder gross, schnell und ohne
-Ablenkung, und finden danach die Mailadresse.
+Ablenkung. Sonst nichts.
+
+> **Nachträgliche Entscheidung des Betreibers:** Kopf- und Fusszeile sind
+> **entfernt**, ebenso die Seiten Über, Kontakt, Impressum und Datenschutz sowie
+> Mail-/Instagram-Links. Die Seite besteht nur noch aus der Startseite (Liste der
+> Serien-Titelbilder, direkt anklickbar) und den Serienseiten. Die Abschnitte zu
+> Header, Fusszeile und diesen Seiten in `docs/01-spezifikation.md` (v. a. 6.1,
+> 6.3–6.5, 3.4) und im Build-Plan sind dadurch überholt.
 
 ### Nicht-Ziele
 

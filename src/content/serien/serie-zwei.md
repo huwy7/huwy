@@ -1,22 +1,22 @@
 ---
-titel: Beispielserie zwei
+# Platzhalter-Serie (Build-Plan Phase 2). Titel und Jahr durch TODO_SERIEN
+# ersetzen; graue Platzhalterbilder durch echte Aufnahmen ersetzen.
+titel: "Beispielserie zwei"
 jahr: 2024
 reihenfolge: 2
-titelbild: ../../assets/serien/serie-zwei/_DSF7108.jpeg
-titelbildAlt: Platzhalterbild – Querformat 3:2
+titelbild: ../../assets/serien/serie-zwei/titel.png
+titelbildAlt: "Platzhalterbild – Querformat 3:2"
 bilder:
-  - datei: ../../assets/serien/serie-zwei/_DSF7107.jpeg
-    alt: g
-  - datei: ../../assets/serien/serie-zwei/_DSF7120.jpeg
-    alt: h
-  - datei: ../../assets/serien/serie-zwei/_DSF7112.jpeg
-    alt: g
-  - datei: ../../assets/serien/serie-zwei/_DSF7144.jpeg
-    alt: v
-  - datei: ../../assets/serien/serie-zwei/_DSF7170.jpeg
-    alt: g
-  - datei: ../../assets/serien/serie-zwei/_DSF7108.jpeg
-    alt: h
+  - datei: ../../assets/serien/serie-zwei/01-quer.png
+    alt: "Platzhalterbild – Querformat 3:2"
+  - datei: ../../assets/serien/serie-zwei/02-hoch.png
+    alt: "Platzhalterbild – Hochformat 2:3"
+  - datei: ../../assets/serien/serie-zwei/03-quadrat.png
+    alt: "Platzhalterbild – Quadrat 1:1"
+  - datei: ../../assets/serien/serie-zwei/04-hoch.png
+    alt: "Platzhalterbild – Hochformat 2:3"
+  - datei: ../../assets/serien/serie-zwei/05-quer.png
+    alt: "Platzhalterbild – Querformat 3:2"
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

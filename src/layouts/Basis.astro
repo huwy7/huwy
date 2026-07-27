@@ -217,8 +217,11 @@ const name = 'TODO_NAME';
 
     <script>
       // Invertierter Touch-Schweif — für Touch-Geräte (kein Cursor dort).
-      // Bei Berührung/Bewegung entstehen invertierende Punkte, die schnell
-      // verblassen und der Bewegung als Schweif nachziehen. Reine Zutat.
+      // Keine Füllfarbe: eine transparente Schicht mit backdrop-filter: invert(1)
+      // kehrt den Untergrund um; eine Maske gibt sie nur entlang der Berührung
+      // frei. Zwischen den Berührungspunkten wird interpoliert (glatt, nicht
+      // stotternd); ältere Punkte verblassen, so zieht der Schweif mit Nachlauf
+      // nach. Passive Listener — Scrollen bleibt frei.
       const touchGeraet =
         window.matchMedia('(pointer: coarse)').matches ||
         'ontouchstart' in window ||
@@ -229,31 +232,92 @@ const name = 'TODO_NAME';
         const schicht = document.createElement('div');
         schicht.className = 'spur';
         schicht.setAttribute('aria-hidden', 'true');
+        // Explizit invert(1) und beide Präfixe — nicht vom CSS-Minifier verändert.
+        schicht.style.setProperty('backdrop-filter', 'invert(1)');
+        schicht.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
         document.body.appendChild(schicht);
 
-        const tupfen = (x: number, y: number) => {
-          const punkt = document.createElement('span');
-          punkt.className = 'spur__punkt';
-          punkt.style.left = `${x}px`;
-          punkt.style.top = `${y}px`;
-          punkt.addEventListener('animationend', () => punkt.remove());
-          schicht.appendChild(punkt);
+        const stil = getComputedStyle(document.documentElement);
+        // Der CSS-Minifier kann 500ms zu .5s machen — Einheit berücksichtigen.
+        const rohDauer = stil.getPropertyValue('--spur-dauer').trim();
+        const DAUER = /ms$/.test(rohDauer)
+          ? parseFloat(rohDauer)
+          : /s$/.test(rohDauer)
+            ? parseFloat(rohDauer) * 1000
+            : 500;
+        const RADIUS = (parseFloat(stil.getPropertyValue('--spur-groesse')) || 44) / 2;
+        const LEER = 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0))';
+        const MAX = 60;
+
+        const punkte: { x: number; y: number; t: number }[] = [];
+        let letzte: { x: number; y: number } | null = null;
+        let laeuft = false;
+
+        const setzeMaske = (wert: string) => {
+          schicht.style.setProperty('-webkit-mask-image', wert);
+          schicht.style.setProperty('mask-image', wert);
         };
 
-        let letzteZeit = 0;
-        const beruehrung = (e: TouchEvent) => {
+        const bauen = () => {
           const jetzt = performance.now();
-          if (jetzt - letzteZeit < 16) return; // drosseln (~60/s)
-          letzteZeit = jetzt;
-          for (let i = 0; i < e.touches.length; i++) {
-            const t = e.touches[i];
-            tupfen(t.clientX, t.clientY);
+          while (punkte.length && jetzt - punkte[0].t > DAUER) punkte.shift();
+          if (!punkte.length) {
+            setzeMaske(LEER);
+            laeuft = false;
+            return;
+          }
+          const maske = punkte
+            .map((p) => {
+              const a = Math.max(0, 1 - (jetzt - p.t) / DAUER);
+              return `radial-gradient(circle ${RADIUS}px at ${p.x}px ${p.y}px, rgba(0,0,0,${a.toFixed(3)}) 0%, rgba(0,0,0,0) 70%)`;
+            })
+            .join(', ');
+          setzeMaske(maske);
+          requestAnimationFrame(bauen);
+        };
+
+        const start = () => {
+          if (!laeuft) {
+            laeuft = true;
+            requestAnimationFrame(bauen);
           }
         };
 
-        // passive: true — Scrollen wird nicht blockiert.
-        window.addEventListener('touchstart', beruehrung, { passive: true });
+        const hinzu = (x: number, y: number) => {
+          const jetzt = performance.now();
+          if (letzte) {
+            const dx = x - letzte.x;
+            const dy = y - letzte.y;
+            const schritte = Math.min(24, Math.floor(Math.hypot(dx, dy) / (RADIUS * 0.5)));
+            for (let i = 1; i < schritte; i++) {
+              punkte.push({ x: letzte.x + (dx * i) / schritte, y: letzte.y + (dy * i) / schritte, t: jetzt });
+            }
+          }
+          punkte.push({ x, y, t: jetzt });
+          letzte = { x, y };
+          while (punkte.length > MAX) punkte.shift();
+          start();
+        };
+
+        const beruehrung = (e: TouchEvent) => {
+          const t = e.touches[0];
+          if (t) hinzu(t.clientX, t.clientY);
+        };
+        const ende = () => {
+          letzte = null;
+        };
+
+        window.addEventListener(
+          'touchstart',
+          (e) => {
+            letzte = null;
+            beruehrung(e);
+          },
+          { passive: true },
+        );
         window.addEventListener('touchmove', beruehrung, { passive: true });
+        window.addEventListener('touchend', ende, { passive: true });
+        window.addEventListener('touchcancel', ende, { passive: true });
       }
     </script>
   </body>

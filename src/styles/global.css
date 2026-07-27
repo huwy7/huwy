@@ -215,36 +215,20 @@ html.cursor-aktiv img:hover {
 }
 
 /* --- Invertierter Touch-Schweif (CLAUDE.md 4a) ---
-   Punkte werden per JavaScript erzeugt (nur auf Touch-Geräten) und tragen kein
-   Astro-Scope-Attribut — die Regeln stehen deshalb global. */
+   Eine einzige transparente Schicht, KEINE Füllfarbe: backdrop-filter: invert
+   kehrt den Untergrund um. Sichtbar nur dort, wo die Maske es zulässt — die
+   setzt das JS entlang der Berührung (nur auf Touch-Geräten). Eine Schicht =
+   kein Doppel-Invert bei Überlappung. Standardmaske transparent = nichts zu
+   sehen, bis berührt wird. */
 .spur {
   position: fixed;
   inset: 0;
   z-index: var(--z-spur);
   pointer-events: none;
-}
-
-.spur__punkt {
-  position: absolute;
-  width: var(--spur-groesse);
-  height: var(--spur-groesse);
-  margin-left: calc(var(--spur-groesse) / -2);
-  margin-top: calc(var(--spur-groesse) / -2);
-  border-radius: 50%;
-  background-color: var(--farbe-hintergrund);
-  mix-blend-mode: difference; /* invertiert die berührte Stelle */
-  animation: spur-verblassen var(--spur-dauer) ease-out forwards;
-}
-
-@keyframes spur-verblassen {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.4);
-  }
+  /* backdrop-filter: invert(1) wird per JS inline gesetzt — der CSS-Minifier
+     würde daraus invert() machen und die unpräfixierte Variante verwerfen. */
+  -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+  mask-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 }
 
 @media (prefers-reduced-motion: reduce) {

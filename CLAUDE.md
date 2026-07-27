@@ -43,6 +43,35 @@ Platzhalter dafür anlegen:
 
 ---
 
+## 1a. Künstlerische Richtung (Mood)
+
+Verbindliche Stimmung für **alles**, was wir umsetzen — Bildauswahl, Interaktion,
+Typografie, spätere Gestaltung. Sehr künstlerisch, düster, roh. Referenz:
+**KEEMO** (OG, düster, hart, kompromisslos). Nicht clean und gefällig, sondern
+kantig, roh und schwer.
+
+**Schlagwörter:** grain, dark, rough, raw, industrial, techno, old school, heavy.
+
+Konkret:
+
+- **Bilder** tragen den Ton: schwarzweiss, körnig (grain), rau — nicht geglättet,
+  nicht geschönt.
+- **Interaktion** unterstreicht ihn: invertierender Cursor, invertierter
+  Touch-Schweif, harte Schwarzweiss-Umkehr statt weicher, gefälliger Effekte.
+- **Typografie**: Monospace als kantiger, technischer, „old school"-Bruch.
+- **Nichts Dekoratives, nichts Liebliches.** Reduktion, Härte, Rohheit,
+  industrielle/techno Kälte.
+
+> **Offene Spannung — bewusst festhalten:** Die frühere Doktrin beschreibt die
+> Seite als „weiss, ruhig, diszipliniert"; der raue Ton kam absichtlich nur aus
+> den Bildern (Spezifikation 1, Regel 6). Diese düstere Richtung legt nahe, dass
+> die Seite **selbst** dunkler/industrieller werden könnte (dunkler Hintergrund
+> statt Weiss). Das ist eine bewusste, noch zu treffende Gestaltungsentscheidung.
+> Bis sie getroffen ist, bleibt der Hintergrund weiss und die Härte kommt aus
+> Bildern und Interaktion.
+
+---
+
 ## 2. Offene Punkte
 
 Diese Werte fehlen. Überall `TODO:` als Platzhalter verwenden und beim ersten

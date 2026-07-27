@@ -10,6 +10,11 @@ Nicht interpretieren, nicht „verbessern". Bei Zweifel fragen.
 Weisser Hintergrund, viel Leerraum, keine Dekoration. Die Bilder sind
 schwarzweiss, körnig und roh. Die Website ist es nicht.
 
+> **Mood (siehe CLAUDE.md 1a):** Die übergeordnete künstlerische Richtung ist
+> düster, roh, industriell — „OG KEEMO"-Stil. Schlagwörter: grain, dark, rough,
+> raw, industrial, techno, old school, heavy. Ob der weisse Hintergrund dabei
+> bleibt oder die Seite selbst dunkel wird, ist eine bewusst offene Entscheidung.
+
 **Das ist die zentrale Regel dieses Projekts:** Der raue Ton kommt aus den Bildern.
 Die Seite trägt ihn, sie imitiert ihn nicht. Eine Seite, die ebenfalls rau sein will,
 konkurriert mit den Bildern statt sie zu zeigen — und in Schwarzweiss gibt es keine

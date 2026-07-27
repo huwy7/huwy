@@ -9,10 +9,6 @@ bilder:
     alt: v
   - datei: ../../assets/serien/serie-zwei/_DSF7120.jpeg
     alt: h
-  - datei: ../../assets/serien/serie-zwei/_DSF7144.jpeg
-    alt: h
-  - datei: ../../assets/serien/serie-zwei/_DSF7170.jpeg
-    alt: h
   - datei: ../../assets/serien/serie-zwei/_DSF7108.jpeg
     alt: b
 ---

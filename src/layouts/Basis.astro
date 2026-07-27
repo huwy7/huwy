@@ -42,8 +42,23 @@ const name = 'TODO_NAME';
     <meta property="og:url" content={kanonisch} />
     {ogBildAbsolut && <meta property="og:image" content={ogBildAbsolut} />}
     <meta name="twitter:card" content={ogBildAbsolut ? 'summary_large_image' : 'summary'} />
+
+    <script is:inline>
+      // Zugangs-Tor: schon freigeschaltet? Dann sofort ausblenden (kein Aufblitzen).
+      try {
+        if (localStorage.getItem('tor') === 'auf') document.documentElement.dataset.tor = 'auf';
+      } catch (e) {}
+    </script>
   </head>
   <body>
+    <!-- Zugangs-Tor (Platzhalter). ACHTUNG: kein echter Schutz auf einer statischen
+         Seite — nur eine sichtbare Sperre gegen zufällige Besucher. Siehe docs. -->
+    <div id="tor">
+      <form id="tor-form" autocomplete="off">
+        <input id="tor-code" type="password" autocomplete="off" aria-label="Zugangscode" />
+      </form>
+    </div>
+
     <!-- Keine Kopf- und Fusszeile (bewusste Entscheidung des Betreibers).
          Nur die Bilder; grosszügige vertikale Ränder wie Prints an der Wand. -->
     <main class="inhalt">
@@ -59,11 +74,70 @@ const name = 'TODO_NAME';
         padding-inline: var(--rand);
         padding-block: var(--abstand-64);
       }
+
+      /* Zugangs-Tor (Platzhalter, weiss mit Eingabefeld mittig). Feinschliff folgt. */
+      #tor {
+        position: fixed;
+        inset: 0;
+        z-index: var(--z-tor);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--farbe-hintergrund);
+      }
+      html[data-tor='auf'] #tor {
+        display: none;
+      }
+      #tor-code {
+        width: 14ch;
+        padding-block: var(--abstand-8);
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-16);
+        color: var(--farbe-text);
+        text-align: center;
+        background: transparent;
+        border: none;
+        border-bottom: var(--linie-staerke) solid var(--farbe-text);
+        outline: none;
+        caret-color: var(--farbe-text);
+        font-variant-ligatures: none;
+      }
     </style>
 
     <script>
+      // Zugangs-Tor (Platzhalter). WICHTIG: Auf einer statischen Seite ist das
+      // KEIN echter Schutz — Fotos bleiben unter ihren URLs öffentlich abrufbar.
+      // Nur eine sichtbare Sperre gegen zufällige Besucher. Code als SHA-256-Hash.
+      const TOR_HASH = 'db6b24692506611e2549894ab528b028af27e114f74fabf2fcb2b0e740fe5a04';
+      const tor = document.getElementById('tor');
+      const torForm = document.getElementById('tor-form');
+      const torCode = document.getElementById('tor-code') as HTMLInputElement | null;
+
+      const sha256 = async (text: string) => {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+        return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+      };
+
+      if (document.documentElement.dataset.tor !== 'auf') torCode?.focus();
+
+      torForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!torCode) return;
+        if ((await sha256(torCode.value)) === TOR_HASH) {
+          try {
+            localStorage.setItem('tor', 'auf');
+          } catch (err) {}
+          document.documentElement.dataset.tor = 'auf';
+        } else {
+          torCode.value = '';
+          tor?.classList.add('tor--falsch');
+          setTimeout(() => tor?.classList.remove('tor--falsch'), 400);
+        }
+      });
+    </script>
+
+    <script>
       // Invertierter Cursor — Progressive Enhancement (CLAUDE.md 4a).
-      // Einziges clientseitiges Skript. Ohne JavaScript passiert nichts.
       const feinerZeiger = window.matchMedia('(pointer: fine)');
       if (feinerZeiger.matches) {
         const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)');

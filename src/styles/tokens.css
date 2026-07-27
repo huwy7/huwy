@@ -80,4 +80,5 @@
   --cursor-skala-druck: 0.7; /* beim Klicken */
   --cursor-uebergang: 200ms; /* weicher Übergang der Grösse */
   --z-cursor: 9999;
+  --z-tor: 900; /* Zugangs-Tor, unter dem Cursor */
 }

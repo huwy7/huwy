@@ -18,6 +18,11 @@ Ablenkung. Sonst nichts.
 > Serien-Titelbilder, direkt anklickbar) und den Serienseiten. Die Abschnitte zu
 > Header, Fusszeile und diesen Seiten in `docs/01-spezifikation.md` (v. a. 6.1,
 > 6.3–6.5, 3.4) und im Build-Plan sind dadurch überholt.
+>
+> **Zugangs-Tor (Platzhalter):** Vor der Seite liegt ein clientseitiges Passwort-Tor
+> (zweite bewusste Client-JS-Ausnahme neben dem Cursor). Es ist **kein echter
+> Schutz** — auf einer statischen Seite bleiben die Bilder unter ihren URLs
+> öffentlich abrufbar. Details und der Weg zu echtem Schutz: `docs/zugang.md`.
 
 ### Nicht-Ziele
 

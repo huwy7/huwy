@@ -1,17 +1,13 @@
 # Sveltia CMS — Konfiguration gegen die Collection aus Spezifikation 7.
-#
-# ACHTUNG (Build-Plan Phase 6): Der GitHub-Backend braucht einen OAuth-Vermittler.
-# Das aktuelle Verfahren konnte aus der Bau-Umgebung nicht gegen die Sveltia-Doku
-# verifiziert werden (Doku nicht erreichbar). Vor dem Live-Gang die aktuelle
-# Sveltia-Dokumentation zum GitHub-Backend prüfen und den OAuth-Schritt einrichten
-# (GitHub-OAuth-App + Vermittler). Siehe docs/cms.md.
+# OAuth-Vermittler: Cloudflare-Worker sveltia-cms-auth (Build-Plan Phase 6).
+# Siehe docs/cms.md.
 
 backend:
   name: github
-  repo: huwy7/huwy # TODO: bei Bedarf auf die produktive Repo anpassen
+  repo: huwy7/huwy
   branch: main
-  # base_url / auth_endpoint des OAuth-Vermittlers hier ergänzen, sobald der
-  # Vermittler nach aktueller Sveltia-Doku eingerichtet ist.
+  # OAuth-Vermittler (Cloudflare-Worker sveltia-cms-auth).
+  base_url: https://sveltia-cms-auth.nico-huwy.workers.dev
 
 # Fallback-Medienordner; die eigentliche Ablage regelt die Collection pro Serie.
 media_folder: src/assets/serien

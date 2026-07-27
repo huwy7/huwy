@@ -5,16 +5,8 @@ reihenfolge: 3
 titelbild: ../../assets/serien/serie-drei/IMG_0098.jpeg
 titelbildAlt: Platzhalterbild – Querformat 3:2
 bilder:
-  - datei: ../../assets/serien/serie-drei/01-quer.png
-    alt: Platzhalterbild – Querformat 3:2
-  - datei: ../../assets/serien/serie-drei/02-hoch.png
-    alt: Platzhalterbild – Hochformat 2:3
-  - datei: ../../assets/serien/serie-drei/03-quadrat.png
-    alt: Platzhalterbild – Quadrat 1:1
-  - datei: ../../assets/serien/serie-drei/04-hoch.png
-    alt: Platzhalterbild – Hochformat 2:3
-  - datei: ../../assets/serien/serie-drei/05-quer.png
-    alt: Platzhalterbild – Querformat 3:2
+  - datei: ../../assets/serien/serie-drei/IMG_0050.jpeg
+    alt: test
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

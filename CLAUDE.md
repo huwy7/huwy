@@ -37,7 +37,8 @@ Platzhalter dafür anlegen:
 - Mehrsprachigkeit, i18n-Setup, Sprachumschalter
 - Dark Mode
 - Suche, Filter, Tags, Kategorien
-- Korn-, Rausch- oder Textur-Overlay über Seite oder Bildern
+- Korn-/Rausch-/Textur-Overlay über den **Bildern** (der körnige, dunkle
+  **Hintergrund** ist dagegen gewollt — siehe Abschnitt 1a)
 - Filmrand-Grafik, Sprocket-Löcher, Scan-Artefakte, Vignetten, Polaroid-Rahmen
 - Laufende Bildnummern, Indizes, Kontaktbogen-Ansicht
 
@@ -73,13 +74,14 @@ liegt ein **weisser Rahmen (Passepartout)** um jedes Bild — der Rahmen ist Chr
 *um* das Bild, kein Eingriff *in* den Bildinhalt (auch kein Polaroid-/Filmrand,
 der bleibt Nicht-Ziel).
 
-> **Offene Spannung — bewusst festhalten:** Die frühere Doktrin beschreibt die
-> Seite als „weiss, ruhig, diszipliniert"; der raue Ton kam absichtlich nur aus
-> den Bildern (Spezifikation 1, Regel 6). Diese düstere Richtung legt nahe, dass
-> die Seite **selbst** dunkler/industrieller werden könnte (dunkler Hintergrund
-> statt Weiss). Das ist eine bewusste, noch zu treffende Gestaltungsentscheidung.
-> Bis sie getroffen ist, bleibt der Hintergrund weiss und die Härte kommt aus
-> Bildern und Interaktion.
+> **Entscheidung getroffen — die Seite geht dunkel.** Hintergrund ist
+> **near-black mit kräftigem Korn** (`public/korn.png` + dezente Vignette,
+> `global.css body::before`), Text hell, Bilder mit **weissem Passepartout**.
+> Damit ist die frühere „weiss, ruhig"-Doktrin (Spezifikation 1, Regel 6)
+> überholt. Auch der Nicht-Ziel-Punkt „Korn-/Textur-Overlay" ist bewusst
+> aufgehoben — **aber nur für den Hintergrund**. Über die **Bilder** kommt
+> weiterhin kein Korn: sie liegen mit weissem Rahmen darüber und bleiben
+> unangetastet.
 
 ---
 

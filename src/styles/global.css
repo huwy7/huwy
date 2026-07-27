@@ -32,6 +32,21 @@ body {
   line-height: var(--zeilenhoehe-1-6);
 }
 
+/* Körniger, dunkler Hintergrund (CLAUDE.md 1a): ein Korn-PNG, fix hinter dem
+   Inhalt, dazu eine dezente Vignette für Schwere. Nur im Hintergrund — die
+   Bilder liegen mit weissem Passepartout darüber und bleiben kornfrei. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    url('/korn.png');
+  background-repeat: no-repeat, repeat;
+}
+
 img,
 picture,
 svg {
@@ -82,9 +97,8 @@ picture > source {
 .serie-bild,
 .vorschau-bild {
   box-sizing: border-box;
-  background-color: var(--farbe-hintergrund);
+  background-color: var(--farbe-rahmen); /* reines Weiss, unabhängig vom Grund */
   padding: var(--rahmen-breite);
-  border: var(--linie-staerke) solid var(--farbe-linie);
 }
 
 /* Höhe aus dem Seitenverhältnis, nicht aus dem height-Attribut (sonst

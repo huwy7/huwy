@@ -6,11 +6,12 @@
 */
 
 :root {
-  /* --- 2. Farbe --- */
-  --farbe-hintergrund: #ffffff;
-  --farbe-text: #111111;
-  --farbe-text-leise: #767676;
-  --farbe-linie: #e5e5e5; /* nur für die Trennlinie über der Fusszeile */
+  /* --- 2. Farbe (dunkle, körnige Richtung — CLAUDE.md 1a) --- */
+  --farbe-hintergrund: #0d0d0d; /* near-black, dazu Korn (global.css body::before) */
+  --farbe-text: #ececec; /* hell, nicht rein weiss */
+  --farbe-text-leise: #8a8a8a; /* AA-tauglich auf Dunkel */
+  --farbe-linie: #2a2a2a;
+  --farbe-rahmen: #ffffff; /* weisses Passepartout um die Bilder */
 
   /* --- 3.3 Schriftfamilien --- */
   --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;

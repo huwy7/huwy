@@ -1,8 +1,0 @@
-# Cloudflare Pages — HTTP-Header (Spezifikation 11).
-# HSTS erzwingt HTTPS im Browser. HTTPS selbst wird auf Cloudflare-Ebene erzwungen
-# („Always Use HTTPS"). max-age = 1 Jahr.
-/*
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  X-Frame-Options: DENY

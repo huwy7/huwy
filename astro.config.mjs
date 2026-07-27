@@ -2,9 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// TODO_DOMAIN: produktive Domain eintragen. Wird für sitemap.xml, robots.txt
-// und absolute Open-Graph-URLs benötigt (Spezifikation 10 und 11).
-const site = 'https://TODO_DOMAIN';
+// Produktive Domain. Wird für sitemap.xml, robots.txt und absolute
+// Open-Graph-/Canonical-URLs benötigt (Spezifikation 10 und 11).
+const site = 'https://hey.hu-wy.ch';
 
 // https://astro.build/config
 export default defineConfig({

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://TODO_DOMAIN/sitemap-index.xml
+Sitemap: https://hey.hu-wy.ch/sitemap-index.xml

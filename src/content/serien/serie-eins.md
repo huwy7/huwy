@@ -13,6 +13,8 @@ bilder:
     alt: v
   - datei: ../../assets/serien/serie-eins/IMG_9803.jpeg
     alt: h
+  - datei: ../../assets/serien/serie-eins/IMG_4187-1.jpeg
+    alt: h
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

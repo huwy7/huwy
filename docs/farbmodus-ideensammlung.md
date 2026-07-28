@@ -75,13 +75,12 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 ### Hauptseite (Karussell)
 
 - [ ] **Manuell weiter/zurück** (Pfeile, Wischen/Swipe, Klick auf Bildrand).
-- [ ] **Automatisches Weiterschalten**, wenn man nichts tut? (Tempo? Pausieren bei
-      Interaktion?) — **noch zu definieren.**
+- [x] **Kein automatisches Weiterschalten für v1** — bewusst simpel gehalten, nur
+      manuell. Auto-Weiterschalten kann später nachgerüstet werden.
 - [ ] **Gruppierung:** ein durchgehender Bildfluss, oder weiter nach Serien
       gruppiert (aber inline als Karussell statt als anklickbare Serie)?
-- [ ] **Technik-Hinweis:** manuelles Wischen/Durchschalten geht als **reines CSS**
-      (scroll-snap, No-JS). **Automatisches** Weiterschalten braucht ein kleines JS
-      (Timer) oder eine CSS-Animation — Entscheidung nötig (JS-Ausnahme ja/nein).
+- [x] **Technik: reines CSS** (scroll-snap, No-JS) fürs manuelle Durchschalten —
+      kein neues JavaScript (Auto-Modus ist raus, siehe oben).
 
 ### Vollbild-Ansicht (Lightbox) — bleibt, jetzt mit Blättern
 
@@ -90,10 +89,14 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 - [x] In der Vollbild-Ansicht **nach links/rechts weiterschalten** (vor/zurück).
 - [x] Vollbild schaltet **nur von Hand** — **kein** automatisches Weiterschalten.
 - [x] **Endlos durchschaltbar** — vor und zurück ohne Ende (Loop).
-- [ ] Schliessen wie bisher (✕ oben rechts / Klick auf die weisse Fläche) — mit den
-      Blätter-Bereichen links/rechts zusammenbringen (Layout klären).
-- [ ] Technik: Blättern in Vollbild braucht Steuerung (Flächen/Pfeile links/rechts).
-      Reines CSS via `:target` möglich, oder kleines JS — Entscheidung nötig.
+- [x] **Schliessen per ✕ oder Klick auf die weisse Fläche** → zurück zur Hauptseite
+      (Portfolio), wie bisher.
+- [x] **Technik: reines CSS via `:target`, kein neues JS** (manuelles Blättern, wie
+      die heutige Vollbild-Ansicht).
+- [ ] **Nur noch zu klären — Klick-Zonen im Vollbild** (Blättern vs. Schliessen):
+      Vorschlag: ✕ oben rechts = schliessen; schmale Zonen/Pfeile ganz links & rechts
+      = zurück/weiter; restliche weisse Fläche (oben/unten ums Bild) = schliessen.
+      Alternative: schliessen nur über ✕, links/rechts rein zum Blättern.
 
 > Hinweis: Mit dem Karussell entfallen die heutigen Serien-**Unterseiten**
 > (`/serien/<slug>`) samt „Nächste Serie" und dem Bilder-Vorlade-Mechanismus.
@@ -137,7 +140,7 @@ Hauptseite** durchschalten/rotieren (Karussell-Prinzip aus A3), evtl. automatisc
 
 ## B4. Offene Punkte düster
 
-- [ ] Auto-Weiterschalten ja/nein + Tempo (siehe A3).
+- [x] Auto-Weiterschalten: **raus für v1** (nur manuell, siehe A3).
 - [ ] Bildfluss durchgehend oder nach Serien gruppiert (siehe A3).
 
 ---
@@ -185,7 +188,7 @@ knallig), leichter Grain, sonnig.**
 ## C5. Offene Punkte Farbe
 
 - [ ] Genauer Grund-Ton + Palette (Muster/Prototyp nötig).
-- [ ] Karussell/Auto-Weiterschalten im Farbmodus identisch zum düsteren? (siehe A3).
+- [x] Karussell wie im düsteren Modus: **nur manuell**, kein Auto (siehe A3).
 
 ---
 

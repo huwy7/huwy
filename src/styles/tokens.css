@@ -11,7 +11,9 @@
   --farbe-text: #ececec; /* hell, nicht rein weiss */
   --farbe-text-leise: #8a8a8a; /* AA-tauglich auf Dunkel */
   --farbe-linie: #2a2a2a;
-  --farbe-rahmen: #ffffff; /* weisses Passepartout um die Bilder */
+  --farbe-rahmen: #ededed; /* ruhiges Weiss für Passepartout + Vollbild-Fläche;
+     bewusst nicht rein #fff — grosse weisse Flächen (Lightbox) wirken sonst zu
+     grell und springen gegen das weichere Weiss der Fotos. Ein Wert überall. */
 
   /* --- 3.3 Schriftfamilien --- */
   --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;

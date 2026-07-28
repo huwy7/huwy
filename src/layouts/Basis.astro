@@ -280,6 +280,10 @@ const name = 'TODO_NAME';
           punkt.style.width = `${w}px`;
           punkt.style.height = `${h}px`;
           punkt.style.borderRadius = `${Math.min(w, h) / 2}px`;
+          // Transparent invertieren statt füllen — Text bleibt lesbar. Inline, da
+          // der CSS-Minifier backdrop-filter/invert(1) verändern würde.
+          punkt.style.setProperty('backdrop-filter', 'invert(1)');
+          punkt.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
           zielX = r.left + r.width / 2;
           zielY = r.top + r.height / 2;
         };
@@ -289,6 +293,8 @@ const name = 'TODO_NAME';
           punkt.style.width = '';
           punkt.style.height = '';
           punkt.style.borderRadius = '';
+          punkt.style.removeProperty('backdrop-filter');
+          punkt.style.removeProperty('-webkit-backdrop-filter');
         };
 
         window.addEventListener('pointermove', (e) => {

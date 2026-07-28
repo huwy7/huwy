@@ -136,7 +136,7 @@ picture > source {
 .serie-bild,
 .vorschau-bild {
   box-sizing: border-box;
-  background-color: var(--farbe-rahmen); /* reines Weiss, unabhängig vom Grund */
+  background-color: var(--farbe-rahmen); /* ruhiges Weiss, unabhängig vom Grund */
   padding: var(--rahmen-breite);
 }
 
@@ -213,9 +213,11 @@ a {
 /* Invertierender Hover auf Textlinks (CLAUDE.md 4a) — reines CSS, ohne JS.
    Nur mit feinem Zeiger, damit auf Touch kein klebriger :hover-Zustand bleibt.
    Vorschaukarten (.serien-link) und Wortmarke sind ausgenommen; die Bilder
-   bleiben unangetastet (Regel 5). */
+   bleiben unangetastet (Regel 5). Nur ohne aktiven JS-Cursor — sonst übernimmt
+   der invertierende Cursor-Kasten (Box-Modus) die Umkehr, sonst doppelte
+   Invertierung. */
 @media (hover: hover) and (pointer: fine) {
-  a:hover:not(.serien-link):not(.wortmarke) {
+  html:not(.cursor-aktiv) a:hover:not(.serien-link):not(.wortmarke) {
     background-color: var(--farbe-text);
     color: var(--farbe-hintergrund);
     text-decoration: none;
@@ -274,6 +276,7 @@ a {
     width var(--cursor-morph) ease,
     height var(--cursor-morph) ease,
     border-radius var(--cursor-morph) ease,
+    background-color var(--cursor-morph) ease,
     transform var(--cursor-uebergang) ease;
 }
 
@@ -291,10 +294,14 @@ a {
 }
 
 /* Box-Modus: der Punkt legt sich als abgerundetes Rechteck um das überfahrene
-   Element (Grösse und Radius setzt das Skript inline). Keine Skalierung — die
-   Grösse kommt aus width/height. Der Invert (mix-blend-mode) bleibt erhalten. */
+   Element (Grösse und Radius setzt das Skript inline). Keine Skalierung. Statt
+   einer Füllfarbe eine transparente Fläche mit backdrop-filter: invert(1) (per JS
+   inline gesetzt) — der Untergrund inkl. Text wird invertiert und bleibt lesbar,
+   kein deckender Block. Kein mix-blend-mode hier, sonst doppelte Umkehr. */
 .cursor--box .cursor__punkt {
   --cursor-skala: 1;
+  background-color: transparent;
+  mix-blend-mode: normal;
 }
 
 /* Nativen Zeiger nur verstecken, solange das Cursor-Skript aktiv ist. */

@@ -26,6 +26,13 @@ Ablenkung. Sonst nichts.
 > (zweite bewusste Client-JS-Ausnahme neben dem Cursor). Es ist **kein echter
 > Schutz** — auf einer statischen Seite bleiben die Bilder unter ihren URLs
 > öffentlich abrufbar. Details und der Weg zu echtem Schutz: `docs/zugang.md`.
+>
+> **Vollbild-Ansicht (Lightbox):** Serienbilder sind anklickbar und öffnen sich
+> im Vollbild auf **weisser Fläche** (maximale Konzentration aufs Bild); schliessen
+> per ✕ oben rechts oder Klick auf die weisse Fläche. Bewusst als **reines CSS**
+> gebaut (`:target`, kein JavaScript, keine Bibliothek) — damit steht es nicht im
+> Widerspruch zu Regel 1 („kein Lightbox-**Plugin**"); die Funktion selbst ist eine
+> Entscheidung des Betreibers.
 
 ### Nicht-Ziele
 

@@ -146,6 +146,24 @@ img {
   height: auto;
 }
 
+/* Bild in der Vollbild-Ansicht (Lightbox). Steht global, weil das <img> aus der
+   Bild-Komponente kommt und den Scope einer Seite nicht erbt. Absolut zentriert
+   (nicht als Flex-Item — sonst greift max-height nicht), passt in den Viewport
+   minus weissem Rand, Seitenverhältnis bleibt. Kein Passepartout (auf Weiss
+   unsichtbar). Nativer Zeiger, da der invertierende Ball auf Weiss verschwindet. */
+.lightbox-bild {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  max-width: calc(100vw - 2 * var(--abstand-48));
+  max-height: calc(100vh - 2 * var(--abstand-48));
+  width: auto;
+  height: auto;
+  cursor: default;
+}
+
 /* Überschriften erben Grösse und Zeilenhöhe; konkrete Werte setzen die Seiten
    und Komponenten. Gewicht bleibt 400 — Schnitt 600/700 ist verboten (3.4). */
 h1,

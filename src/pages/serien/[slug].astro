@@ -72,15 +72,43 @@ const hatEinleitung = (serie.body ?? '').trim().length > 0;
     <div class="serie-bilder">
       {
         alleBilder.map((bild, i) => (
-          <Bild
-            class="serie-bild"
-            src={bild}
-            alt=""
-            widths={[640, 960, 1280, 1600, 2000]}
-            sizes="100vw"
-            loading={i === 0 ? 'eager' : 'lazy'}
-            fetchpriority={i === 0 ? 'high' : undefined}
-          />
+          <Fragment>
+            {/* Anklickbares Bild öffnet die Vollbild-Ansicht (reines CSS via :target,
+                kein JavaScript). Das id am Öffner dient zugleich als Schliess-Ziel,
+                damit man beim Schliessen wieder beim Bild landet. */}
+            <a
+              id={`b-${serie.id}-${i}`}
+              href={`#lb-${serie.id}-${i}`}
+              class="bild-oeffnen"
+              aria-label="Bild als Vollbild öffnen"
+            >
+              <Bild
+                class="serie-bild"
+                src={bild}
+                alt=""
+                widths={[640, 960, 1280, 1600, 2000]}
+                sizes="100vw"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : undefined}
+              />
+            </a>
+
+            <div id={`lb-${serie.id}-${i}`} class="lightbox">
+              {/* Weisse Fläche rundum: Klick darauf schliesst. */}
+              <a href={`#b-${serie.id}-${i}`} class="lightbox-flaeche" aria-label="Schliessen" />
+              <Bild
+                class="lightbox-bild"
+                src={bild}
+                alt=""
+                widths={[640, 960, 1280, 1600, 2000]}
+                sizes="100vw"
+                loading="lazy"
+              />
+              <a href={`#b-${serie.id}-${i}`} class="lightbox-x" aria-label="Schliessen">
+                ×
+              </a>
+            </div>
+          </Fragment>
         ))
       }
     </div>
@@ -128,6 +156,61 @@ const hatEinleitung = (serie.body ?? '').trim().length > 0;
     flex-direction: column;
     align-items: center;
     gap: var(--rhythmus-block);
+  }
+
+  /* Öffner umschliesst das Bild eng (schrumpft auf dessen Grösse). */
+  .bild-oeffnen {
+    display: block;
+    text-decoration: none;
+    line-height: 0;
+  }
+
+  /* --- Vollbild-Ansicht (Lightbox, reines CSS über :target) ---
+     Weisse Fläche über der ganzen Seite, Bild zentriert — maximale Konzentration
+     auf das Bild. Standardmässig ausgeblendet, sichtbar nur als :target. */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-lightbox);
+    display: none;
+    background-color: var(--farbe-rahmen); /* weiss */
+  }
+
+  .lightbox:target {
+    display: block;
+  }
+
+  /* Ganzflächiger Schliess-Bereich (die weisse Fläche neben dem Bild). */
+  .lightbox-flaeche {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* In der Vollbild-Ansicht den nativen Zeiger zeigen: der invertierende Ball
+     (mix-blend-mode) wäre auf Weiss unsichtbar. zoom-out signalisiert „klicken
+     zum Schliessen"; über dem Kreuz ein Pointer, über dem Bild neutral. */
+  .lightbox,
+  .lightbox-flaeche {
+    cursor: zoom-out;
+  }
+  .lightbox-x {
+    cursor: pointer;
+  }
+
+  /* Das Bild im Vollbild (.lightbox-bild) steht global — das <img> kommt aus der
+     Bild-Komponente und trägt deren Scope, nicht den dieser Seite. */
+
+  /* Schliessen-Kreuz oben rechts. */
+  .lightbox-x {
+    position: absolute;
+    top: var(--abstand-24);
+    right: var(--abstand-24);
+    z-index: 2;
+    font-family: var(--schrift-mono);
+    font-size: var(--groesse-22);
+    line-height: 1;
+    color: var(--farbe-hintergrund); /* dunkel auf Weiss */
+    text-decoration: none;
   }
 
   /* 12vh vor „Nächste Serie". inline-block, damit der Cursor-Kasten (Box-Modus)

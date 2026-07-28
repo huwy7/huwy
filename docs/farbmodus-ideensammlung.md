@@ -180,7 +180,8 @@ schaltet man die Bilder **direkt/inline** durch (Karussell aus A3), ohne Unterse
 ## B4. Offene Punkte düster
 
 - [x] Auto-Weiterschalten: **raus für v1** (nur manuell, siehe A3).
-- [ ] Bildfluss durchgehend oder nach Serien gruppiert (siehe A3).
+- [x] Bildfluss **nach Serien gruppiert** (jede Serie ein eigenes Karussell,
+      Serien gestapelt) — nicht durchgehend. (Umgesetzt.)
 
 ---
 
@@ -214,14 +215,14 @@ knallig), leichter Grain, sonnig.**
 ## C3. Architektur / CMS
 
 - [x] Route: **`/color`** (einheitlich gehalten).
-- [ ] Zweite Content-Sammlung `farbserien` (einfaches Schema wie heute:
-      Titel, Jahr, Reihenfolge, Titelbild = erstes Bild, weitere Bilder).
-- [ ] Eigener Bildordner (`src/assets/farbserien/<slug>/`, Inhalt `src/content/farbserien/`).
-- [ ] CMS: zweite Sammlung „Farbserien" in `public/admin/config.yml`
-      (separater Upload-Bereich, eigener Medienordner).
-- [ ] Farbmodus-Theme als eigener Scope/Mode-Klasse, damit der düstere Modus
-      unberührt bleibt.
-- [ ] Menü **rechts** (gespiegelt), Umschalt-Button **oben links** (siehe A2b).
+- [x] Zweite Content-Sammlung `farbserien` (einfaches Schema wie heute:
+      Titel, Jahr, Reihenfolge, Titelbild = erstes Bild, weitere Bilder). (Umgesetzt.)
+- [x] Eigener Bildordner (`src/assets/farbserien/<slug>/`, Inhalt `src/content/farbserien/`). (Umgesetzt.)
+- [x] CMS: zweite Sammlung „Farbserien" in `public/admin/config.yml`
+      (separater Upload-Bereich, eigener Medienordner). (Umgesetzt.)
+- [x] Farbmodus-Theme als eigener Scope/Mode-Klasse (`data-modus='farbe'`), damit
+      der düstere Modus unberührt bleibt. (Umgesetzt.)
+- [x] Menü **rechts** (gespiegelt), Umschalt-Button **oben links** (siehe A2b). (Umgesetzt.)
 
 ## C4. „More about me" (farbig) — eigener Inhalt
 

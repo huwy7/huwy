@@ -24,6 +24,18 @@ Serie mehr an, um eine Ebene tiefer zu gehen. Stattdessen laufen/rotieren die
 Bilder **direkt auf der Hauptseite** — durchschalten (vor/zurück) und evtl.
 automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspringen.
 
+## Umsetzungsstand
+
+- **Stufe 1 — erledigt (live):** Modus-abhängiges Layout, **Umschalt-Button**
+  (spanisch) in beide Richtungen, **gespiegelte, englische Kopfzeile**
+  (`Portfolio`, `About me`/`More about me`), Routen **`/color`** + `/color/ueber-mich`,
+  Farbmodus-**Platzhalter-Theme** (warmes Dunkel, kein Hund-Blur). Düstere Seite
+  läuft unverändert weiter.
+- **Nächste Stufen (offen):** (2) CMS-Sammlung `farbserien` + Farbfotos-Upload;
+  (3) **Karussell** (pro Serie inline durchschalten) — zuerst Farbmodus, dann
+  düsterer Modus; (4) düstere Seite: Untermenüs raus, Titelbild = erstes Serienbild;
+  (5) finaler warmer/verwaschener Look aus dem eigenen Bild des Betreibers.
+
 ---
 
 # Teil A — Gemeinsam (beide Modi)

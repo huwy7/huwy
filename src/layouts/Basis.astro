@@ -14,9 +14,21 @@ interface Props {
   // Bild einer Serie beim Anklicken schon im Cache liegt. Reiner Browser-Hinweis,
   // kein JavaScript.
   bildVorladen?: string[];
+  // Modus: 'duester' (Standard, Schwarzweiss) oder 'farbe' (farbige Unterseite).
+  // Steuert Theme (data-modus), Kopfzeilen-Layout (gespiegelt) und Ziele.
+  modus?: 'duester' | 'farbe';
 }
 
-const { titel, beschreibung, ogBild, bildVorladen } = Astro.props;
+const { titel, beschreibung, ogBild, bildVorladen, modus = 'duester' } = Astro.props;
+
+// Modus-abhängige Navigation. Farbmodus ist gespiegelt (Menü rechts, Umschalt-
+// Button links); Beschriftungen englisch, nur der Umschalt-Button spanisch.
+const farbe = modus === 'farbe';
+const portfolioZiel = farbe ? '/color' : '/';
+const aboutZiel = farbe ? '/color/ueber-mich' : '/ueber-mich';
+const aboutLabel = farbe ? 'More about me' : 'About me';
+const switchZiel = farbe ? '/' : '/color';
+const switchLabel = farbe ? 'Me gusta la noche' : 'Me gusta el sol';
 
 // Hintergrund des Zugangs-Tors: das raue Schwarzweiss-Foto (grain, düster —
 // CLAUDE.md 1a) füllt den Bildschirm formatunabhängig (cover). Optimiert über
@@ -26,10 +38,12 @@ const torWebp = await getImage({ src: torBild, format: 'webp', quality: 80 });
 const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url("${torWebp.src}") type("image/webp"))`;
 
 // Aktive Navigation: Portfolio umfasst Startseite und Serienseiten (die Galerie),
-// „Über mich" die gleichnamige Seite.
+// About me die gleichnamige Seite — je Modus mit eigenem Pfad-Präfix.
 const pfad = Astro.url.pathname;
-const istPortfolio = pfad === '/' || pfad.startsWith('/serien');
-const istUeber = pfad.startsWith('/ueber-mich');
+const istPortfolio = farbe
+  ? pfad === '/color' || pfad.startsWith('/color/serien')
+  : pfad === '/' || pfad.startsWith('/serien');
+const istUeber = farbe ? pfad.startsWith('/color/ueber-mich') : pfad.startsWith('/ueber-mich');
 
 // Absolute URLs für Kanonik und Open Graph.
 const kanonisch = new URL(Astro.url.pathname, Astro.site);
@@ -40,7 +54,7 @@ const name = 'TODO_NAME';
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-modus={modus}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -91,13 +105,41 @@ const name = 'TODO_NAME';
       </form>
     </div>
 
-    <!-- Kopfzeile: Portfolio (Galerie/Startseite) und Über mich. Bewusst schlicht,
-         mono, damit der Fokus auf den Bildern bleibt. -->
+    <!-- Kopfzeile: Portfolio + About me, dazu der Modus-Umschalt-Button. Gespiegelt
+         je Modus (düster: Menü links / Button rechts; farbig: Button links / Menü
+         rechts). Schlicht, mono, Fokus bleibt auf den Bildern. -->
     <header class="kopf">
-      <nav class="kopf-nav" aria-label="Hauptnavigation">
-        <a href="/" aria-current={istPortfolio ? 'page' : undefined}>Portfolio</a>
-        <a href="/ueber-mich" aria-current={istUeber ? 'page' : undefined}>Über mich</a>
-      </nav>
+      {
+        farbe ? (
+          <>
+            <a class="kopf-switch" href={switchZiel}>
+              {switchLabel}
+            </a>
+            <nav class="kopf-nav" aria-label="Hauptnavigation">
+              <a href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
+                {aboutLabel}
+              </a>
+              <a href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
+                Portfolio
+              </a>
+            </nav>
+          </>
+        ) : (
+          <>
+            <nav class="kopf-nav" aria-label="Hauptnavigation">
+              <a href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
+                Portfolio
+              </a>
+              <a href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
+                {aboutLabel}
+              </a>
+            </nav>
+            <a class="kopf-switch" href={switchZiel}>
+              {switchLabel}
+            </a>
+          </>
+        )
+      }
     </header>
 
     <main class="inhalt">
@@ -105,8 +147,15 @@ const name = 'TODO_NAME';
     </main>
 
     <style>
-      /* Kopfzeile: gleicher Rasterrahmen wie der Inhalt, schlicht und mono. */
+      /* Kopfzeile: gleicher Rasterrahmen wie der Inhalt, schlicht und mono. Menü und
+         Umschalt-Button sitzen an den beiden Enden (space-between) — dadurch ist die
+         Kopfzeile im Farbmodus automatisch gespiegelt (dort steht der Button zuerst
+         im Markup, also links, das Menü rechts). */
       .kopf {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--abstand-24);
         max-width: var(--container);
         width: 100%;
         margin-inline: auto;
@@ -117,19 +166,29 @@ const name = 'TODO_NAME';
       .kopf-nav {
         display: flex;
         gap: var(--abstand-24);
+      }
+
+      .kopf-nav,
+      .kopf-switch {
         font-family: var(--schrift-mono);
         font-size: var(--groesse-14);
         line-height: var(--zeilenhoehe-1-4);
         font-variant-ligatures: none;
       }
 
-      .kopf-nav a {
+      .kopf-nav a,
+      .kopf-switch {
         color: var(--farbe-text-leise);
         text-decoration: none;
       }
 
       /* Aktive Seite hervorheben (die andere bleibt gedämpft). */
       .kopf-nav a[aria-current='page'] {
+        color: var(--farbe-text);
+      }
+
+      /* Umschalt-Button (spanisch) — etwas präsenter als die Navigation. */
+      .kopf-switch {
         color: var(--farbe-text);
       }
 

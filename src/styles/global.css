@@ -83,6 +83,18 @@ body::after {
   opacity: 0.6;
 }
 
+/* --- Farbmodus (Platzhalter) ---
+   Vorerst nur strukturell: leicht warmer, dunkler Grund ohne den Hund-Blur. Der
+   finale warme/sonnige, verwaschene Look (eigenes Bild + Palette) kommt später —
+   siehe docs/farbmodus-ideensammlung.md. Nur der Farbmodus (data-modus="farbe")
+   ist betroffen; die düstere Seite bleibt unverändert. */
+:root[data-modus='farbe'] {
+  --farbe-hintergrund: #17110a;
+}
+:root[data-modus='farbe'] body::before {
+  display: none;
+}
+
 img,
 picture,
 svg {

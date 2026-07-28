@@ -33,10 +33,13 @@ automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspring
 - [x] **Passwort-Tor gilt für beide Modi** — einmal im Besuch entsperrt, beides offen.
 - [x] **Kopfzeile gespiegelt** je Modus (Details A2b): düster = Menü **links**,
       Umschalt-Button **rechts**; farbig = Menü **rechts**, Umschalt-Button **links**.
-- [x] **Eigenes „Über mich" pro Modus** mit **anderem Inhalt** (düster:
-      künstlerisch/Musik; farbig: z. B. Reisen/Sport). Kein geteiltes „Über mich".
-- [x] **Kein Untermenü / keine Serie zum Anklicken** — in beiden Modi Bilder direkt
-      auf der Hauptseite durchschalten (siehe A3).
+- [x] **Sprache:** nur die **Umschalt-Buttons spanisch**; der Rest **englisch** —
+      `Portfolio`, `About me` (düster), `More about me` (farbig).
+- [x] **Eigenes „About me" pro Modus** mit **anderem Inhalt** (düster:
+      künstlerisch/Musik; farbig: z. B. Reisen/Sport). Kein geteiltes About.
+- [x] **Route Farbmodus:** `/color` (einheitlich gehalten).
+- [x] **Kein Untermenü / keine Serie zum Anklicken.** Aber: **Serien bleiben**,
+      untereinander gestapelt; **pro Serie** die Bilder direkt durchschalten (A3/B2).
 
 ## A2. Umschalt-Button (Beschriftung)
 
@@ -51,24 +54,27 @@ Verspielter, augenzwinkernder **spanischer** Ton. Erste Ideen:
   - `Me gusta la noche` — „Ich mag die Nacht"
   - kurz: `La noche`
 
-Offen: finale Formulierung, Länge (Satz vs. kurz), Stil/Platzierung. Hinweis:
-Sentence Case ist sonst Regel (Regel 8) — hier bewusst brechen oder anpassen.
+Offen: finale Formulierung, Länge (Satz vs. kurz), Stil/Platzierung. Nur diese
+Umschalt-Buttons sind spanisch; alle übrigen Beschriftungen englisch (A2b).
 
-## A2b. Kopfzeilen-Layout (gespiegelt)
+## A2b. Kopfzeilen-Layout (gespiegelt) + Sprache
 
 Die Kopfzeile ist zwischen den Modi **gespiegelt**:
 
-- **Düstere Seite:** Menü **links** — `Portfolio`, dann `Über mich`. Umschalt-Button
-  **oben rechts** (→ Farbe, z. B. „¿A quién le gusta el sol?").
-- **Farbige Seite:** Menü **rechts** — von der Mitte nach aussen `mehr über mich`,
-  dann `Portfolio` ganz rechts (Spiegelbild). Umschalt-Button **oben links**
-  (→ zurück in den düsteren Modus, z. B. „A mí me gusta la noche").
+- **Düstere Seite:** Menü **links** — `Portfolio`, dann `About me`. Umschalt-Button
+  **oben rechts**, spanisch (→ Farbe, z. B. „¿A quién le gusta el sol?").
+- **Farbige Seite:** Menü **rechts** — von der Mitte nach aussen `More about me`,
+  dann `Portfolio` ganz rechts (Spiegelbild). Umschalt-Button **oben links**,
+  spanisch (→ zurück in den düsteren Modus, z. B. „A mí me gusta la noche").
 
-Das Menü bleibt in beiden Modi `Portfolio` + ein „Über mich", nur gespiegelt
-angeordnet. Auf der düsteren Seite heisst es **`Über mich`**, auf der farbigen
-**`mehr über mich`** — damit klar ist, dass es dort **zusätzliche** Dinge gibt
-(nicht dasselbe wie auf der düsteren Seite, wo man es evtl. schon angeklickt hat).
-`Portfolio` führt zur jeweiligen Bild-Hauptseite, das „Über mich" zum modus-eigenen.
+**Sprache:** Menü/Beschriftungen **englisch** (`Portfolio`, `About me`,
+`More about me`), nur die Modus-**Umschalt-Buttons spanisch**. Das About heisst
+düster **`About me`**, farbig **`More about me`** — damit klar ist, dass es dort
+**zusätzliche** Dinge gibt. `Portfolio` führt zur jeweiligen Bild-Hauptseite, das
+About zum modus-eigenen.
+
+Hinweis: die heutige deutsche Navigation (`Über mich`) wird beim Umbau auf Englisch
+umgestellt.
 
 ## A3. Bild-Weiterschaltung statt Untermenü (Karussell) — für BEIDE Modi
 
@@ -79,8 +85,10 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 - [ ] **Manuell weiter/zurück** (Pfeile, Wischen/Swipe, Klick auf Bildrand).
 - [x] **Kein automatisches Weiterschalten für v1** — bewusst simpel gehalten, nur
       manuell. Auto-Weiterschalten kann später nachgerüstet werden.
-- [ ] **Gruppierung:** ein durchgehender Bildfluss, oder weiter nach Serien
-      gruppiert (aber inline als Karussell statt als anklickbare Serie)?
+- [x] **Gruppierung: nach Serien** (kein durchgehender Fluss). Serien untereinander
+      gestapelt, **neuste zuoberst**, ältere weiter unten. Man scrollt runter durch
+      die Serien; **pro Serie** ist ein **inline-Karussell** (Bilder in-place
+      durchschalten), statt die Serie anzuklicken.
 - [x] **Technik: reines CSS** (scroll-snap, No-JS) fürs manuelle Durchschalten —
       kein neues JavaScript (Auto-Modus ist raus, siehe oben).
 
@@ -119,23 +127,29 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 
 - [x] **Düster, dunkel, raw** bleibt der Standard (near-black Grund, Grain, ruhiges
       Weiss als Passepartout). **Nicht** anfassen beim Farbmodus-Bau.
+- [x] **Verwischter Hund-Hintergrund** ~10% sichtbarer (Helligkeit/Kontrast) für mehr
+      S/W-Dynamik; **nur Hochkant** Richtung Schnauze (rechts) verschoben. Gilt
+      **nur** für den Blur-Layer (`body::before`) — das **Sperrbildschirm-Bild**
+      (`#tor`) hat keinen filter und bleibt scharf/unangetastet. (Umgesetzt.)
 
-## B2. Umbau: kein Untermenü mehr (aktuelle Änderung an der düsteren Seite)
+## B2. Umbau: kein Untermenü mehr, aber Serien bleiben (gestapelt)
 
 Heute: Startseite zeigt Serien-Titelbilder → Klick öffnet die Serien-Unterseite.
 
-Neu gewünscht: **kein Klick in eine Serie**, sondern Bilder **direkt auf der
-Hauptseite** durchschalten/rotieren (Karussell-Prinzip aus A3), evtl. automatisch.
+Neu: **kein Klick in eine Serie**. Die **Serien bleiben** und liegen untereinander
+(**neuste zuoberst**, ältere weiter unten — man scrollt runter). Aber **pro Serie**
+schaltet man die Bilder **direkt/inline** durch (Karussell aus A3), ohne Unterseite.
 
-- [ ] Startseite düster auf Karussell/Durchschalten umstellen (Details siehe A3).
+- [ ] Startseite düster: je Serie ein inline-Karussell, Serien untereinander,
+      Sortierung neuste zuoberst.
 - [ ] Klären, was mit den heutigen Serien-Unterseiten (`/serien/<slug>`),
       der „Nächste Serie"-Navigation und dem Vorlade-Mechanismus passiert.
 - [ ] Vollbild-Ansicht (Lightbox) in das neue Prinzip einpassen (A3).
 
-## B3. „Über mich" (düster) — eigener Inhalt
+## B3. „About me" (düster) — eigener Inhalt
 
 - [ ] Künstlerisch/düster gehaltene Themen, z. B. **Musikgeschmack** u. Ä.
-      (Gedanke, noch offen). Menü links, führt zum düsteren „Über mich".
+      (Gedanke, noch offen). Menü links, Label `About me`, führt zum düsteren About.
 
 ## B4. Offene Punkte düster
 
@@ -173,7 +187,7 @@ knallig), leichter Grain, sonnig.**
 
 ## C3. Architektur / CMS
 
-- [ ] Route: `/color` (o. `/farbe`) — **Name noch offen** (englischer Button vs. deutsch).
+- [x] Route: **`/color`** (einheitlich gehalten).
 - [ ] Zweite Content-Sammlung `farbserien` (einfaches Schema wie heute:
       Titel, Jahr, Reihenfolge, Titelbild = erstes Bild, weitere Bilder).
 - [ ] Eigener Bildordner (`src/assets/farbserien/<slug>/`, Inhalt `src/content/farbserien/`).
@@ -183,12 +197,12 @@ knallig), leichter Grain, sonnig.**
       unberührt bleibt.
 - [ ] Menü **rechts** (gespiegelt), Umschalt-Button **oben links** (siehe A2b).
 
-## C4. „mehr über mich" (farbig) — eigener Inhalt
+## C4. „More about me" (farbig) — eigener Inhalt
 
-- [x] Label **`mehr über mich`** (statt nur „Über mich") — signalisiert, dass es
-      hier zusätzlichen Inhalt gibt. (Betreiber offen für Alternativen, vorerst so.)
+- [x] Label **`More about me`** (statt nur „About me") — signalisiert, dass es hier
+      zusätzlichen Inhalt gibt. (Betreiber offen für Alternativen, vorerst so.)
 - [ ] Themenmässig anders, z. B. **Reisen, Sport** u. Ä. (Gedanke, noch offen).
-      Menü rechts, führt zum farbigen „mehr über mich".
+      Menü rechts, führt zum farbigen „More about me".
 - [ ] Evtl. weitere Signale „hier gibt's mehr" (kleiner Hinweis/Zähler?) — optional,
       offen für Vorschläge.
 

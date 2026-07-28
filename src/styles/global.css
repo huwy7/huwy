@@ -50,7 +50,11 @@ body::before {
   background-repeat: no-repeat;
   /* Stark verwischt: keine erkennbaren Details. brightness/contrast leicht höher
      als zuvor (~10% mehr Sichtbarkeit) für etwas mehr Schwarzweiss-Dynamik im
-     Grund — weiterhin ruhig, Fokus bleibt auf den Bildern. */
+     Grund — weiterhin ruhig, Fokus bleibt auf den Bildern.
+     WICHTIG: dieser filter (und die Hochkant-Verschiebung unten) gilt NUR für
+     diesen Blur-Layer. Das Zugangs-Tor (#tor, Sperrbildschirm) nutzt dieselbe
+     Bilddatei, hat aber KEINEN filter — es bleibt scharf/natürlich und darf hier
+     nicht mitverändert werden. */
   filter: blur(72px) brightness(0.48) contrast(1.4) grayscale(1);
 }
 

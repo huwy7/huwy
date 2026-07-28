@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import Basis from '../layouts/Basis.astro';
 import Bild from '../components/Bild.astro';
 
@@ -7,11 +8,25 @@ import Bild from '../components/Bild.astro';
 const serien = (await getCollection('serien')).sort(
   (a, b) => a.data.reihenfolge - b.data.reihenfolge,
 );
+
+// Vom ersten Bild jeder Serie eine AVIF-Variante im Hintergrund vorladen, damit
+// die Serienseite beim Anklicken sofort ein Bild zeigt. Breite 1280 und Qualität
+// 65 sind identisch zur Serienseite (Bild.astro, widths + QUALITAET.avif), damit
+// die vorgeladene URL exakt einem srcset-Eintrag entspricht — echter Cache-Treffer.
+const vorladeAvif = await Promise.all(
+  serien.map(async (serie) => {
+    const erstes = serie.data.bilder[0]?.datei;
+    if (!erstes) return null;
+    const avif = await getImage({ src: erstes, widths: [1280], format: 'avif', quality: 65 });
+    return avif.src;
+  }),
+);
+const bildVorladen = vorladeAvif.filter((u): u is string => u !== null);
 ---
 
 <!-- Startseite (Spezifikation 6.1). Erstes sichtbares Element unter dem Header
      ist ein Bild; die h1 trägt den Namen nur für Screenreader. -->
-<Basis titel="TODO_NAME">
+<Basis titel="TODO_NAME" bildVorladen={bildVorladen}>
   <h1 class="visuell-versteckt">TODO_NAME</h1>
 
   <ul class="serien-liste">

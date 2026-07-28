@@ -34,10 +34,23 @@ const og = await getImage({
   format: 'jpeg',
   quality: 80,
 });
+
+// Erstes Bild der nächsten Serie im Hintergrund vorladen (rel="prefetch"), damit
+// der „Nächste Serie"-Sprung sofort ein Bild zeigt. Parameter identisch zur
+// Bilddarstellung (Breite 1280, AVIF q65) — echter Cache-Treffer.
+const naechstesBild = naechste.data.bilder[0]?.datei;
+const bildVorladen = naechstesBild
+  ? [(await getImage({ src: naechstesBild, widths: [1280], format: 'avif', quality: 65 })).src]
+  : [];
 ---
 
 <!-- Serienseite (Spezifikation 6.2). Header-Abstand 64px, Bildnormierung 5.1. -->
-<Basis titel={`${serie.data.titel} — TODO_NAME`} beschreibung={beschreibung} ogBild={og.src}>
+<Basis
+  titel={`${serie.data.titel} — TODO_NAME`}
+  beschreibung={beschreibung}
+  ogBild={og.src}
+  bildVorladen={bildVorladen}
+>
   <article class="serie">
     <h1 class="serie-titel">{serie.data.titel}</h1>
     <p class="serie-jahr">{serie.data.jahr}</p>

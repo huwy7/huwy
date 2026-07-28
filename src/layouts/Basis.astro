@@ -28,7 +28,8 @@ const portfolioZiel = farbe ? '/color' : '/';
 const aboutZiel = farbe ? '/color/ueber-mich' : '/ueber-mich';
 const aboutLabel = farbe ? 'More about me' : 'About me';
 const switchZiel = farbe ? '/' : '/color';
-const switchLabel = farbe ? 'Me gusta la noche' : 'Me gusta el sol';
+// Spanisch, augenzwinkernd — als Einladung/Frage. Nur diese Buttons sind spanisch.
+const switchLabel = farbe ? 'A mí me gusta la noche' : '¿A quién le gusta el sol?';
 
 // Hintergrund des Zugangs-Tors: das raue Schwarzweiss-Foto (grain, düster —
 // CLAUDE.md 1a) füllt den Bildschirm formatunabhängig (cover). Optimiert über
@@ -153,9 +154,10 @@ const name = 'TODO_NAME';
          im Markup, also links, das Menü rechts). */
       .kopf {
         display: flex;
+        flex-wrap: wrap; /* langer spanischer Button rutscht bei Bedarf in eine 2. Zeile */
         justify-content: space-between;
         align-items: center;
-        gap: var(--abstand-24);
+        gap: var(--abstand-8) var(--abstand-24);
         max-width: var(--container);
         width: 100%;
         margin-inline: auto;
@@ -166,6 +168,13 @@ const name = 'TODO_NAME';
       .kopf-nav {
         display: flex;
         gap: var(--abstand-24);
+      }
+
+      /* Beschriftungen brechen nicht mitten im Wort/Satz um; lieber die ganze
+         Gruppe in eine neue Zeile (via flex-wrap oben). */
+      .kopf-nav a,
+      .kopf-switch {
+        white-space: nowrap;
       }
 
       .kopf-nav,
@@ -225,6 +234,16 @@ const name = 'TODO_NAME';
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+      }
+      /* Hochkant: der zentrierte Ausschnitt zeigt v. a. Auge/Wange, die Zähne nur
+         am Rand. Das Bild etwas nach rechts Richtung Schnauze schieben, damit mehr
+         vom Hundegebiss sichtbar ist. Nur Position — keine Bildbearbeitung. Nur
+         Hochformat; Querformat bleibt zentriert. Der Dunkel-Schleier (erste Ebene)
+         bleibt mittig hinter dem Eingabefeld, nur das Foto (zweite Ebene) wandert. */
+      @media (orientation: portrait) {
+        #tor {
+          background-position: center, 72% center;
+        }
       }
       html[data-tor='auf'] #tor {
         display: none;

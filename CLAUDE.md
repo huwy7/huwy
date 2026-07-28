@@ -12,12 +12,15 @@ Website, deutschsprachig, keine Anwendungslogik.
 **Das einzige Ziel der Seite:** Besucher sehen die Bilder gross, schnell und ohne
 Ablenkung. Sonst nichts.
 
-> **Nachträgliche Entscheidung des Betreibers:** Kopf- und Fusszeile sind
-> **entfernt**, ebenso die Seiten Über, Kontakt, Impressum und Datenschutz sowie
-> Mail-/Instagram-Links. Die Seite besteht nur noch aus der Startseite (Liste der
-> Serien-Titelbilder, direkt anklickbar) und den Serienseiten. Die Abschnitte zu
-> Header, Fusszeile und diesen Seiten in `docs/01-spezifikation.md` (v. a. 6.1,
-> 6.3–6.5, 3.4) und im Build-Plan sind dadurch überholt.
+> **Nachträgliche Entscheidung des Betreibers:** Fusszeile ist **entfernt**, ebenso
+> die Seiten Kontakt, Impressum und Datenschutz sowie Mail-/Instagram-Links. Die
+> **Kopfzeile ist wieder da** (spätere Entscheidung, hebt die frühere Entfernung
+> teilweise auf): schlichte Mono-Navigation mit **Portfolio** (Galerie = Startseite
+> + Serienseiten) und **Über mich** (`/ueber-mich`, vorerst leer, Inhalt folgt).
+> Ansonsten besteht die Seite aus der Startseite (Liste der Serien-Titelbilder,
+> direkt anklickbar) und den Serienseiten. Die Abschnitte zu Fusszeile und den
+> entfernten Seiten in `docs/01-spezifikation.md` (v. a. 6.3–6.5) und im Build-Plan
+> bleiben überholt.
 >
 > **Zugangs-Tor (Platzhalter):** Vor der Seite liegt ein clientseitiges Passwort-Tor
 > (zweite bewusste Client-JS-Ausnahme neben dem Cursor). Es ist **kein echter

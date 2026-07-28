@@ -25,6 +25,12 @@ const torAvif = await getImage({ src: torBild, format: 'avif', quality: 62 });
 const torWebp = await getImage({ src: torBild, format: 'webp', quality: 80 });
 const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url("${torWebp.src}") type("image/webp"))`;
 
+// Aktive Navigation: Portfolio umfasst Startseite und Serienseiten (die Galerie),
+// „Über mich" die gleichnamige Seite.
+const pfad = Astro.url.pathname;
+const istPortfolio = pfad === '/' || pfad.startsWith('/serien');
+const istUeber = pfad.startsWith('/ueber-mich');
+
 // Absolute URLs für Kanonik und Open Graph.
 const kanonisch = new URL(Astro.url.pathname, Astro.site);
 const ogBildAbsolut = ogBild ? new URL(ogBild, Astro.site) : undefined;
@@ -85,13 +91,48 @@ const name = 'TODO_NAME';
       </form>
     </div>
 
-    <!-- Keine Kopf- und Fusszeile (bewusste Entscheidung des Betreibers).
-         Nur die Bilder; grosszügige vertikale Ränder wie Prints an der Wand. -->
+    <!-- Kopfzeile: Portfolio (Galerie/Startseite) und Über mich. Bewusst schlicht,
+         mono, damit der Fokus auf den Bildern bleibt. -->
+    <header class="kopf">
+      <nav class="kopf-nav" aria-label="Hauptnavigation">
+        <a href="/" aria-current={istPortfolio ? 'page' : undefined}>Portfolio</a>
+        <a href="/ueber-mich" aria-current={istUeber ? 'page' : undefined}>Über mich</a>
+      </nav>
+    </header>
+
     <main class="inhalt">
       <slot />
     </main>
 
     <style>
+      /* Kopfzeile: gleicher Rasterrahmen wie der Inhalt, schlicht und mono. */
+      .kopf {
+        max-width: var(--container);
+        width: 100%;
+        margin-inline: auto;
+        padding-inline: var(--rand);
+        padding-block: var(--abstand-24);
+      }
+
+      .kopf-nav {
+        display: flex;
+        gap: var(--abstand-24);
+        font-family: var(--schrift-mono);
+        font-size: var(--groesse-14);
+        line-height: var(--zeilenhoehe-1-4);
+        font-variant-ligatures: none;
+      }
+
+      .kopf-nav a {
+        color: var(--farbe-text-leise);
+        text-decoration: none;
+      }
+
+      /* Aktive Seite hervorheben (die andere bleibt gedämpft). */
+      .kopf-nav a[aria-current='page'] {
+        color: var(--farbe-text);
+      }
+
       .inhalt {
         flex: 1 0 auto;
         max-width: var(--container);
@@ -129,18 +170,24 @@ const name = 'TODO_NAME';
       html[data-tor='auf'] #tor {
         display: none;
       }
+      /* Eingabefeld als Box mit Invert-Effekt: weisse Fläche + mix-blend-mode:
+         difference wirkt wie eine transparente, invertierte Box (dasselbe Prinzip
+         wie der Cursor). Der Untergrund (Foto) erscheint im Kasten invertiert;
+         Text und Cursor in near-black kontrastieren dadurch immer. Harte Kante,
+         kein Rahmen nötig — die invertierte Fläche ist die Box. */
       #tor-code {
         width: 14ch;
-        padding-block: var(--abstand-8);
+        padding: var(--abstand-8) var(--abstand-16);
         font-family: var(--schrift-mono);
         font-size: var(--groesse-16);
-        color: var(--farbe-text);
+        color: var(--farbe-hintergrund);
         text-align: center;
-        background: transparent;
+        background: var(--farbe-rahmen);
+        mix-blend-mode: difference;
         border: none;
-        border-bottom: var(--linie-staerke) solid var(--farbe-text);
+        border-radius: 0;
         outline: none;
-        caret-color: var(--farbe-text);
+        caret-color: var(--farbe-hintergrund);
         font-variant-ligatures: none;
       }
       /* Der Touch-Schweif (.spur / .spur__punkt) steht in global.css — die

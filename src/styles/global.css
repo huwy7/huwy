@@ -48,10 +48,19 @@ body::before {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  /* Stark verwischt: keine erkennbaren Details. contrast(1.25) verstärkt die
-     Schwarzweiss-Tonwertunterschiede (mehr Stufen/Struktur), brightness bleibt
-     niedrig — nur wenig mehr Sichtbarkeit, weiterhin ruhig. */
-  filter: blur(72px) brightness(0.44) contrast(1.25) grayscale(1);
+  /* Stark verwischt: keine erkennbaren Details. brightness/contrast leicht höher
+     als zuvor (~10% mehr Sichtbarkeit) für etwas mehr Schwarzweiss-Dynamik im
+     Grund — weiterhin ruhig, Fokus bleibt auf den Bildern. */
+  filter: blur(72px) brightness(0.48) contrast(1.4) grayscale(1);
+}
+
+/* Hochkant (Smartphone): der Ausschnitt wirkt mittig sehr gleichmässig. Das Bild
+   etwas Richtung Schnauze (rechts im Bild) schieben — mehr Tonwert-Dynamik im
+   sichtbaren Ausschnitt. Nur Hochformat; Querformat bleibt zentriert. */
+@media (orientation: portrait) {
+  body::before {
+    background-position: 72% center;
+  }
 }
 
 /* Darüber Korn + Vignette (leicht transparent), damit die Textur erhalten bleibt

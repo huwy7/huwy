@@ -91,14 +91,11 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 - [x] In der Vollbild-Ansicht **nach links/rechts weiterschalten** (vor/zurück).
 - [x] Vollbild schaltet **nur von Hand** — **kein** automatisches Weiterschalten.
 - [x] **Endlos durchschaltbar** — vor und zurück ohne Ende (Loop).
-- [x] **Schliessen per ✕ oder Klick auf die weisse Fläche** → zurück zur Hauptseite
-      (Portfolio), wie bisher.
+- [x] **Schliessen nur über ✕** (oben rechts) → zurück zur Hauptseite (Portfolio).
+- [x] **Weisse Fläche links = zurück, rechts = weiter** (Blättern). Die Fläche
+      schliesst **nicht** mehr — sie ist zum Durchschalten da.
 - [x] **Technik: reines CSS via `:target`, kein neues JS** (manuelles Blättern, wie
       die heutige Vollbild-Ansicht).
-- [ ] **Nur noch zu klären — Klick-Zonen im Vollbild** (Blättern vs. Schliessen):
-      Vorschlag: ✕ oben rechts = schliessen; schmale Zonen/Pfeile ganz links & rechts
-      = zurück/weiter; restliche weisse Fläche (oben/unten ums Bild) = schliessen.
-      Alternative: schliessen nur über ✕, links/rechts rein zum Blättern.
 
 > Hinweis: Mit dem Karussell entfallen die heutigen Serien-**Unterseiten**
 > (`/serien/<slug>`) samt „Nächste Serie" und dem Bilder-Vorlade-Mechanismus.
@@ -162,6 +159,10 @@ Hauptseite** durchschalten/rotieren (Karussell-Prinzip aus A3), evtl. automatisc
 
 Stichworte: **Retro, Vintage, verwaschener Look, ruhige warme Farben (nicht
 knallig), leichter Grain, sonnig.**
+
+> **Vorgehen (entschieden):** Noch **nichts** an Palette/Grund bauen. Der Betreiber
+> liefert ein **eigenes Bild**, das — wie beim düsteren Modus — **hinter Blur** als
+> Hintergrund liegt und den warmen Grundton vorgibt. Palette danach vom Bild ableiten.
 
 - [ ] Grund: **warm, verwaschen** (statt near-black) — sonnig, gedämpft, nicht grell.
 - [ ] **Leichter Grain**, heller/wärmer abgestimmt als im düsteren Modus.

@@ -56,20 +56,32 @@ Sentence Case ist sonst Regel (Regel 8) — hier bewusst brechen oder anpassen.
 
 Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite.
 
-Offen / zu definieren:
+### Hauptseite (Karussell)
 
 - [ ] **Manuell weiter/zurück** (Pfeile, Wischen/Swipe, Klick auf Bildrand).
 - [ ] **Automatisches Weiterschalten**, wenn man nichts tut? (Tempo? Pausieren bei
       Interaktion?) — **noch zu definieren.**
 - [ ] **Gruppierung:** ein durchgehender Bildfluss, oder weiter nach Serien
       gruppiert (aber inline als Karussell statt als anklickbare Serie)?
-- [ ] **Vollbild-Ansicht (Lightbox):** bleibt sie? Wie fügt sie sich ins Karussell?
-      (Die heutigen Serien-Unterseiten würden entfallen — das betrifft auch die
-      aktuelle „Nächste Serie"-Navigation und den Bilder-Vorlade-Mechanismus.)
 - [ ] **Technik-Hinweis:** manuelles Wischen/Durchschalten geht als **reines CSS**
-      (scroll-snap, No-JS). **Automatisches** Weiterschalten braucht entweder ein
-      kleines JS (Timer) oder eine CSS-Animation — Entscheidung nötig (weitere
-      bewusste JS-Ausnahme ja/nein).
+      (scroll-snap, No-JS). **Automatisches** Weiterschalten braucht ein kleines JS
+      (Timer) oder eine CSS-Animation — Entscheidung nötig (JS-Ausnahme ja/nein).
+
+### Vollbild-Ansicht (Lightbox) — bleibt, jetzt mit Blättern
+
+- [x] **Vollbild bleibt.** Das gerade sichtbare Foto ist **anklickbar** und öffnet
+      wie bisher die Vollbild-Ansicht (weisse Fläche, Konzentration aufs Bild).
+- [x] In der Vollbild-Ansicht **nach links/rechts weiterschalten** (vor/zurück).
+- [x] Vollbild schaltet **nur von Hand** — **kein** automatisches Weiterschalten.
+- [x] **Endlos durchschaltbar** — vor und zurück ohne Ende (Loop).
+- [ ] Schliessen wie bisher (✕ oben rechts / Klick auf die weisse Fläche) — mit den
+      Blätter-Bereichen links/rechts zusammenbringen (Layout klären).
+- [ ] Technik: Blättern in Vollbild braucht Steuerung (Flächen/Pfeile links/rechts).
+      Reines CSS via `:target` möglich, oder kleines JS — Entscheidung nötig.
+
+> Hinweis: Mit dem Karussell entfallen die heutigen Serien-**Unterseiten**
+> (`/serien/<slug>`) samt „Nächste Serie" und dem Bilder-Vorlade-Mechanismus.
+> Die Vollbild-Ansicht mit Links/Rechts-Blättern ersetzt das Durchsehen einer Serie.
 
 ## A4. Sonstiges gemeinsam
 

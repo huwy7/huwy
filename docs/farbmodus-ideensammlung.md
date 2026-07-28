@@ -31,8 +31,10 @@ automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspring
 ## A1. Steht fest
 
 - [x] **Passwort-Tor gilt für beide Modi** — einmal im Besuch entsperrt, beides offen.
-- [x] **Umschalt-Button oben rechts** in der Kopfzeile; auf der Gegenseite durch den
-      Rück-Button ersetzt.
+- [x] **Kopfzeile gespiegelt** je Modus (Details A2b): düster = Menü **links**,
+      Umschalt-Button **rechts**; farbig = Menü **rechts**, Umschalt-Button **links**.
+- [x] **Eigenes „Über mich" pro Modus** mit **anderem Inhalt** (düster:
+      künstlerisch/Musik; farbig: z. B. Reisen/Sport). Kein geteiltes „Über mich".
 - [x] **Kein Untermenü / keine Serie zum Anklicken** — in beiden Modi Bilder direkt
       auf der Hauptseite durchschalten (siehe A3).
 
@@ -51,6 +53,20 @@ Verspielter, augenzwinkernder **spanischer** Ton. Erste Ideen:
 
 Offen: finale Formulierung, Länge (Satz vs. kurz), Stil/Platzierung. Hinweis:
 Sentence Case ist sonst Regel (Regel 8) — hier bewusst brechen oder anpassen.
+
+## A2b. Kopfzeilen-Layout (gespiegelt)
+
+Die Kopfzeile ist zwischen den Modi **gespiegelt**:
+
+- **Düstere Seite:** Menü **links** — `Portfolio`, dann `Über mich`. Umschalt-Button
+  **oben rechts** (→ Farbe, z. B. „¿A quién le gusta el sol?").
+- **Farbige Seite:** Menü **rechts** — von der Mitte nach aussen `Über mich`, dann
+  `Portfolio` ganz rechts (Spiegelbild). Umschalt-Button **oben links**
+  (→ zurück in den düsteren Modus, z. B. „A mí me gusta la noche").
+
+Das Menü bleibt in beiden Modi `Portfolio` + `Über mich`, nur gespiegelt angeordnet.
+`Portfolio` führt zur jeweiligen Bild-Hauptseite, `Über mich` zum modus-eigenen
+„Über mich".
 
 ## A3. Bild-Weiterschaltung statt Untermenü (Karussell) — für BEIDE Modi
 
@@ -85,7 +101,7 @@ Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite
 
 ## A4. Sonstiges gemeinsam
 
-- [ ] **„Über mich": geteilt oder pro Modus?** (Eine gemeinsame Seite, oder je Modus.)
+- [x] **„Über mich" pro Modus** (entschieden, siehe A1) — je eigener Inhalt.
 - [ ] **Cursor/Touch-Invert** in beiden Modi gleich (invertiert einfach den Grund).
 - [ ] **Weicher Überblend-Effekt beim Umschalten?** (View Transitions = etwas
       Client-JS) — für v1 eher harter Seitenwechsel, später möglich.
@@ -114,7 +130,12 @@ Hauptseite** durchschalten/rotieren (Karussell-Prinzip aus A3), evtl. automatisc
       der „Nächste Serie"-Navigation und dem Vorlade-Mechanismus passiert.
 - [ ] Vollbild-Ansicht (Lightbox) in das neue Prinzip einpassen (A3).
 
-## B3. Offene Punkte düster
+## B3. „Über mich" (düster) — eigener Inhalt
+
+- [ ] Künstlerisch/düster gehaltene Themen, z. B. **Musikgeschmack** u. Ä.
+      (Gedanke, noch offen). Menü links, führt zum düsteren „Über mich".
+
+## B4. Offene Punkte düster
 
 - [ ] Auto-Weiterschalten ja/nein + Tempo (siehe A3).
 - [ ] Bildfluss durchgehend oder nach Serien gruppiert (siehe A3).
@@ -154,9 +175,14 @@ knallig), leichter Grain, sonnig.**
       (separater Upload-Bereich, eigener Medienordner).
 - [ ] Farbmodus-Theme als eigener Scope/Mode-Klasse, damit der düstere Modus
       unberührt bleibt.
-- [ ] Umfang: nur Galerie, oder auch eigene Unterseiten? (siehe A4: „Über mich").
+- [ ] Menü **rechts** (gespiegelt), Umschalt-Button **oben links** (siehe A2b).
 
-## C4. Offene Punkte Farbe
+## C4. „Über mich" (farbig) — eigener Inhalt
+
+- [ ] Themenmässig anders, z. B. **Reisen, Sport** u. Ä. (Gedanke, noch offen).
+      Menü rechts, führt zum farbigen „Über mich".
+
+## C5. Offene Punkte Farbe
 
 - [ ] Genauer Grund-Ton + Palette (Muster/Prototyp nötig).
 - [ ] Karussell/Auto-Weiterschalten im Farbmodus identisch zum düsteren? (siehe A3).

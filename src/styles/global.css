@@ -32,19 +32,39 @@ body {
   line-height: var(--zeilenhoehe-1-6);
 }
 
-/* Körniger, dunkler Hintergrund (CLAUDE.md 1a): ein Korn-PNG, fix hinter dem
-   Inhalt, dazu eine dezente Vignette für Schwere. Nur im Hintergrund — die
-   Bilder liegen mit weissem Passepartout darüber und bleiben kornfrei. */
+/* Unterste Hintergrundebene: dasselbe Bild wie das Zugangs-Tor, aber stark
+   verwischt und abgedunkelt. Der Hund ist nicht mehr erkennbar — es bleibt ein
+   ruhiger, körniger Schwarzweiss-Look, der der Seite Leben gibt, ohne die
+   eigentlichen Fotos zu überstrahlen (Fokus bleibt auf den Bildern). Nutzt die
+   bereits geladene Bilddatei (--tor-bg auf <body>), kein zusätzlicher Download.
+   inset negativ, damit der Blur keine hellen Ränder in den Viewport zieht. */
 body::before {
+  content: '';
+  position: fixed;
+  inset: -80px;
+  z-index: -2;
+  pointer-events: none;
+  background-image: var(--tor-bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(72px) brightness(0.4) grayscale(1);
+}
+
+/* Darüber Korn + Vignette (leicht transparent), damit die Textur erhalten bleibt
+   und der Blick zur Mitte geführt wird. Nur im Hintergrund — die Bilder liegen
+   mit weissem Passepartout darüber und bleiben kornfrei. */
+body::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.72) 100%),
     url('/korn.png');
   background-repeat: no-repeat, repeat;
+  opacity: 0.6;
 }
 
 img,

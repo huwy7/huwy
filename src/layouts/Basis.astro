@@ -74,10 +74,12 @@ const name = 'TODO_NAME';
       } catch (e) {}
     </script>
   </head>
-  <body>
+  <body style={`--tor-bg: ${torHintergrund}`}>
     <!-- Zugangs-Tor (Platzhalter). ACHTUNG: kein echter Schutz auf einer statischen
-         Seite — nur eine sichtbare Sperre gegen zufällige Besucher. Siehe docs. -->
-    <div id="tor" style={`--tor-bg: ${torHintergrund}`}>
+         Seite — nur eine sichtbare Sperre gegen zufällige Besucher. Siehe docs.
+         --tor-bg steht auf <body>, damit auch der verwischte Seitenhintergrund
+         (global.css body::before) dieselbe Bilddatei nutzt. -->
+    <div id="tor">
       <form id="tor-form" autocomplete="off">
         <input id="tor-code" type="password" autocomplete="off" aria-label="Zugangscode" />
       </form>

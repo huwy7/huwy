@@ -91,8 +91,13 @@ body::after {
 :root[data-modus='farbe'] {
   --farbe-hintergrund: #17110a;
 }
+/* Farbmodus: statt des Hundes ein warmer Sonnenuntergang, gleiche Blur-Stärke
+   (72px) wie düster, aber ohne Graustufen — der warme Ton bleibt. Etwas gedimmt
+   und kontrastiert, damit der helle Text lesbar bleibt (dazu Vignette + Korn aus
+   body::after, das modusunabhängig darüberliegt). */
 :root[data-modus='farbe'] body::before {
-  display: none;
+  background-image: var(--farbe-bg);
+  filter: blur(72px) brightness(0.5) contrast(1.2) saturate(1.05);
 }
 
 img,

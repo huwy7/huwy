@@ -10,16 +10,12 @@ interface Props {
   beschreibung?: string;
   // Pfad zum Open-Graph-Bild (z. B. aus getImage), wird absolut aufgelöst.
   ogBild?: string;
-  // AVIF-URLs, die im Hintergrund vorgeladen werden (rel="prefetch"), damit das
-  // Bild einer Serie beim Anklicken schon im Cache liegt. Reiner Browser-Hinweis,
-  // kein JavaScript.
-  bildVorladen?: string[];
   // Modus: 'duester' (Standard, Schwarzweiss) oder 'farbe' (farbige Unterseite).
   // Steuert Theme (data-modus), Kopfzeilen-Layout (gespiegelt) und Ziele.
   modus?: 'duester' | 'farbe';
 }
 
-const { titel, beschreibung, ogBild, bildVorladen, modus = 'duester' } = Astro.props;
+const { titel, beschreibung, ogBild, modus = 'duester' } = Astro.props;
 
 // Modus-abhängige Navigation. Farbmodus ist gespiegelt (Menü rechts, Umschalt-
 // Button links); Beschriftungen englisch, nur der Umschalt-Button spanisch.
@@ -67,14 +63,6 @@ const name = 'TODO_NAME';
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-
-    {/* Serienbilder im Hintergrund vorladen (rel="prefetch", Leerlauf-Priorität),
-        damit sie beim Anklicken der Serie schon im Cache liegen. Kein JavaScript. */}
-    {
-      bildVorladen?.map((href) => (
-        <link rel="prefetch" as="image" href={href} type="image/avif" />
-      ))
-    }
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />

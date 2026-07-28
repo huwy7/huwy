@@ -40,10 +40,12 @@ automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspring
   sichtbare Bild öffnet die **Vollbild-Ansicht** (weiss), dort links/rechts blättern
   (endlos), Schliessen nur über **✕** (weisse Flächen = blättern). Alles reines CSS
   (`:target` + scroll-snap), kein JavaScript.
-- **Nächste Stufen (offen):** (4) düstere Seite auf dasselbe Karussell umstellen:
-  Untermenüs (`/serien/[slug]`) raus, Serien gestapelt inline, Titelbild = erstes
-  Serienbild; (5) finaler warmer/verwaschener Look aus dem eigenen Bild des
-  Betreibers.
+- **Stufe 4 — erledigt (live):** Düstere Startseite auf dasselbe **Karussell**
+  umgestellt. Untermenüs (`/serien/[slug]`) raus, Serien gestapelt inline (neueste
+  oben), Titelbild = erstes Serienbild (einmal). „Nächste Serie"-Navigation und
+  Vorlade-Mechanismus (`bildVorladen`) entfernt.
+- **Nächste Stufe (offen):** (5) finaler warmer/verwaschener Look aus dem eigenen
+  Bild des Betreibers — braucht ein Bild vom Betreiber.
 
 ---
 
@@ -161,11 +163,14 @@ Neu: **kein Klick in eine Serie**. Die **Serien bleiben** und liegen untereinand
 (**neuste zuoberst**, ältere weiter unten — man scrollt runter). Aber **pro Serie**
 schaltet man die Bilder **direkt/inline** durch (Karussell aus A3), ohne Unterseite.
 
-- [ ] Startseite düster: je Serie ein inline-Karussell, Serien untereinander,
-      Sortierung neuste zuoberst.
-- [ ] Klären, was mit den heutigen Serien-Unterseiten (`/serien/<slug>`),
-      der „Nächste Serie"-Navigation und dem Vorlade-Mechanismus passiert.
-- [ ] Vollbild-Ansicht (Lightbox) in das neue Prinzip einpassen (A3).
+- [x] Startseite düster: je Serie ein inline-Karussell, Serien untereinander,
+      Sortierung neuste zuoberst (`reihenfolge`, 1 = zuoberst). (Umgesetzt.)
+- [x] Serien-Unterseiten (`/serien/<slug>`) **entfernt**, ebenso die „Nächste
+      Serie"-Navigation und der **Vorlade-Mechanismus** (`bildVorladen`): mit den
+      Bildern direkt auf der Startseite wird nichts mehr vorab in eine Unterseite
+      geladen. (Umgesetzt.)
+- [x] Vollbild-Ansicht (Lightbox) ins Karussell eingepasst (A3): reines CSS,
+      endloses Blättern, Schliessen nur über ✕. (Umgesetzt.)
 
 ## B3. „About me" (düster) — eigener Inhalt
 

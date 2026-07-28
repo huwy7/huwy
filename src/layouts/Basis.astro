@@ -96,6 +96,17 @@ const name = 'TODO_NAME';
       try {
         if (sessionStorage.getItem('tor') === 'auf') document.documentElement.dataset.tor = 'auf';
       } catch (e) {}
+
+      // Seite immer zuoberst öffnen: die automatische Scroll-Wiederherstellung des
+      // Browsers abschalten und bei jedem Seitenaufruf (auch aus dem bfcache) nach
+      // oben scrollen. Reine Progressive Enhancement — ohne JS lädt die Seite wie
+      // gehabt, nur ohne diesen Reset.
+      try {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      } catch (e) {}
+      addEventListener('pageshow', function () {
+        window.scrollTo(0, 0);
+      });
     </script>
   </head>
   <body style={bodyStil}>
@@ -166,6 +177,15 @@ const name = 'TODO_NAME';
         margin-inline: auto;
         padding-inline: var(--rand);
         padding-block: var(--abstand-24);
+      }
+
+      /* Beim Umbruch (schmale Screens) rutscht das zweite Element in eine zweite
+         Zeile. Damit bleibt es rechtsbündig (düster: Umschalt-Button, farbig:
+         Navigation) — die gespiegelte Anordnung bleibt erhalten, statt dass beide
+         Zeilen links untereinander kleben. Auf einer Zeile wirkt es wie
+         space-between. */
+      .kopf > :last-child {
+        margin-inline-start: auto;
       }
 
       .kopf-nav {
@@ -289,7 +309,14 @@ const name = 'TODO_NAME';
         return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
       };
 
-      if (document.documentElement.dataset.tor !== 'auf') torCode?.focus();
+      // Nur bei feinem Zeiger (Desktop) automatisch fokussieren. Auf Touch würde
+      // das Fokussieren die Tastatur öffnen und den Viewport verschieben (iOS
+      // scrollt dann weg von zuoberst) — dort tippt man das Feld selbst an.
+      if (
+        document.documentElement.dataset.tor !== 'auf' &&
+        window.matchMedia('(pointer: fine)').matches
+      )
+        torCode?.focus();
 
       torForm?.addEventListener('submit', async (e) => {
         e.preventDefault();

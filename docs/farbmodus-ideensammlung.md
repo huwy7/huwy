@@ -1,42 +1,42 @@
-# Farbmodus — Ideensammlung & Checkliste
+# Ideensammlung & Checkliste — düstere Seite + farbige Seite
 
 > Status: **nur Ideensammlung.** Noch nichts umgesetzt. Diese Datei sammelt alles,
-> was besprochen wurde, und dient später als Abarbeitungs-Checkliste. Beim Bauen
-> die offenen Punkte (Abschnitt 6) klären, dann Abschnitt 7 abarbeiten.
+> was besprochen wurde, und dient später als Abarbeitungs-Checkliste.
+>
+> **Bewusst getrennt in drei Teile — damit keine Funktion vermischt oder am
+> falschen Ort eingebaut wird:**
+> - **Teil A — Gemeinsam** (gilt für beide Modi)
+> - **Teil B — Düstere Seite** (Schwarzweiss, Standard)
+> - **Teil C — Farbige Seite** (Farbmodus, Unterseite)
 
-## 1. Grundidee
+---
 
-Neben dem bestehenden **düsteren Schwarzweiss-Modus** (Standard) gibt es einen
-zweiten, **farbigen Modus** als getrennte „Unterseite". Oben rechts in der
-Kopfzeile ein Button, der zwischen den Welten wechselt. Technisch dieselbe
-Website, aber eigene URLs/Seiten — man „wechselt den Modus".
+## Überblick
 
-## 2. Was schon feststeht (Entscheidungen)
+Zwei Modi derselben Website:
 
-- [x] **Standard bleibt düster, dunkel, raw** (S/W-Modus = Hauptseite, unverändert).
+- **Düster (Standard):** Schwarzweiss, dunkel, raw. Die Hauptseite.
+- **Farbig (Unterseite):** getrennter Bereich, retro/vintage/warm, eigener
+  Upload-Bereich. Erreichbar über einen Umschalt-Button oben rechts.
+
+**Neuer Leitgedanke für BEIDE Modi:** **kein Untermenü mehr.** Man klickt keine
+Serie mehr an, um eine Ebene tiefer zu gehen. Stattdessen laufen/rotieren die
+Bilder **direkt auf der Hauptseite** — durchschalten (vor/zurück) und evtl.
+automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspringen.
+
+---
+
+# Teil A — Gemeinsam (beide Modi)
+
+## A1. Steht fest
+
 - [x] **Passwort-Tor gilt für beide Modi** — einmal im Besuch entsperrt, beides offen.
-- [x] Der Farbmodus ist eine **Unterseite / eigener Bereich**, **unabhängig** vom
-      düsteren Teil (eigene Galerie, eigener Inhalt).
-- [x] **Getrennte Optik** je Modus.
-- [x] **Eigener Upload-Bereich** für die Farbfotos — **im selben CMS**, aber als
-      **separate Sammlung** (nicht mit den S/W-Serien vermischt).
-- [x] **Umschalt-Button oben rechts** in der Kopfzeile; auf der Gegenseite wird er
-      durch den Rück-Button ersetzt.
+- [x] **Umschalt-Button oben rechts** in der Kopfzeile; auf der Gegenseite durch den
+      Rück-Button ersetzt.
+- [x] **Kein Untermenü / keine Serie zum Anklicken** — in beiden Modi Bilder direkt
+      auf der Hauptseite durchschalten (siehe A3).
 
-## 3. Architektur (Vorschlag, No-JS)
-
-Modus = **eigene Routen**, kein Zustand, kein Toggle-Skript (bleibt No-JS):
-
-- Dunkel (wie jetzt): `/`, `/serien/<slug>`, `/ueber-mich`
-- Farbe (neu): `/color` (o. `/farbe`), `/color/serien/<slug>`
-- Der Button ist ein **Link** auf die andere Welt. Unterschiedliches Aussehen =
-  eigene Seiten mit eigenem Theme.
-
-CMS: zweite Sammlung **„Farbserien"** mit denselben einfachen Feldern (Titel,
-Jahr, Reihenfolge, Titelbild = erstes Bild, weitere Bilder), eigener Bildordner
-(z. B. `src/assets/farbserien/<slug>/`, Inhalt `src/content/farbserien/`).
-
-## 4. Der Umschalt-Button (Beschriftung)
+## A2. Umschalt-Button (Beschriftung)
 
 Verspielter, augenzwinkernder **spanischer** Ton. Erste Ideen:
 
@@ -49,57 +49,109 @@ Verspielter, augenzwinkernder **spanischer** Ton. Erste Ideen:
   - `Me gusta la noche` — „Ich mag die Nacht"
   - kurz: `La noche`
 
-Offen: genaue Formulierung, Länge (ganzer Satz vs. kurz), Stil/Platzierung.
-Hinweis: Sentence Case ist sonst Regel auf der Seite (Regel 8) — hier bewusst
-brechen oder anpassen.
+Offen: finale Formulierung, Länge (Satz vs. kurz), Stil/Platzierung. Hinweis:
+Sentence Case ist sonst Regel (Regel 8) — hier bewusst brechen oder anpassen.
 
-## 5. Optik des Farbmodus (Mood)
+## A3. Bild-Weiterschaltung statt Untermenü (Karussell) — für BEIDE Modi
 
-Stichworte des Betreibers: **Retro, Vintage, verwaschener Look, ruhige warme
-Farben (nicht knallig), leichter Grain, sonnig, vintage.**
+Kernwunsch: Bilder **direkt auf der Hauptseite** durchschalten, keine Unterseite.
 
-Richtung zum Ausarbeiten:
+Offen / zu definieren:
 
-- [ ] Grund: **warm, verwaschen** (statt near-black) — sonnig, gedämpft, nicht grell.
-- [ ] **Leichter Grain** (wie im düsteren Modus, aber heller/wärmer abgestimmt).
-- [ ] **Gedämpfte, warme Palette** (creme/sand/sepia-nah), keine kräftigen Farben.
-- [ ] Passepartout/Rahmen-Ton auf den warmen Grund abstimmen (nicht kaltes Weiss).
-- [ ] Evtl. dezenter Vintage-/Verwaschen-Effekt im Hintergrund (nicht über den Fotos).
-- [ ] Textfarbe/Kontrast auf warmem Grund prüfen (Lesbarkeit).
-- [ ] Bilder bleiben unangetastet (wie im S/W-Modus) — Farbfotos werden so
-      übernommen, wie hochgeladen (keine Filter aufs Bild).
+- [ ] **Manuell weiter/zurück** (Pfeile, Wischen/Swipe, Klick auf Bildrand).
+- [ ] **Automatisches Weiterschalten**, wenn man nichts tut? (Tempo? Pausieren bei
+      Interaktion?) — **noch zu definieren.**
+- [ ] **Gruppierung:** ein durchgehender Bildfluss, oder weiter nach Serien
+      gruppiert (aber inline als Karussell statt als anklickbare Serie)?
+- [ ] **Vollbild-Ansicht (Lightbox):** bleibt sie? Wie fügt sie sich ins Karussell?
+      (Die heutigen Serien-Unterseiten würden entfallen — das betrifft auch die
+      aktuelle „Nächste Serie"-Navigation und den Bilder-Vorlade-Mechanismus.)
+- [ ] **Technik-Hinweis:** manuelles Wischen/Durchschalten geht als **reines CSS**
+      (scroll-snap, No-JS). **Automatisches** Weiterschalten braucht entweder ein
+      kleines JS (Timer) oder eine CSS-Animation — Entscheidung nötig (weitere
+      bewusste JS-Ausnahme ja/nein).
 
-## 6. Offene Punkte / noch zu entscheiden
+## A4. Sonstiges gemeinsam
 
-- [ ] **„Über mich": geteilt oder pro Modus?** (Eine gemeinsame Seite, oder je Modus eigene.)
-- [ ] **Umfang Farbmodus:** nur Galerie/Portfolio, oder auch eigene Unterseiten?
-- [ ] **Route-Name:** `/color` (zum englischen Button) oder `/farbe` (deutsch)?
-- [ ] **Cursor/Touch-Invert & Lightbox** im Farbmodus gleich lassen? (invertiert
-      einfach den farbigen Grund) — vermutlich ja.
-- [ ] **Genauer Grund-Ton + Palette** des Farbmodus (Muster/Prototyp nötig).
-- [ ] **Button-Text final** (siehe Abschnitt 4).
+- [ ] **„Über mich": geteilt oder pro Modus?** (Eine gemeinsame Seite, oder je Modus.)
+- [ ] **Cursor/Touch-Invert** in beiden Modi gleich (invertiert einfach den Grund).
 - [ ] **Weicher Überblend-Effekt beim Umschalten?** (View Transitions = etwas
       Client-JS) — für v1 eher harter Seitenwechsel, später möglich.
+- [ ] Bilder bleiben **unangetastet** (keine Filter aufs Bild) — in beiden Modi.
+- [ ] Definition of done je Umsetzung: 375px & 1440px, kein H-Scroll,
+      Fokus/Tastatur, Kontrast, `astro check` + `npm run build` sauber.
 
-## 7. Umsetzungs-Checkliste (später abarbeiten)
+---
 
-- [ ] Zweite Content-Sammlung `farbserien` (Schema wie `serien`).
-- [ ] CMS: zweite Sammlung „Farbserien" in `public/admin/config.yml` (separater
-      Upload-Bereich, eigener Medienordner).
-- [ ] Farbmodus-Theme: eigene Tokens/Variante (warmer Grund, Grain, Palette,
-      Rahmen-Ton) — als Mode-Klasse/Scope, damit der düstere Modus unberührt bleibt.
-- [ ] Routen: `/color` (Startseite Farbmodus) + `/color/serien/<slug>`.
-- [ ] Header: Umschalt-Button oben rechts, je Modus die passende Beschriftung/Link.
-- [ ] Startseite Farbmodus (Liste der Farbserien-Titelbilder) analog zur S/W-Startseite.
-- [ ] Serienseiten Farbmodus (Titelbild = erstes Bild, Lightbox, Vorladen) wie S/W.
-- [ ] Passwort-Tor greift auch im Farbmodus (dieselbe Sitzungs-Freischaltung).
-- [ ] Sitemap/robots: Farbmodus-Seiten aufnehmen.
-- [ ] CLAUDE.md: zweiten Modus/Mood dokumentieren (bewusste Entscheidung).
-- [ ] Prüfen: 375px & 1440px, kein H-Scroll, Fokus/Tastatur, Kontrast, `astro check`,
-      `npm run build` sauber (Definition of done).
+# Teil B — Düstere Seite (Schwarzweiss, Standard)
 
-## 8. Notizen / Referenz
+## B1. Optik / Mood — bleibt
 
-- Frühere Alternatividee (verworfen): scroll-gesteuerter Hintergrund-Verlauf von
-  S/W zu Farbe. Stattdessen **getrennter Modus per Button** (sauberer, No-JS,
-  düsterer Grund bleibt Standard).
+- [x] **Düster, dunkel, raw** bleibt der Standard (near-black Grund, Grain, ruhiges
+      Weiss als Passepartout). **Nicht** anfassen beim Farbmodus-Bau.
+
+## B2. Umbau: kein Untermenü mehr (aktuelle Änderung an der düsteren Seite)
+
+Heute: Startseite zeigt Serien-Titelbilder → Klick öffnet die Serien-Unterseite.
+
+Neu gewünscht: **kein Klick in eine Serie**, sondern Bilder **direkt auf der
+Hauptseite** durchschalten/rotieren (Karussell-Prinzip aus A3), evtl. automatisch.
+
+- [ ] Startseite düster auf Karussell/Durchschalten umstellen (Details siehe A3).
+- [ ] Klären, was mit den heutigen Serien-Unterseiten (`/serien/<slug>`),
+      der „Nächste Serie"-Navigation und dem Vorlade-Mechanismus passiert.
+- [ ] Vollbild-Ansicht (Lightbox) in das neue Prinzip einpassen (A3).
+
+## B3. Offene Punkte düster
+
+- [ ] Auto-Weiterschalten ja/nein + Tempo (siehe A3).
+- [ ] Bildfluss durchgehend oder nach Serien gruppiert (siehe A3).
+
+---
+
+# Teil C — Farbige Seite (Farbmodus, Unterseite)
+
+## C1. Steht fest
+
+- [x] Farbmodus ist eine **Unterseite / eigener Bereich**, **unabhängig** vom
+      düsteren Teil (eigene Galerie, eigener Inhalt).
+- [x] **Getrennte Optik**.
+- [x] **Eigener Upload-Bereich** für Farbfotos — **im selben CMS**, aber als
+      **separate Sammlung** (nicht mit den S/W-Serien vermischt).
+- [x] **Auch hier kein Untermenü** — Bilder direkt durchschalten/rotieren (A3).
+
+## C2. Optik / Mood — Farbe
+
+Stichworte: **Retro, Vintage, verwaschener Look, ruhige warme Farben (nicht
+knallig), leichter Grain, sonnig.**
+
+- [ ] Grund: **warm, verwaschen** (statt near-black) — sonnig, gedämpft, nicht grell.
+- [ ] **Leichter Grain**, heller/wärmer abgestimmt als im düsteren Modus.
+- [ ] **Gedämpfte, warme Palette** (creme/sand/sepia-nah), keine kräftigen Farben.
+- [ ] Rahmen-Ton auf den warmen Grund abstimmen (nicht kaltes Weiss).
+- [ ] Dezenter Vintage-/Verwaschen-Effekt im Hintergrund (nicht über den Fotos).
+- [ ] Textfarbe/Kontrast auf warmem Grund prüfen.
+
+## C3. Architektur / CMS
+
+- [ ] Route: `/color` (o. `/farbe`) — **Name noch offen** (englischer Button vs. deutsch).
+- [ ] Zweite Content-Sammlung `farbserien` (einfaches Schema wie heute:
+      Titel, Jahr, Reihenfolge, Titelbild = erstes Bild, weitere Bilder).
+- [ ] Eigener Bildordner (`src/assets/farbserien/<slug>/`, Inhalt `src/content/farbserien/`).
+- [ ] CMS: zweite Sammlung „Farbserien" in `public/admin/config.yml`
+      (separater Upload-Bereich, eigener Medienordner).
+- [ ] Farbmodus-Theme als eigener Scope/Mode-Klasse, damit der düstere Modus
+      unberührt bleibt.
+- [ ] Umfang: nur Galerie, oder auch eigene Unterseiten? (siehe A4: „Über mich").
+
+## C4. Offene Punkte Farbe
+
+- [ ] Genauer Grund-Ton + Palette (Muster/Prototyp nötig).
+- [ ] Karussell/Auto-Weiterschalten im Farbmodus identisch zum düsteren? (siehe A3).
+
+---
+
+## Notizen / verworfene Ideen
+
+- Verworfen: scroll-gesteuerter Hintergrund-Verlauf von S/W zu Farbe. Stattdessen
+  **getrennter Modus per Button** (sauberer, düsterer Grund bleibt Standard).

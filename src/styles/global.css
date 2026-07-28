@@ -96,18 +96,18 @@ body::after {
    gehalten (kaum gedimmt), gemütlich statt düster. */
 :root[data-modus='farbe'] body::before {
   background-image: var(--farbe-bg);
-  filter: blur(72px) brightness(0.82) contrast(1) saturate(1.06);
+  filter: blur(72px) brightness(1.08) contrast(0.96) saturate(1.1);
 }
 
-/* Feiner Film-Grain statt des groben Korns (korn-fein.png, 1px-Körnung) und nur
-   eine sehr sanfte, warme Vignette — keine düstere Abdunklung. Hält den Grund
-   hell und gemütlich. */
+/* Feiner Film-Grain statt des groben Korns (korn-fein.png, 1px-Körnung), fast
+   ohne Vignette — der helle, sonnige Grund soll nach vorne kommen. Nur ein Hauch
+   Korn für die gemütliche Textur. */
 :root[data-modus='farbe'] body::after {
   background-image:
-    radial-gradient(ellipse at center, transparent 72%, rgba(48, 26, 8, 0.18) 100%),
+    radial-gradient(ellipse at center, transparent 82%, rgba(60, 34, 10, 0.1) 100%),
     url('/korn-fein.png');
   background-repeat: no-repeat, repeat;
-  opacity: 0.7;
+  opacity: 0.45;
 }
 
 img,

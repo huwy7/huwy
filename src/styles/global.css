@@ -92,12 +92,22 @@ body::after {
   --farbe-hintergrund: #17110a;
 }
 /* Farbmodus: statt des Hundes ein warmer Sonnenuntergang, gleiche Blur-Stärke
-   (72px) wie düster, aber ohne Graustufen — der warme Ton bleibt. Etwas gedimmt
-   und kontrastiert, damit der helle Text lesbar bleibt (dazu Vignette + Korn aus
-   body::after, das modusunabhängig darüberliegt). */
+   (72px) wie düster, aber ohne Graustufen — der warme Ton bleibt. Bewusst HELL
+   gehalten (kaum gedimmt), gemütlich statt düster. */
 :root[data-modus='farbe'] body::before {
   background-image: var(--farbe-bg);
-  filter: blur(72px) brightness(0.5) contrast(1.2) saturate(1.05);
+  filter: blur(72px) brightness(0.82) contrast(1) saturate(1.06);
+}
+
+/* Feiner Film-Grain statt des groben Korns (korn-fein.png, 1px-Körnung) und nur
+   eine sehr sanfte, warme Vignette — keine düstere Abdunklung. Hält den Grund
+   hell und gemütlich. */
+:root[data-modus='farbe'] body::after {
+  background-image:
+    radial-gradient(ellipse at center, transparent 72%, rgba(48, 26, 8, 0.18) 100%),
+    url('/korn-fein.png');
+  background-repeat: no-repeat, repeat;
+  opacity: 0.7;
 }
 
 img,

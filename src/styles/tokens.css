@@ -81,7 +81,8 @@
   --cursor-skala-aktiv: 1.8; /* Vergrösserung über interaktiven Elementen */
   --cursor-skala-bild: 0.28; /* kleiner Punkt über Fotos */
   --cursor-skala-druck: 0.7; /* beim Klicken */
-  --cursor-uebergang: 200ms; /* weicher Übergang der Grösse */
+  --cursor-uebergang: 200ms; /* weicher Übergang der Grösse (Skala) */
+  --cursor-morph: 260ms; /* Übergang beim Umschliessen eines Elements (Box-Modus) */
   --z-cursor: 9999;
   --z-tor: 900; /* Zugangs-Tor, unter dem Cursor */
 

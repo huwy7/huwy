@@ -119,9 +119,10 @@ const bildVorladen = naechstesBild
     gap: var(--rhythmus-block);
   }
 
-  /* 12vh vor „Nächste Serie". */
+  /* 12vh vor „Nächste Serie". inline-block, damit der Cursor-Kasten (Box-Modus)
+     eng um den Text schwappt statt über die volle Breite. */
   .naechste-serie {
-    display: block;
+    display: inline-block;
     margin-block-start: var(--rhythmus-block);
     font-family: var(--schrift-mono);
     font-size: var(--groesse-14);

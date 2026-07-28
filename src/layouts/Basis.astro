@@ -200,7 +200,18 @@ const name = 'TODO_NAME';
         let zielY = window.innerHeight / 2;
         let istX = zielX;
         let istY = zielY;
+        let mausX = zielX; // letzte Zeigerposition (Freimodus)
+        let mausY = zielY;
         let sichtbar = false;
+        let boxEl: Element | null = null; // aktuell umschlossenes Element (Box-Modus)
+        const BOX_PAD = 10; // Luft rund um das Element
+
+        // Auswahl der Elemente, die der Cursor als Box umschliesst: kleine
+        // interaktive Elemente. Serienkarten (.serien-link) sind ausgenommen —
+        // dort wirkt der Bild-Invert, kein grosser Kasten um die ganze Karte.
+        const BOX_SELEKTOR =
+          'a:not(.serien-link), button, [role="button"], input, label, summary';
+        const INTERAKTIV_SELEKTOR = 'a, button, [role="button"], input, label, summary';
 
         const platziere = () => {
           cursor.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;
@@ -211,26 +222,62 @@ const name = 'TODO_NAME';
           cursor.classList.remove('cursor--sichtbar');
         };
 
+        // Ziel = Mitte des Elements; Punkt auf dessen Grösse/Radius bringen.
+        const zielAufBox = () => {
+          if (!boxEl) return;
+          const r = boxEl.getBoundingClientRect();
+          const w = r.width + BOX_PAD * 2;
+          const h = r.height + BOX_PAD * 2;
+          punkt.style.width = `${w}px`;
+          punkt.style.height = `${h}px`;
+          punkt.style.borderRadius = `${Math.min(w, h) / 2}px`;
+          zielX = r.left + r.width / 2;
+          zielY = r.top + r.height / 2;
+        };
+
+        // Box lösen: Punkt zurück auf den Kreis (Werte kommen wieder aus dem CSS).
+        const loeseBox = () => {
+          punkt.style.width = '';
+          punkt.style.height = '';
+          punkt.style.borderRadius = '';
+        };
+
         window.addEventListener('pointermove', (e) => {
           if (e.pointerType !== 'mouse') return;
-          zielX = e.clientX;
-          zielY = e.clientY;
+          mausX = e.clientX;
+          mausY = e.clientY;
           if (!sichtbar) {
             sichtbar = true;
-            istX = zielX;
-            istY = zielY;
+            istX = mausX;
+            istY = mausY;
             cursor.classList.add('cursor--sichtbar');
           }
           const ziel = e.target instanceof Element ? e.target : null;
           const ueberBild = !!(ziel && ziel.closest('img, picture'));
-          const interaktiv = !!(
-            ziel && ziel.closest('a, button, [role="button"], input, label, summary')
-          );
+          const boxZiel = ueberBild ? null : (ziel?.closest(BOX_SELEKTOR) ?? null);
+
           // Über Fotos: Ball schrumpft zum Punkt, das Bild invertiert (per CSS).
           cursor.classList.toggle('cursor--auf-bild', ueberBild);
-          // Über interaktiven Elementen (aber nicht über Fotos) vergrössern.
-          cursor.classList.toggle('cursor--aktiv', interaktiv && !ueberBild);
+          // Box-Modus: der Cursor schwappt in die Umrandung des Elements.
+          cursor.classList.toggle('cursor--box', !!boxZiel);
+          // Fallback-Vergrösserung nur für interaktive Elemente ohne Box/Bild.
+          cursor.classList.toggle(
+            'cursor--aktiv',
+            !ueberBild && !boxZiel && !!(ziel && ziel.closest(INTERAKTIV_SELEKTOR)),
+          );
+
+          if (boxZiel !== boxEl) {
+            boxEl = boxZiel;
+            if (boxEl) zielAufBox();
+            else loeseBox();
+          }
+          if (!boxEl) {
+            zielX = mausX;
+            zielY = mausY;
+          }
+
           if (reduziert.matches) {
+            if (boxEl) zielAufBox();
             istX = zielX;
             istY = zielY;
             platziere();
@@ -247,6 +294,16 @@ const name = 'TODO_NAME';
           const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
           const nachlauf = 0.15; // kleiner = weicherer, längerer Nachlauf
           const schritt = () => {
+            // Box beim Scrollen an das Element gebunden halten; verschwindet das
+            // Element (z. B. Navigation), zurück in den Freimodus.
+            if (boxEl) {
+              if (boxEl.isConnected) zielAufBox();
+              else {
+                boxEl = null;
+                loeseBox();
+                cursor.classList.remove('cursor--box');
+              }
+            }
             istX = lerp(istX, zielX, nachlauf);
             istY = lerp(istY, zielY, nachlauf);
             platziere();

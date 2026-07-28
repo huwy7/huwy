@@ -222,25 +222,38 @@ a {
   display: block;
   width: var(--cursor-groesse);
   height: var(--cursor-groesse);
-  margin-left: calc(var(--cursor-groesse) / -2);
-  margin-top: calc(var(--cursor-groesse) / -2);
   border-radius: 50%; /* Kreis, kein Bild — Regel 5 betrifft nur Bilder */
   background-color: var(--farbe-hintergrund);
   mix-blend-mode: difference; /* invertiert gegen den Untergrund */
-  transition: transform var(--cursor-uebergang) ease;
+  /* Zentriert auf den Zeigerpunkt — funktioniert für jede Grösse, auch wenn der
+     Punkt im Box-Modus zum Rechteck wird. Die Skalierung läuft über eine Custom
+     Property, damit sie sich nicht mit dem Zentrier-translate beisst. */
+  transform: translate(-50%, -50%) scale(var(--cursor-skala, 1));
+  transition:
+    width var(--cursor-morph) ease,
+    height var(--cursor-morph) ease,
+    border-radius var(--cursor-morph) ease,
+    transform var(--cursor-uebergang) ease;
 }
 
 .cursor--aktiv .cursor__punkt {
-  transform: scale(var(--cursor-skala-aktiv));
+  --cursor-skala: var(--cursor-skala-aktiv);
 }
 
 .cursor--druck .cursor__punkt {
-  transform: scale(var(--cursor-skala-druck));
+  --cursor-skala: var(--cursor-skala-druck);
 }
 
 /* Über Fotos: der Ball schrumpft zu einem kleinen Punkt (CLAUDE.md 4a). */
 .cursor--auf-bild .cursor__punkt {
-  transform: scale(var(--cursor-skala-bild));
+  --cursor-skala: var(--cursor-skala-bild);
+}
+
+/* Box-Modus: der Punkt legt sich als abgerundetes Rechteck um das überfahrene
+   Element (Grösse und Radius setzt das Skript inline). Keine Skalierung — die
+   Grösse kommt aus width/height. Der Invert (mix-blend-mode) bleibt erhalten. */
+.cursor--box .cursor__punkt {
+  --cursor-skala: 1;
 }
 
 /* Nativen Zeiger nur verstecken, solange das Cursor-Skript aktiv ist. */

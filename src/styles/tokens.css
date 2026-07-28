@@ -77,6 +77,8 @@
   --vorschau-max-hoehe: 72vh; /* Deckel für Titelbilder der Startseite (Hochformat) */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */
   --rhythmus-block: 12vh; /* 6.2 Abstand zwischen Blöcken/Bildern der Serienseite */
+  --karussell-hoehe: 72vh; /* feste Höhe einer Karussell-Ansicht, damit der Streifen
+     bei unterschiedlichen Seitenverhältnissen ruhig bleibt; Bild wird darin zentriert */
 
   /* --- 4a. Invertierter Cursor (bewusste Ausnahme, siehe CLAUDE.md) --- */
   --cursor-groesse: 24px;

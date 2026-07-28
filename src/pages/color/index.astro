@@ -1,12 +1,33 @@
 ---
+import { getCollection } from 'astro:content';
 import Basis from '../../layouts/Basis.astro';
+import Serie from '../../components/Serie.astro';
 
-// Farbmodus — Portfolio (Startseite der farbigen Seite). Gerüst (Stufe 1):
-// gespiegelte Kopfzeile + Platzhalter-Theme. Galerie/Karussell und die eigenen
-// Farbfotos folgen als nächste Stufe (siehe docs/farbmodus-ideensammlung.md).
+// Farbmodus — Portfolio (Startseite der farbigen Seite). Kein Untermenü mehr:
+// jede Serie liegt als inline-Karussell direkt auf der Seite, gestapelt (neueste
+// oben). Sortierung nach reihenfolge (aufsteigend). Siehe Serie.astro und
+// docs/farbmodus-ideensammlung.md.
+const serien = (await getCollection('farbserien')).sort(
+  (a, b) => a.data.reihenfolge - b.data.reihenfolge,
+);
 ---
 
 <Basis titel="Portfolio — color — TODO_NAME" modus="farbe">
   <h1 class="visuell-versteckt">TODO_NAME — color</h1>
-  <p class="fliesstext">Color — coming soon.</p>
+
+  <div class="serien-liste">
+    {serien.map((serie) => <Serie serie={serie} />)}
+  </div>
 </Basis>
+
+<style>
+  .serien-liste {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Abstand zwischen Serien (Spezifikation 6.1). */
+  .serien-liste :global(.serie) + :global(.serie) {
+    margin-block-start: var(--rhythmus-serie);
+  }
+</style>

@@ -165,6 +165,20 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
+/* Karussell-Foto: das sichtbare Bild einer Karussell-Ansicht. Steht global, weil
+   das <img> aus der Bild-Komponente kommt und den Scope von Serie.astro nicht erbt.
+   Es fügt sich in die feste Karussell-Höhe (--karussell-hoehe) ein, behält sein
+   Seitenverhältnis und trägt dasselbe weisse Passepartout wie die übrigen Bilder. */
+.karussell-foto {
+  box-sizing: border-box;
+  max-height: 100%; /* füllt die feste Höhe der Karussell-Ansicht, ohne zu überlaufen */
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  background-color: var(--farbe-rahmen);
+  padding: var(--rahmen-breite);
+}
+
 /* Höhe aus dem Seitenverhältnis, nicht aus dem height-Attribut (sonst
    verzerren die width/height-Attribute das Bild bei responsiver Breite). */
 img {
@@ -187,6 +201,10 @@ img {
   width: auto;
   height: auto;
   cursor: default;
+  /* Klicks aufs Bild fallen an die darunterliegenden Flächen durch: auf der
+     Serienseite an die Schliess-Fläche, im Karussell an die Blätter-Zonen
+     (links/rechts). Das ✕ liegt darüber (höherer z-index) und schliesst weiter. */
+  pointer-events: none;
 }
 
 /* Überschriften erben Grösse und Zeilenhöhe; konkrete Werte setzen die Seiten

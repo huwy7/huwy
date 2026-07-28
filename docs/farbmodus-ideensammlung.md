@@ -31,10 +31,19 @@ automatisches Weiterschalten. Alles auf **einer Ebene**, kein Vor-/Zurückspring
   (`Portfolio`, `About me`/`More about me`), Routen **`/color`** + `/color/ueber-mich`,
   Farbmodus-**Platzhalter-Theme** (warmes Dunkel, kein Hund-Blur). Düstere Seite
   läuft unverändert weiter.
-- **Nächste Stufen (offen):** (2) CMS-Sammlung `farbserien` + Farbfotos-Upload;
-  (3) **Karussell** (pro Serie inline durchschalten) — zuerst Farbmodus, dann
-  düsterer Modus; (4) düstere Seite: Untermenüs raus, Titelbild = erstes Serienbild;
-  (5) finaler warmer/verwaschener Look aus dem eigenen Bild des Betreibers.
+- **Stufe 2 — erledigt (live):** CMS-Sammlung **`farbserien`** (getrennter
+  Upload-Bereich in `/admin`, gleiche Felder wie die Schwarzweiss-Serien),
+  Content-Collection + gemeinsames Schema, Platzhalter-Farbserien.
+- **Stufe 3 — erledigt (live):** **Karussell** im Farbmodus. Jede Farbserie liegt
+  als inline scroll-snap-Streifen direkt auf `/color` (gestapelt, neueste oben,
+  kein Untermenü). Blättern per Pfeil links/rechts (endlos, reines CSS). Klick aufs
+  sichtbare Bild öffnet die **Vollbild-Ansicht** (weiss), dort links/rechts blättern
+  (endlos), Schliessen nur über **✕** (weisse Flächen = blättern). Alles reines CSS
+  (`:target` + scroll-snap), kein JavaScript.
+- **Nächste Stufen (offen):** (4) düstere Seite auf dasselbe Karussell umstellen:
+  Untermenüs (`/serien/[slug]`) raus, Serien gestapelt inline, Titelbild = erstes
+  Serienbild; (5) finaler warmer/verwaschener Look aus dem eigenen Bild des
+  Betreibers.
 
 ---
 

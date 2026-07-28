@@ -1,25 +1,29 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// Schema exakt nach Spezifikation Abschnitt 7.
-// Abweichung von der Spec-Vorlage: Astro 7 hat die alten Collections
-// (`type: 'content'`) durch die Content-Layer-API ersetzt. Statt `type: 'content'`
-// wird deshalb der `glob`-Loader verwendet. Das zod-Schema selbst ist unverändert.
-// Der Markdown-Körper bleibt der Einleitungstext der Serienseite.
+// Gemeinsames Schema für beide Serien-Sammlungen (düster + farbig): identisch
+// einfach — Titelbild ist zugleich das erste Bild, weitere Bilder als Liste, kein
+// Alt-Text (CLAUDE.md Regel 4). Astro 7: glob-Loader statt `type: 'content'`.
+const serienSchema = ({ image }: SchemaContext) =>
+  z.object({
+    titel: z.string(),
+    jahr: z.number().int(),
+    reihenfolge: z.number().int(), // Sortierung auf der Startseite
+    titelbild: image(),
+    bilder: z.array(image()).default([]),
+  });
+
+// Schwarzweiss-Serien (düsterer Standard-Modus).
 const serien = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/serien' }),
-  schema: ({ image }) =>
-    z.object({
-      titel: z.string(),
-      jahr: z.number().int(),
-      reihenfolge: z.number().int(), // Sortierung auf der Startseite
-      // Titelbild ist zugleich das erste Bild der Serie (Vorschau auf der
-      // Startseite + erstes Bild auf der Serienseite).
-      titelbild: image(),
-      // Weitere Bilder der Serie, einfache Liste von Bild-Uploads (kein Alt-Text).
-      bilder: z.array(image()).default([]),
-    }),
+  schema: serienSchema,
 });
 
-export const collections = { serien };
+// Farbserien (farbiger Modus, /color) — eigener Bereich, gleiche Struktur.
+const farbserien = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/farbserien' }),
+  schema: serienSchema,
+});
+
+export const collections = { serien, farbserien };

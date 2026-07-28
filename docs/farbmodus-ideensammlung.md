@@ -60,13 +60,15 @@ Die Kopfzeile ist zwischen den Modi **gespiegelt**:
 
 - **Düstere Seite:** Menü **links** — `Portfolio`, dann `Über mich`. Umschalt-Button
   **oben rechts** (→ Farbe, z. B. „¿A quién le gusta el sol?").
-- **Farbige Seite:** Menü **rechts** — von der Mitte nach aussen `Über mich`, dann
-  `Portfolio` ganz rechts (Spiegelbild). Umschalt-Button **oben links**
+- **Farbige Seite:** Menü **rechts** — von der Mitte nach aussen `mehr über mich`,
+  dann `Portfolio` ganz rechts (Spiegelbild). Umschalt-Button **oben links**
   (→ zurück in den düsteren Modus, z. B. „A mí me gusta la noche").
 
-Das Menü bleibt in beiden Modi `Portfolio` + `Über mich`, nur gespiegelt angeordnet.
-`Portfolio` führt zur jeweiligen Bild-Hauptseite, `Über mich` zum modus-eigenen
-„Über mich".
+Das Menü bleibt in beiden Modi `Portfolio` + ein „Über mich", nur gespiegelt
+angeordnet. Auf der düsteren Seite heisst es **`Über mich`**, auf der farbigen
+**`mehr über mich`** — damit klar ist, dass es dort **zusätzliche** Dinge gibt
+(nicht dasselbe wie auf der düsteren Seite, wo man es evtl. schon angeklickt hat).
+`Portfolio` führt zur jeweiligen Bild-Hauptseite, das „Über mich" zum modus-eigenen.
 
 ## A3. Bild-Weiterschaltung statt Untermenü (Karussell) — für BEIDE Modi
 
@@ -180,10 +182,14 @@ knallig), leichter Grain, sonnig.**
       unberührt bleibt.
 - [ ] Menü **rechts** (gespiegelt), Umschalt-Button **oben links** (siehe A2b).
 
-## C4. „Über mich" (farbig) — eigener Inhalt
+## C4. „mehr über mich" (farbig) — eigener Inhalt
 
+- [x] Label **`mehr über mich`** (statt nur „Über mich") — signalisiert, dass es
+      hier zusätzlichen Inhalt gibt. (Betreiber offen für Alternativen, vorerst so.)
 - [ ] Themenmässig anders, z. B. **Reisen, Sport** u. Ä. (Gedanke, noch offen).
-      Menü rechts, führt zum farbigen „Über mich".
+      Menü rechts, führt zum farbigen „mehr über mich".
+- [ ] Evtl. weitere Signale „hier gibt's mehr" (kleiner Hinweis/Zähler?) — optional,
+      offen für Vorschläge.
 
 ## C5. Offene Punkte Farbe
 

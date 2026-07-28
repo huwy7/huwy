@@ -35,13 +35,19 @@ const og = await getImage({
   quality: 80,
 });
 
-// Erstes Bild der nächsten Serie im Hintergrund vorladen (rel="prefetch"), damit
-// der „Nächste Serie"-Sprung sofort ein Bild zeigt. Parameter identisch zur
-// Bilddarstellung (Breite 1280, AVIF q65) — echter Cache-Treffer.
-const naechstesBild = naechste.data.bilder[0]?.datei;
-const bildVorladen = naechstesBild
-  ? [(await getImage({ src: naechstesBild, widths: [1280], format: 'avif', quality: 65 })).src]
-  : [];
+// Titelbild der nächsten Serie (= deren erstes Bild) im Hintergrund vorladen
+// (rel="prefetch"), damit der „Nächste Serie"-Sprung sofort ein Bild zeigt.
+// Parameter identisch zur Bilddarstellung (Breite 1280, AVIF q65) — Cache-Treffer.
+const bildVorladen = [
+  (await getImage({ src: naechste.data.titelbild, widths: [1280], format: 'avif', quality: 65 }))
+    .src,
+];
+
+// Anzeigereihenfolge: Titelbild zuerst, dann die weiteren Bilder.
+const alleBilder = [serie.data.titelbild, ...serie.data.bilder];
+
+// Einleitung nur zeigen, wenn Text vorhanden ist (sonst kein leerer Block).
+const hatEinleitung = (serie.body ?? '').trim().length > 0;
 ---
 
 <!-- Serienseite (Spezifikation 6.2). Header-Abstand 64px, Bildnormierung 5.1. -->
@@ -55,20 +61,25 @@ const bildVorladen = naechstesBild
     <h1 class="serie-titel">{serie.data.titel}</h1>
     <p class="serie-jahr">{serie.data.jahr}</p>
 
-    <div class="serie-einleitung">
-      <Content />
-    </div>
+    {
+      hatEinleitung && (
+        <div class="serie-einleitung">
+          <Content />
+        </div>
+      )
+    }
 
     <div class="serie-bilder">
       {
-        serie.data.bilder.map((bild) => (
+        alleBilder.map((bild, i) => (
           <Bild
             class="serie-bild"
-            src={bild.datei}
-            alt={bild.alt}
+            src={bild}
+            alt=""
             widths={[640, 960, 1280, 1600, 2000]}
             sizes="100vw"
-            loading="lazy"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
           />
         ))
       }

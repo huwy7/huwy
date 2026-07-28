@@ -3,14 +3,9 @@ titel: Beispielserie zwei
 jahr: 2024
 reihenfolge: 2
 titelbild: ../../assets/serien/serie-zwei/_DSF7108.jpeg
-titelbildAlt: Platzhalterbild – Querformat 3:2
 bilder:
-  - datei: ../../assets/serien/serie-zwei/_DSF7107.jpeg
-    alt: v
-  - datei: ../../assets/serien/serie-zwei/_DSF7120.jpeg
-    alt: h
-  - datei: ../../assets/serien/serie-zwei/_DSF7108.jpeg
-    alt: b
+  - ../../assets/serien/serie-zwei/_DSF7107.jpeg
+  - ../../assets/serien/serie-zwei/_DSF7120.jpeg
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

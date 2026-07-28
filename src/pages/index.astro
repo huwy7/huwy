@@ -9,19 +9,21 @@ const serien = (await getCollection('serien')).sort(
   (a, b) => a.data.reihenfolge - b.data.reihenfolge,
 );
 
-// Vom ersten Bild jeder Serie eine AVIF-Variante im Hintergrund vorladen, damit
-// die Serienseite beim Anklicken sofort ein Bild zeigt. Breite 1280 und Qualität
-// 65 sind identisch zur Serienseite (Bild.astro, widths + QUALITAET.avif), damit
-// die vorgeladene URL exakt einem srcset-Eintrag entspricht — echter Cache-Treffer.
-const vorladeAvif = await Promise.all(
+// Das Titelbild (= erstes Bild der Serie) jeder Serie als AVIF im Hintergrund
+// vorladen, damit die Serienseite beim Anklicken sofort ihr erstes Bild zeigt.
+// Breite 1280 und Qualität 65 sind identisch zur Serienseite (Bild.astro, widths +
+// QUALITAET.avif), damit die vorgeladene URL exakt einem srcset-Eintrag entspricht.
+const bildVorladen = await Promise.all(
   serien.map(async (serie) => {
-    const erstes = serie.data.bilder[0]?.datei;
-    if (!erstes) return null;
-    const avif = await getImage({ src: erstes, widths: [1280], format: 'avif', quality: 65 });
+    const avif = await getImage({
+      src: serie.data.titelbild,
+      widths: [1280],
+      format: 'avif',
+      quality: 65,
+    });
     return avif.src;
   }),
 );
-const bildVorladen = vorladeAvif.filter((u): u is string => u !== null);
 ---
 
 <!-- Startseite (Spezifikation 6.1). Erstes sichtbares Element unter dem Header
@@ -37,7 +39,7 @@ const bildVorladen = vorladeAvif.filter((u): u is string => u !== null);
             <Bild
               class="vorschau-bild"
               src={serie.data.titelbild}
-              alt={serie.data.titelbildAlt}
+              alt=""
               widths={[640, 960, 1280, 1600, 2000]}
               sizes="(max-width: 768px) 100vw, 1088px"
               loading={i === 0 ? 'eager' : 'lazy'}

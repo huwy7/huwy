@@ -3,14 +3,9 @@ titel: Beispielserie drei
 jahr: 2025
 reihenfolge: 3
 titelbild: ../../assets/serien/serie-drei/IMG_0098.jpeg
-titelbildAlt: Platzhalterbild – Querformat 3:2
 bilder:
-  - datei: ../../assets/serien/serie-drei/IMG_0050.jpeg
-    alt: test
-  - datei: ../../assets/serien/serie-drei/IMG_0068.jpeg
-    alt: test
-  - datei: ../../assets/serien/serie-drei/IMG_0098-1.jpeg
-    alt: trst
+  - ../../assets/serien/serie-drei/IMG_0050.jpeg
+  - ../../assets/serien/serie-drei/IMG_0068.jpeg
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

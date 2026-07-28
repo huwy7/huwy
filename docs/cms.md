@@ -11,11 +11,12 @@ funktioniert unverändert, wenn `/admin` gelöscht wird.
   `/admin`, nicht auf der öffentlichen Seite.
 - `public/admin/config.yml` — Backend, Medienordner und die Felder der Collection.
 
-Die Felder bilden das zod-Schema aus Spezifikation 7 ab: `titel`, `jahr`,
-`reihenfolge`, `titelbild`, `titelbildAlt`, die Liste `bilder` (`datei`, `alt`)
-und der Markdown-Körper als Einleitungstext. Bilder werden pro Serie nach
-`src/assets/serien/<slug>/` gelegt (relativ zur Markdown-Datei), passend zu
-`astro:assets`.
+Die Felder: `titel`, `jahr`, `reihenfolge`, `titelbild` (zugleich das **erste
+Bild** der Serie) und die einfache Bild-Liste `bilder` (weitere Bilder, reine
+Uploads ohne Textfelder); der Markdown-Körper ist der optionale Einleitungstext.
+Alt-Texte sind entfallen (bewusst schlanker, siehe CLAUDE.md Regel 4). Bilder
+werden pro Serie nach `src/assets/serien/<slug>/` gelegt (relativ zur
+Markdown-Datei), passend zu `astro:assets`.
 
 ## Offen — vom Betreiber zu erledigen
 

@@ -14,18 +14,11 @@ const serien = defineCollection({
       titel: z.string(),
       jahr: z.number().int(),
       reihenfolge: z.number().int(), // Sortierung auf der Startseite
+      // Titelbild ist zugleich das erste Bild der Serie (Vorschau auf der
+      // Startseite + erstes Bild auf der Serienseite).
       titelbild: image(),
-      // Alt-Text ist optional (Entscheidung des Betreibers): leer = kein Problem,
-      // gefüllt = wird als alt ausgegeben. Siehe CLAUDE.md Regel 4.
-      titelbildAlt: z.string().optional(),
-      bilder: z
-        .array(
-          z.object({
-            datei: image(),
-            alt: z.string().optional(),
-          }),
-        )
-        .min(1),
+      // Weitere Bilder der Serie, einfache Liste von Bild-Uploads (kein Alt-Text).
+      bilder: z.array(image()).default([]),
     }),
 });
 

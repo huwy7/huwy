@@ -3,18 +3,11 @@ titel: Beispielserie eins
 jahr: 2023
 reihenfolge: 1
 titelbild: ../../assets/serien/serie-eins/IMG_4187.jpeg
-titelbildAlt: Platzhalterbild – Querformat 3:2
 bilder:
-  - datei: ../../assets/serien/serie-eins/IMG_9786.jpeg
-    alt: t
-  - datei: ../../assets/serien/serie-eins/IMG_9782.jpeg
-    alt: v
-  - datei: ../../assets/serien/serie-eins/IMG_9800.jpeg
-    alt: v
-  - datei: ../../assets/serien/serie-eins/IMG_9803.jpeg
-    alt: h
-  - datei: ../../assets/serien/serie-eins/IMG_4187-1.jpeg
-    alt: h
+  - ../../assets/serien/serie-eins/IMG_9786.jpeg
+  - ../../assets/serien/serie-eins/IMG_9782.jpeg
+  - ../../assets/serien/serie-eins/IMG_9800.jpeg
+  - ../../assets/serien/serie-eins/IMG_9803.jpeg
 ---
 
 Platzhaltertext für die Serieneinleitung. Zwei bis vier Sätze, linksbündig und

@@ -24,45 +24,17 @@ collections:
     # Bildpfade relativ zur Content-Datei auflöst (Spezifikation 8).
     media_folder: '../../assets/serien/{{slug}}'
     public_folder: '../../assets/serien/{{slug}}'
+    # Titelbild = zugleich erstes Bild der Serie. „Weitere Bilder" ist eine
+    # einfache Upload-Liste ohne zusätzliche Textfelder.
     fields:
       - { name: titel, label: Titel, widget: string }
       - { name: jahr, label: Jahr, widget: number, value_type: int }
-      - {
-          name: reihenfolge,
-          label: Reihenfolge (Sortierung Startseite),
-          widget: number,
-          value_type: int,
-        }
-      - {
-          name: titelbild,
-          label: Titelbild,
-          widget: image,
-          hint: "Beliebiges Format — quer, hoch oder quadratisch. Das Bild gibt sein Seitenverhältnis selbst vor, es wird nicht zugeschnitten.",
-        }
-      - {
-          name: titelbildAlt,
-          label: Titelbild — Alt-Text (optional),
-          widget: string,
-          required: false,
-          hint: "Optional. Leer lassen ist in Ordnung; wenn gefüllt, wird der Text als Bildbeschreibung ausgegeben.",
-        }
+      - { name: reihenfolge, label: Reihenfolge, widget: number, value_type: int }
+      - { name: titelbild, label: Titelbild (= erstes Bild), widget: image }
       - name: bilder
-        label: Bilder
+        label: Weitere Bilder
         label_singular: Bild
         widget: list
-        min: 1
-        fields:
-          - {
-              name: datei,
-              label: Datei,
-              widget: image,
-              hint: "Beliebiges Format — jedes Bild behält sein eigenes Seitenverhältnis.",
-            }
-          - {
-              name: alt,
-              label: Alt-Text (optional),
-              widget: string,
-              required: false,
-              hint: "Optional. Leer lassen ist in Ordnung; wenn gefüllt, wird der Text als Bildbeschreibung ausgegeben.",
-            }
-      - { name: body, label: Einleitungstext, widget: markdown }
+        required: false
+        field: { name: bild, label: Bild, widget: image }
+      - { name: body, label: Text, widget: markdown, required: false }

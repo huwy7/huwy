@@ -67,8 +67,8 @@ Konkret:
 
 - **Bilder** tragen den Ton: schwarzweiss, körnig (grain), rau — nicht geglättet,
   nicht geschönt.
-- **Interaktion** unterstreicht ihn: invertierender Cursor, invertierter
-  Touch-Schweif, harte Schwarzweiss-Umkehr statt weicher, gefälliger Effekte.
+- **Interaktion** unterstreicht ihn: invertierender Cursor bzw. invertierender
+  Touch-Kreis, harte Schwarzweiss-Umkehr statt weicher, gefälliger Effekte.
 - **Typografie**: Monospace als kantiger, technischer, „old school"-Bruch.
 - **Nichts Dekoratives, nichts Liebliches.** Reduktion, Härte, Rohheit,
   industrielle/techno Kälte.
@@ -177,19 +177,20 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
 
 **Was gebaut wird**
 
-- Ein kleiner Kreis folgt dem Zeiger mit weichem Nachlauf und ersetzt ihn.
-  `mix-blend-mode: difference` invertiert ihn gegen den Untergrund (schwarz auf
-  Weiss, weiss auf Dunkel).
-- Interaktive Elemente (Links, Navigation) invertieren beim Hover ihre Farben —
-  das ist reines CSS und funktioniert auch ohne JavaScript. Der Cursor vergrössert
-  sich zusätzlich über ihnen.
+- Ein kleiner Kreis folgt dem Zeiger mit weichem Nachlauf und ersetzt ihn. Es ist
+  eine transparente Fläche mit `backdrop-filter: invert(1)` (per JS inline gesetzt):
+  der Kreis invertiert den Untergrund inkl. Text und bleibt so überall sichtbar —
+  auf Dunkel wie auf Weiss. Keine Füllfarbe, kein `mix-blend-mode`.
+- Über interaktiven Elementen (Links, Navigation, Eingabefeld) morpht der Kreis zu
+  einem abgerundeten Kasten, der sich um das Element legt (Box-Modus) und es per
+  `backdrop-filter: invert(1)` invertiert — der Text bleibt lesbar (kein deckender
+  Block). Ohne JavaScript invertieren Textlinks stattdessen per reinem CSS-Hover.
 - Über Fotos schrumpft der Ball zu einem kleinen Punkt, und das Bild unter dem
   Zeiger invertiert kurz (`filter: invert(1)`) — angelehnt an die Referenzseite.
-- Auf Touch-Geräten (kein Cursor) invertiert die Berührung den Untergrund: eine
-  transparente Schicht mit `backdrop-filter: invert(1)` (keine Füllfarbe), per
-  Maske als **hart abgegrenzter Kreis** freigegeben, der mit der Bewegung zur
-  Kapsel wird (länger mit der Bewegung) und beim Stoppen hart zurückweicht —
-  kein weicher Verlauf, kein Verblassen (raw/industrial).
+- Auf Touch-Geräten (kein Cursor) folgt derselbe Effekt der Berührung: ein
+  **einzelner** transparenter Kreis mit `backdrop-filter: invert(1)`, der der
+  Berührung mit etwas Verzögerung nachzieht und beim Loslassen verschwindet — kein
+  Schweif, keine Kapsel.
 
 **Guardrails (verbindlich)**
 

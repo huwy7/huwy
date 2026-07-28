@@ -241,6 +241,11 @@ const name = 'TODO_NAME';
         cursor.setAttribute('aria-hidden', 'true');
         const punkt = document.createElement('span');
         punkt.className = 'cursor__punkt';
+        // Transparent invertierend statt gefüllt — der Kreis kehrt den Untergrund
+        // um (inkl. Text) und bleibt überall sichtbar. Inline gesetzt, da der
+        // CSS-Minifier backdrop-filter/invert(1) verändern würde.
+        punkt.style.setProperty('backdrop-filter', 'invert(1)');
+        punkt.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
         cursor.appendChild(punkt);
         document.body.appendChild(cursor);
         wurzel.classList.add('cursor-aktiv');
@@ -280,21 +285,16 @@ const name = 'TODO_NAME';
           punkt.style.width = `${w}px`;
           punkt.style.height = `${h}px`;
           punkt.style.borderRadius = `${Math.min(w, h) / 2}px`;
-          // Transparent invertieren statt füllen — Text bleibt lesbar. Inline, da
-          // der CSS-Minifier backdrop-filter/invert(1) verändern würde.
-          punkt.style.setProperty('backdrop-filter', 'invert(1)');
-          punkt.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
           zielX = r.left + r.width / 2;
           zielY = r.top + r.height / 2;
         };
 
-        // Box lösen: Punkt zurück auf den Kreis (Werte kommen wieder aus dem CSS).
+        // Box lösen: Punkt zurück auf den Kreis (Werte kommen wieder aus dem CSS;
+        // backdrop-filter bleibt dauerhaft am Punkt).
         const loeseBox = () => {
           punkt.style.width = '';
           punkt.style.height = '';
           punkt.style.borderRadius = '';
-          punkt.style.removeProperty('backdrop-filter');
-          punkt.style.removeProperty('-webkit-backdrop-filter');
         };
 
         window.addEventListener('pointermove', (e) => {
@@ -370,112 +370,77 @@ const name = 'TODO_NAME';
     </script>
 
     <script>
-      // Invertierter Touch-Schweif — für Touch-Geräte (kein Cursor dort).
-      // Keine Füllfarbe: eine transparente Schicht mit backdrop-filter: invert(1)
-      // kehrt den Untergrund um; eine Maske gibt sie nur entlang der Berührung
-      // frei. Zwischen den Berührungspunkten wird interpoliert (glatt, nicht
-      // stotternd); ältere Punkte verblassen, so zieht der Schweif mit Nachlauf
-      // nach. Passive Listener — Scrollen bleibt frei.
+      // Invertierender Touch-Kreis — für Touch-Geräte (kein Cursor dort). Ein
+      // einzelner transparenter Kreis mit backdrop-filter: invert(1) folgt der
+      // Berührung mit etwas Verzögerung (Nachlauf) und verschwindet beim Loslassen.
+      // Kein Schweif, keine Maske. Passive Listener — Scrollen bleibt frei.
       const touchGeraet =
         window.matchMedia('(pointer: coarse)').matches ||
         'ontouchstart' in window ||
         navigator.maxTouchPoints > 0;
       const spurReduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-      if (touchGeraet && !spurReduziert.matches) {
-        const schicht = document.createElement('div');
-        schicht.className = 'spur';
-        schicht.setAttribute('aria-hidden', 'true');
+      if (touchGeraet) {
+        const kreis = document.createElement('div');
+        kreis.className = 'touch-kreis';
+        kreis.setAttribute('aria-hidden', 'true');
         // Explizit invert(1) und beide Präfixe — nicht vom CSS-Minifier verändert.
-        schicht.style.setProperty('backdrop-filter', 'invert(1)');
-        schicht.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
-        document.body.appendChild(schicht);
+        kreis.style.setProperty('backdrop-filter', 'invert(1)');
+        kreis.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
+        document.body.appendChild(kreis);
 
-        const stil = getComputedStyle(document.documentElement);
-        // Der CSS-Minifier kann 500ms zu .5s machen — Einheit berücksichtigen.
-        const rohDauer = stil.getPropertyValue('--spur-dauer').trim();
-        const DAUER = /ms$/.test(rohDauer)
-          ? parseFloat(rohDauer)
-          : /s$/.test(rohDauer)
-            ? parseFloat(rohDauer) * 1000
-            : 500;
-        const RADIUS = (parseFloat(stil.getPropertyValue('--spur-groesse')) || 44) / 2;
-        const LEER = 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0))';
-        const MAX = 60;
+        let zielX = 0;
+        let zielY = 0;
+        let istX = 0;
+        let istY = 0;
+        let sichtbar = false;
 
-        const punkte: { x: number; y: number; t: number }[] = [];
-        let letzte: { x: number; y: number } | null = null;
-        let laeuft = false;
-
-        const setzeMaske = (wert: string) => {
-          schicht.style.setProperty('-webkit-mask-image', wert);
-          schicht.style.setProperty('mask-image', wert);
-        };
-
-        const bauen = () => {
-          const jetzt = performance.now();
-          while (punkte.length && jetzt - punkte[0].t > DAUER) punkte.shift();
-          if (!punkte.length) {
-            setzeMaske(LEER);
-            laeuft = false;
-            return;
-          }
-          // Hart abgegrenzte Kreise (raw/industrial): solide bis zum Radius,
-          // dann harte Kante — kein weicher Verlauf, keine Alpha-Verblassung.
-          // Überlappende, interpolierte Kreise ergeben eine harte Kapsel, die
-          // mit der Bewegung länger wird und beim Stoppen hart zurückweicht.
-          const maske = punkte
-            .map(
-              (p) =>
-                `radial-gradient(circle ${RADIUS}px at ${p.x}px ${p.y}px, #000 0%, #000 100%, rgba(0,0,0,0) 100%)`,
-            )
-            .join(', ');
-          setzeMaske(maske);
-          requestAnimationFrame(bauen);
-        };
-
-        const start = () => {
-          if (!laeuft) {
-            laeuft = true;
-            requestAnimationFrame(bauen);
-          }
-        };
-
-        const hinzu = (x: number, y: number) => {
-          const jetzt = performance.now();
-          if (letzte) {
-            const dx = x - letzte.x;
-            const dy = y - letzte.y;
-            const schritte = Math.min(24, Math.floor(Math.hypot(dx, dy) / (RADIUS * 0.5)));
-            for (let i = 1; i < schritte; i++) {
-              punkte.push({ x: letzte.x + (dx * i) / schritte, y: letzte.y + (dy * i) / schritte, t: jetzt });
-            }
-          }
-          punkte.push({ x, y, t: jetzt });
-          letzte = { x, y };
-          while (punkte.length > MAX) punkte.shift();
-          start();
+        const setze = () => {
+          kreis.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;
         };
 
         const beruehrung = (e: TouchEvent) => {
           const t = e.touches[0];
-          if (t) hinzu(t.clientX, t.clientY);
-        };
-        const ende = () => {
-          letzte = null;
+          if (!t) return;
+          zielX = t.clientX;
+          zielY = t.clientY;
+          if (!sichtbar) {
+            // Am Berührungspunkt erscheinen (kein Hereinfliegen von 0,0).
+            sichtbar = true;
+            istX = zielX;
+            istY = zielY;
+            setze();
+            kreis.classList.add('touch-kreis--sichtbar');
+          }
+          if (spurReduziert.matches) {
+            istX = zielX;
+            istY = zielY;
+            setze();
+          }
         };
 
-        window.addEventListener(
-          'touchstart',
-          (e) => {
-            letzte = null;
-            beruehrung(e);
-          },
-          { passive: true },
-        );
+        const ende = () => {
+          sichtbar = false;
+          kreis.classList.remove('touch-kreis--sichtbar');
+        };
+
+        window.addEventListener('touchstart', beruehrung, { passive: true });
         window.addEventListener('touchmove', beruehrung, { passive: true });
         window.addEventListener('touchend', ende, { passive: true });
         window.addEventListener('touchcancel', ende, { passive: true });
+
+        // Nachlauf: der Kreis zieht der Berührung mit etwas Verzögerung nach.
+        if (!spurReduziert.matches) {
+          const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
+          const nachlauf = 0.18;
+          const schritt = () => {
+            istX = lerp(istX, zielX, nachlauf);
+            istY = lerp(istY, zielY, nachlauf);
+            setze();
+            requestAnimationFrame(schritt);
+          };
+          requestAnimationFrame(schritt);
+        }
       }
     </script>
   </body>

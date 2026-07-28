@@ -89,8 +89,8 @@
   --z-tor: 900; /* Zugangs-Tor, unter dem Cursor */
   --z-lightbox: 950; /* Vollbild-Ansicht der Serienbilder, über dem Tor, unter dem Cursor */
 
-  /* Invertierter Touch-Schweif (Ergänzung zum Cursor, für Touch-Geräte). */
-  --spur-groesse: 44px;
-  --spur-dauer: 500ms; /* Lebensdauer eines Schweif-Punkts */
+  /* Invertierender Touch-Kreis (Pendant zum Cursor, für Touch-Geräte): ein einzelner
+     Kreis, der der Berührung mit etwas Verzögerung folgt. Kein Schweif. */
+  --spur-groesse: 56px;
   --z-spur: 800; /* über dem Inhalt, unter dem Tor */
 }

@@ -266,8 +266,10 @@ a {
   width: var(--cursor-groesse);
   height: var(--cursor-groesse);
   border-radius: 50%; /* Kreis, kein Bild — Regel 5 betrifft nur Bilder */
-  background-color: var(--farbe-hintergrund);
-  mix-blend-mode: difference; /* invertiert gegen den Untergrund */
+  /* Transparente Fläche mit backdrop-filter: invert(1) (per JS inline gesetzt —
+     der CSS-Minifier würde invert(1) verändern). Der Kreis invertiert den
+     Untergrund inkl. Text und bleibt so überall sichtbar (auf Dunkel wie auf
+     Weiss); keine Füllfarbe, kein mix-blend-mode. */
   /* Zentriert auf den Zeigerpunkt — funktioniert für jede Grösse, auch wenn der
      Punkt im Box-Modus zum Rechteck wird. Die Skalierung läuft über eine Custom
      Property, damit sie sich nicht mit dem Zentrier-translate beisst. */
@@ -276,7 +278,6 @@ a {
     width var(--cursor-morph) ease,
     height var(--cursor-morph) ease,
     border-radius var(--cursor-morph) ease,
-    background-color var(--cursor-morph) ease,
     transform var(--cursor-uebergang) ease;
 }
 
@@ -294,14 +295,11 @@ a {
 }
 
 /* Box-Modus: der Punkt legt sich als abgerundetes Rechteck um das überfahrene
-   Element (Grösse und Radius setzt das Skript inline). Keine Skalierung. Statt
-   einer Füllfarbe eine transparente Fläche mit backdrop-filter: invert(1) (per JS
-   inline gesetzt) — der Untergrund inkl. Text wird invertiert und bleibt lesbar,
-   kein deckender Block. Kein mix-blend-mode hier, sonst doppelte Umkehr. */
+   Element (Grösse und Radius setzt das Skript inline). Keine Skalierung — die
+   Grösse kommt aus width/height. Der backdrop-filter: invert(1) des Punkts wirkt
+   unverändert weiter, der Text im Kasten bleibt lesbar. */
 .cursor--box .cursor__punkt {
   --cursor-skala: 1;
-  background-color: transparent;
-  mix-blend-mode: normal;
 }
 
 /* Nativen Zeiger nur verstecken, solange das Cursor-Skript aktiv ist. */
@@ -317,21 +315,29 @@ html.cursor-aktiv img:hover {
   filter: invert(1);
 }
 
-/* --- Invertierter Touch-Schweif (CLAUDE.md 4a) ---
-   Eine einzige transparente Schicht, KEINE Füllfarbe: backdrop-filter: invert
-   kehrt den Untergrund um. Sichtbar nur dort, wo die Maske es zulässt — die
-   setzt das JS entlang der Berührung (nur auf Touch-Geräten). Eine Schicht =
-   kein Doppel-Invert bei Überlappung. Standardmaske transparent = nichts zu
-   sehen, bis berührt wird. */
-.spur {
+/* --- Invertierender Touch-Kreis (CLAUDE.md 4a) ---
+   Ein einzelner transparenter Kreis (keine Füllfarbe): backdrop-filter: invert(1)
+   (per JS inline gesetzt) kehrt den Untergrund unter dem Kreis um. Er folgt der
+   Berührung mit etwas Verzögerung und verschwindet beim Loslassen — kein Schweif.
+   Zentriert per negativer Margin, Position setzt das JS per translate3d. */
+.touch-kreis {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: var(--spur-groesse);
+  height: var(--spur-groesse);
+  margin-left: calc(var(--spur-groesse) / -2);
+  margin-top: calc(var(--spur-groesse) / -2);
+  border-radius: 50%;
   z-index: var(--z-spur);
   pointer-events: none;
-  /* backdrop-filter: invert(1) wird per JS inline gesetzt — der CSS-Minifier
-     würde daraus invert() machen und die unpräfixierte Variante verwerfen. */
-  -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
-  mask-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+  opacity: 0;
+  transition: opacity 220ms ease;
+  will-change: transform;
+}
+
+.touch-kreis--sichtbar {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

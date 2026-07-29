@@ -14,9 +14,13 @@ interface Props {
   // Modus: 'duester' (Standard, Schwarzweiss) oder 'farbe' (farbige Unterseite).
   // Steuert Theme (data-modus), Kopfzeilen-Layout (gespiegelt) und Ziele.
   modus?: 'duester' | 'farbe';
+  // Galerie-Seiten (Karussell) bringen ihre volle Höhe je Serie selbst mit —
+  // dann ohne zusätzlichen vertikalen Innenabstand, damit das erste Bild nicht
+  // knapp abgeschnitten wird.
+  vollhoehe?: boolean;
 }
 
-const { titel, beschreibung, ogBild, modus = 'duester' } = Astro.props;
+const { titel, beschreibung, ogBild, modus = 'duester', vollhoehe = false } = Astro.props;
 
 // Modus-abhängige Navigation. Farbmodus ist gespiegelt (Menü rechts, Umschalt-
 // Button links); Beschriftungen englisch, nur der Umschalt-Button spanisch.
@@ -157,7 +161,7 @@ const name = 'TODO_NAME';
       }
     </header>
 
-    <main class="inhalt">
+    <main class:list={['inhalt', { 'inhalt--voll': vollhoehe }]}>
       <slot />
     </main>
 
@@ -245,6 +249,11 @@ const name = 'TODO_NAME';
         margin-inline: auto;
         padding-inline: var(--rand);
         padding-block: var(--abstand-64);
+      }
+      /* Galerie-Seiten: kein vertikaler Innenabstand — jede Serie ist eine volle
+         Bildschirmhöhe hoch und zentriert sich selbst. */
+      .inhalt--voll {
+        padding-block: 0;
       }
 
       /* Zugangs-Tor: das raue Schwarzweiss-Foto füllt den Bildschirm (cover),

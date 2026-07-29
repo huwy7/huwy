@@ -12,7 +12,7 @@ const serien = (await getCollection('farbserien')).sort(
 );
 ---
 
-<Basis titel="Portfolio — color — TODO_NAME" modus="farbe">
+<Basis titel="Portfolio — color — TODO_NAME" modus="farbe" vollhoehe>
   <h1 class="visuell-versteckt">TODO_NAME — color</h1>
 
   <div class="serien-liste">
@@ -21,13 +21,10 @@ const serien = (await getCollection('farbserien')).sort(
 </Basis>
 
 <style>
+  /* Kein Zwischenabstand nötig: jede Serie ist eine volle Bildschirmhöhe hoch
+     (Serie.astro) und zentriert ihren Inhalt selbst. */
   .serien-liste {
     display: flex;
     flex-direction: column;
-  }
-
-  /* Abstand zwischen Serien (Spezifikation 6.1). */
-  .serien-liste :global(.serie) + :global(.serie) {
-    margin-block-start: var(--rhythmus-serie);
   }
 </style>

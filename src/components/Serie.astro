@@ -137,6 +137,18 @@ const breiten = [640, 960, 1280, 1600, 2000];
 </script>
 
 <style>
+  /* Jede Serie füllt (mindestens) eine Bildschirmhöhe und liegt darin vertikal
+     zentriert. So ist immer nur eine Serie im Blick — die obere/untere Serie ist
+     ausserhalb des Sichtfensters. Gleichmässiger Abstand für maximale Übersicht;
+     auch die letzte Serie bekommt genug Raum. 100svh statt 100vh, damit die
+     Adressleiste auf Mobil nichts abschneidet. */
+  .serie {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .serie-kopf {
     display: flex;
     gap: var(--abstand-16);

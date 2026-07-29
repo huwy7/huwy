@@ -352,11 +352,6 @@ a {
   --cursor-skala: var(--cursor-skala-druck);
 }
 
-/* Über Fotos: der Ball schrumpft zu einem kleinen Punkt (CLAUDE.md 4a). */
-.cursor--auf-bild .cursor__punkt {
-  --cursor-skala: var(--cursor-skala-bild);
-}
-
 /* Box-Modus: der Punkt legt sich als abgerundetes Rechteck um das überfahrene
    Element (Grösse und Radius setzt das Skript inline). Keine Skalierung — die
    Grösse kommt aus width/height. Der backdrop-filter: invert(1) des Punkts wirkt
@@ -369,13 +364,6 @@ a {
 html.cursor-aktiv,
 html.cursor-aktiv * {
   cursor: none;
-}
-
-/* Über Fotos invertiert das Bild unter dem Zeiger kurz (Regel 5, Ausnahme).
-   Nur mit aktivem Cursor-Skript und feinem Zeiger; ohne JS bleibt das Bild
-   unangetastet. */
-html.cursor-aktiv img:hover {
-  filter: invert(1);
 }
 
 /* --- Invertierender Touch-Kreis (CLAUDE.md 4a) ---

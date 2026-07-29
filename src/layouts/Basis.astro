@@ -208,20 +208,13 @@ const name = 'TODO_NAME';
         font-variant-ligatures: none;
       }
 
+      /* Alle Beschriftungen einheitlich weiss (keine unterschiedlichen Töne).
+         Die aktive Seite wird nicht mehr über die Farbe hervorgehoben; das
+         aria-current-Attribut bleibt für Screenreader erhalten. */
       .kopf-nav a,
       .kopf-switch {
-        color: var(--farbe-text-leise);
+        color: var(--farbe-text);
         text-decoration: none;
-      }
-
-      /* Aktive Seite hervorheben (die andere bleibt gedämpft). */
-      .kopf-nav a[aria-current='page'] {
-        color: var(--farbe-text);
-      }
-
-      /* Umschalt-Button (spanisch) — etwas präsenter als die Navigation. */
-      .kopf-switch {
-        color: var(--farbe-text);
       }
 
       /* Mobil: der lange spanische Button passt nicht neben die Navigation. Statt
@@ -432,11 +425,12 @@ const name = 'TODO_NAME';
         // so bleibt die Box dort, wo die Maus ist, statt beim Blättern mit dem
         // wegscrollenden Element mitzuwandern.
         const aktualisiere = (ziel: Element | null) => {
+          // Über einem Foto: kein Box-Modus (der Cursor legt sich nicht um das
+          // ganze Bild) — es bleibt der normale, lokal invertierende Kreis unter
+          // dem Zeiger. Das Bild selbst wird nicht mehr komplett invertiert.
           const ueberBild = !!(ziel && ziel.closest('img, picture'));
           const boxZiel = ueberBild ? null : (ziel?.closest(BOX_SELEKTOR) ?? null);
 
-          // Über Fotos: Ball schrumpft zum Punkt, das Bild invertiert (per CSS).
-          cursor.classList.toggle('cursor--auf-bild', ueberBild);
           // Box-Modus: der Cursor schwappt in die Umrandung des Elements.
           cursor.classList.toggle('cursor--box', !!boxZiel);
           // Fallback-Vergrösserung nur für interaktive Elemente ohne Box/Bild.

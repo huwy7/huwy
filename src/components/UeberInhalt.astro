@@ -1,39 +1,42 @@
 ---
-// Platzhalter-Inhalt für die About-Seiten (düster: „About me", farbig: „More
-// about me"). Bewusst nur Fülltext (Lorem ipsum) und graue Bild-Platzhalter mit
-// Seitenverhältnis (CLAUDE.md Regel 9) — der echte Inhalt kommt später. Gleich
-// für beide Seiten, damit wir eine Struktur zum Weiterarbeiten haben.
-//
+import Bild from './Bild.astro';
+import type { ImageMetadata } from 'astro';
+
+// Inhalt der About-Seiten. Text kommt als Slot (gerendertes Markdown aus dem CMS),
+// die Bilder als flexible Liste (abwechselnd rechts/links, Format dynamisch =
+// echtes Seitenverhältnis, Grösse passend zur Seite — nicht seitenfüllend).
 // spotify: nur die düstere Seite bekommt zusätzlich den Spotify-API-Platzhalter.
 interface Props {
+  bilder: ImageMetadata[];
   spotify?: boolean;
 }
-const { spotify = false } = Astro.props;
-
-const fueller = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
-  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
-];
+const { bilder, spotify = false } = Astro.props;
+const breiten = [640, 960, 1280];
 ---
 
 <div class="ueber">
-  {/* Block 1: Text links, Platzhalterbild rechts */}
-  <section class="ueber-block">
-    <div class="ueber-text">
-      <p>{fueller[0]}</p>
-      <p>{fueller[1]}</p>
-    </div>
-    <div class="platzhalter platzhalter--hoch" role="img" aria-label="Platzhalter-Bild"></div>
-  </section>
+  <div class="ueber-text fliesstext">
+    <slot />
+  </div>
 
-  {/* Block 2: Platzhalterbild links, Text rechts (gespiegelt) */}
-  <section class="ueber-block ueber-block--gedreht">
-    <div class="platzhalter platzhalter--quer" role="img" aria-label="Platzhalter-Bild"></div>
-    <div class="ueber-text">
-      <p>{fueller[1]}</p>
-      <p>{fueller[0]}</p>
-    </div>
-  </section>
+  {
+    bilder.length > 0 && (
+      <div class="ueber-galerie">
+        {bilder.map((bild, i) => (
+          <div class:list={['ueber-bild', i % 2 === 0 ? 'ueber-bild--rechts' : 'ueber-bild--links']}>
+            <Bild
+              class="ueber-foto"
+              src={bild}
+              alt=""
+              widths={breiten}
+              sizes="(max-width: 768px) 100vw, 640px"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   {
     spotify && (
@@ -50,53 +53,39 @@ const fueller = [
 </div>
 
 <style>
-  .ueber {
-    display: flex;
-    flex-direction: column;
-    gap: var(--rhythmus-block);
-  }
-
-  /* Textblock + Bild nebeneinander; der zweite Block gespiegelt (Bild links). */
-  .ueber-block {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--abstand-48);
-    align-items: start;
-  }
-
   .ueber-text {
     font-size: var(--groesse-16);
     line-height: var(--zeilenhoehe-1-6);
   }
-  .ueber-text p + p {
+  .ueber-text :global(p + p) {
     margin-block-start: var(--abstand-16);
   }
 
-  /* Graue Bild-Platzhalter mit festem Seitenverhältnis (Regel 9). */
-  .platzhalter {
-    width: 100%;
-    background-color: var(--farbe-platzhalter);
+  /* Bilder abwechselnd rechts/links, mit vertikalem Rhythmus. Die Grösse steckt in
+     .ueber-foto (global, weil das <img> aus der Bild-Komponente kommt). */
+  .ueber-galerie {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rhythmus-block);
+    margin-block-start: var(--rhythmus-block);
   }
-  .platzhalter--hoch {
-    aspect-ratio: 4 / 5;
+  .ueber-bild {
+    display: flex;
   }
-  .platzhalter--quer {
-    aspect-ratio: 3 / 2;
+  .ueber-bild--rechts {
+    justify-content: flex-end;
   }
-
+  .ueber-bild--links {
+    justify-content: flex-start;
+  }
   @media (max-width: 768px) {
-    /* Mobil: untereinander. Text zuerst, dann Bild — in beiden Blöcken. */
-    .ueber-block {
-      grid-template-columns: 1fr;
-      gap: var(--abstand-24);
-    }
-    .ueber-block--gedreht .platzhalter {
-      order: 2;
+    /* Mobil: volle Breite, Ausrichtung egal. */
+    .ueber-bild {
+      justify-content: center;
     }
   }
 
-  /* Spotify-Platzhalter (nur düster): angedeutete „Now playing"-Karte —
-     quadratisches Cover, Titel- und Künstlerzeile als graue Balken. */
+  /* Spotify-Platzhalter (nur düster): angedeutete „Now playing"-Karte. */
   .spotify {
     display: flex;
     align-items: center;
@@ -104,6 +93,7 @@ const fueller = [
     padding: var(--abstand-16);
     border: var(--linie-staerke) solid var(--farbe-linie);
     max-width: 420px;
+    margin-block-start: var(--rhythmus-block);
   }
   .spotify-cover {
     flex: 0 0 auto;

@@ -1,12 +1,18 @@
 ---
+import { getEntry, render } from 'astro:content';
 import Basis from '../../layouts/Basis.astro';
 import UeberInhalt from '../../components/UeberInhalt.astro';
 
-// More about me (farbig). Gleiche Platzhalter-Struktur wie die düstere Seite,
-// aber OHNE Spotify-Platzhalter (nur düster).
+// More about me (farbig). Text + Bilder aus dem CMS (seiten/mehr-ueber-mich),
+// OHNE Spotify-Platzhalter (nur düster).
+const eintrag = await getEntry('seiten', 'mehr-ueber-mich');
+const { Content } = await render(eintrag!);
+const bilder = eintrag!.data.bilder.map((b) => b.bild);
 ---
 
 <Basis titel="More about me — TODO_NAME" modus="farbe">
   <h1 class="seiten-titel">More about me</h1>
-  <UeberInhalt />
+  <UeberInhalt bilder={bilder}>
+    <Content />
+  </UeberInhalt>
 </Basis>

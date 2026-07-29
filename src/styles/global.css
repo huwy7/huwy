@@ -193,6 +193,24 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
+/* About-Bilder: Format dynamisch (echtes Seitenverhältnis), Grösse passend zur
+   Seite — etwa halbe Spaltenbreite, gedeckelt, damit ein Upload nicht plötzlich
+   die ganze Seite füllt. Steht global (das <img> kommt aus der Bild-Komponente). */
+.ueber-foto {
+  display: block;
+  max-width: min(58%, 640px);
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+}
+@media (max-width: 768px) {
+  /* Mobil: volle Breite, Höhe folgt dem Bild. */
+  .ueber-foto {
+    max-width: 100%;
+    max-height: none;
+  }
+}
+
 /* Höhe aus dem Seitenverhältnis, nicht aus dem height-Attribut (sonst
    verzerren die width/height-Attribute das Bild bei responsiver Breite). */
 img {

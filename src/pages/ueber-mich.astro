@@ -1,12 +1,18 @@
 ---
+import { getEntry, render } from 'astro:content';
 import Basis from '../layouts/Basis.astro';
 import UeberInhalt from '../components/UeberInhalt.astro';
 
-// About me (düster). Vorerst Platzhalter-Inhalt (Fülltext + graue Bild-Flächen),
-// dazu der Spotify-API-Platzhalter — nur auf dieser (dunklen) Seite.
+// About me (düster). Text + Bilder aus dem CMS (seiten/ueber-mich). Der
+// Spotify-API-Platzhalter kommt nur auf dieser (dunklen) Seite dazu.
+const eintrag = await getEntry('seiten', 'ueber-mich');
+const { Content } = await render(eintrag!);
+const bilder = eintrag!.data.bilder.map((b) => b.bild);
 ---
 
 <Basis titel="About me — TODO_NAME">
   <h1 class="seiten-titel">About me</h1>
-  <UeberInhalt spotify />
+  <UeberInhalt bilder={bilder} spotify>
+    <Content />
+  </UeberInhalt>
 </Basis>

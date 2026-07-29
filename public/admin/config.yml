@@ -104,3 +104,35 @@ collections:
           widget: number,
           value_type: int,
         }
+
+  # --- About-Seiten (Text + flexible Bilder-Liste) ---
+  # Zwei feste Seiten. Text = Markdown, Bilder = Liste (abwechselnd rechts/links).
+  # Platzhalter-Bilder einfach ersetzen; Reihenfolge per Drag. Spotify ist ein
+  # Code-Platzhalter (nur düster) und nicht im CMS.
+  - name: seiten
+    label: About-Seiten
+    files:
+      - name: ueber-mich
+        label: About me (düster)
+        file: src/content/seiten/ueber-mich.md
+        media_folder: '../../assets/seiten'
+        public_folder: '../../assets/seiten'
+        fields:
+          - name: bilder
+            label: Bilder
+            label_singular: Bild
+            widget: list
+            field: { name: bild, label: Bild, widget: image }
+          - { name: body, label: Text, widget: markdown }
+      - name: mehr-ueber-mich
+        label: More about me (farbig)
+        file: src/content/seiten/mehr-ueber-mich.md
+        media_folder: '../../assets/seiten'
+        public_folder: '../../assets/seiten'
+        fields:
+          - name: bilder
+            label: Bilder
+            label_singular: Bild
+            widget: list
+            field: { name: bild, label: Bild, widget: image }
+          - { name: body, label: Text, widget: markdown }

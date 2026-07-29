@@ -38,4 +38,14 @@ const farbbilder = defineCollection({
   schema: bildSchema,
 });
 
-export const collections = { serien, serienbilder, farbserien, farbbilder };
+// About-Seiten (düster: „About me", farbig: „More about me"). Text = Markdown-Body
+// (im CMS editierbar), dazu eine flexible Bilder-Liste (abwechselnd rechts/links).
+const seiten = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/seiten' }),
+  schema: ({ image }: SchemaContext) =>
+    z.object({
+      bilder: z.array(z.object({ bild: image() })).default([]),
+    }),
+});
+
+export const collections = { serien, serienbilder, farbserien, farbbilder, seiten };

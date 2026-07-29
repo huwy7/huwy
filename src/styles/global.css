@@ -331,6 +331,14 @@ a {
      Punkt im Box-Modus zum Rechteck wird. Die Skalierung läuft über eine Custom
      Property, damit sie sich nicht mit dem Zentrier-translate beisst. */
   transform: translate(-50%, -50%) scale(var(--cursor-skala, 1));
+  /* Fallback-Sichtbarkeit: der Ball ist eigentlich transparent und nur über
+     backdrop-filter: invert(1) sichtbar. Rendert der Browser backdrop-filter gerade
+     nicht (z. B. Hardware-Beschleunigung aus), bliebe er unsichtbar. Ein feiner
+     zweifarbiger Ring (dunkel innen, hell aussen) hält ihn auf jedem Grund sichtbar
+     — bei aktivem backdrop-filter kaum wahrnehmbar, sonst der sichtbare Kreis. */
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
   /* Kein transform-Übergang: im Freimodus setzt das Skript die Verformung pro
      Frame (elastische Dehnung) — ein Übergang würde sie verschmieren. Grösse und
      Radius (Box-Modus) bleiben weich. */
@@ -379,6 +387,10 @@ html.cursor-aktiv * {
   z-index: var(--z-spur);
   pointer-events: none;
   opacity: 0;
+  /* Fallback-Ring wie beim Desktop-Cursor, falls backdrop-filter nicht rendert. */
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
   transition: opacity 220ms ease;
   will-change: transform;
 }

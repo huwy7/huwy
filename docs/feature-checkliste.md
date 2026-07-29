@@ -32,11 +32,13 @@ Erledigt:
 - [x] **Aus dem Pool ziehen** (kopiert) in Serien und Über-mich; mobil per Antippen.
 - [x] **Neue Serie anlegen** (Schwarzweiss/Farbe) im Werkzeug.
 - [x] **Über-mich-Seiten** als Ziele — ganze Seite mit Fotos befüllbar.
+- [x] **Foto-Upload direkt im Werkzeug** (Datei-/Foto-Picker → base64 → ein Commit
+      nach `src/assets/pool/`, sofort im Pool). Sveltia für Uploads nicht mehr nötig.
 
 Noch offen:
-- [ ] **Datei-Upload** neuer Fotos direkt im Werkzeug (aktuell landen neue Fotos
-      über Sveltia im Repo, tauchen dann im Pool auf). Braucht base64-Upload + Commit.
 - [ ] **Serien löschen** im Werkzeug (anlegen geht; löschen noch über Git/Sveltia).
+- [ ] **Foto aus dem Pool/Repo löschen** (aktuell bleibt ein Asset liegen, wenn es
+      aus allen Zielen entfernt wird).
 - [ ] Komfort-Login via **GitHub-OAuth** statt Token.
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.

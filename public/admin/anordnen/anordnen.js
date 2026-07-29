@@ -715,6 +715,97 @@ const speichern = async () => {
 };
 
 // ---------------------------------------------------------------------------
+// Foto-Upload (direkt ins Repo, danach im Pool)
+// ---------------------------------------------------------------------------
+const DATEI_OK = /\.(jpe?g|png|webp)$/i;
+const POOL_DIR = 'src/assets/pool';
+
+// Datei als Base64 (in Blöcken, damit auch grosse Fotos nicht den Stack sprengen).
+const alsBase64 = async (file) => {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  return btoa(bin);
+};
+
+// Kollisionsfreier Zielpfad im Pool-Ordner (kebab + ggf. -2, -3 …).
+const eindeutigerPfad = (name, belegt) => {
+  const punkt = name.lastIndexOf('.');
+  const roh = punkt > 0 ? name.slice(0, punkt) : name;
+  const ext = (punkt > 0 ? name.slice(punkt + 1) : 'jpg').toLowerCase();
+  const basis = kebab(roh) || 'foto';
+  let pfad = `${POOL_DIR}/${basis}.${ext}`;
+  let n = 2;
+  while (belegt.has(pfad)) pfad = `${POOL_DIR}/${basis}-${n++}.${ext}`;
+  belegt.add(pfad);
+  return pfad;
+};
+
+const hochladen = async (dateien) => {
+  const alle = [...(dateien || [])];
+  if (!alle.length) return;
+  if (!state.token) {
+    setzeStatus('Zum Hochladen zuerst einen Token einfügen (Einstellungen).', 'fehler');
+    return;
+  }
+  const liste = alle.filter((f) => DATEI_OK.test(f.name));
+  const abgelehnt = alle.length - liste.length;
+  if (!liste.length) {
+    setzeStatus('Nur JPG, PNG oder WebP werden unterstützt.', 'fehler');
+    return;
+  }
+  $('#hochladen').disabled = true;
+  try {
+    setzeStatus(`Lädt ${liste.length} Foto(s) hoch …`);
+    const belegt = new Set([...document.querySelectorAll('#pool .kachel')].map((k) => k.dataset.bild));
+    const eintraege = [];
+    for (const f of liste) {
+      const pfad = eindeutigerPfad(f.name, belegt);
+      const blob = await gh('/git/blobs', {
+        method: 'POST',
+        body: JSON.stringify({ content: await alsBase64(f), encoding: 'base64' }),
+      });
+      eintraege.push({ pfad, sha: blob.sha, file: f });
+    }
+    // Ein Commit mit allen neuen Assets.
+    const ref = await gh(`/git/ref/heads/${state.branch}`);
+    const commitSha = ref.object.sha;
+    const commit = await gh(`/git/commits/${commitSha}`);
+    const baum = await gh('/git/trees', {
+      method: 'POST',
+      body: JSON.stringify({
+        base_tree: commit.tree.sha,
+        tree: eintraege.map((e) => ({ path: e.pfad, mode: '100644', type: 'blob', sha: e.sha })),
+      }),
+    });
+    const neu = await gh('/git/commits', {
+      method: 'POST',
+      body: JSON.stringify({ message: `Fotos hochladen (${liste.length}) via Admin`, tree: baum.sha, parents: [commitSha] }),
+    });
+    await gh(`/git/refs/heads/${state.branch}`, { method: 'PATCH', body: JSON.stringify({ sha: neu.sha }) });
+
+    // Sofort in den Pool (lokale Vorschau, kein Warten auf das CDN).
+    const pool = $('#pool');
+    for (const e of eintraege) {
+      const kachel = macheKachel(e.pfad, { pool: true });
+      kachel.querySelector('img').src = URL.createObjectURL(e.file);
+      pool.append(kachel);
+    }
+    $('#pool-anzahl').textContent = `(${pool.querySelectorAll('.kachel').length})`;
+    setzeStatus(
+      `${liste.length} Foto(s) hochgeladen${abgelehnt ? ` (${abgelehnt} ignoriert)` : ''}. Jetzt in ein Ziel ziehen.`,
+      'ok',
+    );
+  } catch (err) {
+    console.error(err);
+    setzeStatus('Fehler beim Hochladen: ' + err.message, 'fehler');
+  } finally {
+    $('#hochladen').disabled = false;
+  }
+};
+
+// ---------------------------------------------------------------------------
 // Einstellungen
 // ---------------------------------------------------------------------------
 const initEinstellungen = () => {
@@ -745,6 +836,11 @@ window.addEventListener('beforeunload', (e) => {
 initEinstellungen();
 $('#neuladen').addEventListener('click', () => laden().catch((e) => setzeStatus('Fehler: ' + e.message, 'fehler')));
 $('#speichern').addEventListener('click', speichern);
+$('#hochladen').addEventListener('click', () => $('#datei').click());
+$('#datei').addEventListener('change', (e) => {
+  hochladen(e.target.files);
+  e.target.value = '';
+});
 
 // Bilder/Galerie: verschieben + Pool-Kopie; nur Ziele derselben Gruppe (Pool überall).
 ziehbar({

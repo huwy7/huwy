@@ -102,6 +102,8 @@
       }
       .pool-titel { display: flex; align-items: baseline; gap: 8px; }
       .pool-hinweis { color: var(--leise); font-size: 11px; margin: 0; }
+      .pool-werkzeug { display: flex; gap: 8px; }
+      .pool-werkzeug button { width: 100%; }
       .pool-liste {
         overflow-y: auto;
         display: flex;
@@ -258,19 +260,23 @@
     </details>
 
     <p class="hinweis">
-      Rechts der <strong>Pool</strong> aller Fotos: in eine Serie oder in „Über mich"
-      <strong>ziehen</strong> — oder ein Foto <strong>antippen</strong> und das Ziel
-      wählen. Bilder innerhalb/zwischen Serien ziehen, Serien am Griff verschieben,
-      Titel/Jahr im Feld ändern, mit <strong>+ neue Serie</strong> anlegen.
-      <strong>Speichern</strong> schreibt einen Commit. Texte laufen weiter über
-      <a href="../">Sveltia CMS</a>.
+      Rechts der <strong>Pool</strong>: <strong>Fotos hochladen</strong>, dann in eine
+      Serie oder in „Über mich" <strong>ziehen</strong> — oder ein Foto
+      <strong>antippen</strong> und das Ziel wählen. Bilder innerhalb/zwischen Serien
+      ziehen, Serien am Griff verschieben, Titel/Jahr im Feld ändern, mit
+      <strong>+ neue Serie</strong> anlegen. <strong>Speichern</strong> schreibt einen
+      Commit. Nur Texte (Über-mich) laufen weiter über <a href="../">Sveltia CMS</a>.
     </p>
 
     <div class="layout" id="app">
       <main id="board" class="spalte-links"></main>
       <aside class="spalte-rechts">
         <h2 class="pool-titel">Pool <span id="pool-anzahl" class="leise"></span></h2>
-        <p class="pool-hinweis">Alle hochgeladenen Fotos im Repo. Ziehen oder antippen → Ziel wählen.</p>
+        <p class="pool-hinweis">Alle Fotos im Repo. Ziehen oder antippen → Ziel wählen.</p>
+        <div class="pool-werkzeug">
+          <button id="hochladen" type="button" class="primaer">＋ Fotos hochladen</button>
+          <input id="datei" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden />
+        </div>
         <div id="pool" class="pool-liste"></div>
       </aside>
     </div>

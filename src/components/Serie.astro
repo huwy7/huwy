@@ -258,13 +258,14 @@ const breiten = [640, 960, 1280, 1600, 2000];
     width: 50%;
     z-index: 1;
   }
+  /* Keine nativen Zeiger (kein w-/e-resize-Pfeil, kein Hand-Zeiger) im Vollbild —
+     der eigene Cursor-Ball ist der einzige Zeiger. Ohne aktives Cursor-Skript
+     greift der Standardzeiger. */
   .lightbox-prev {
     left: 0;
-    cursor: w-resize;
   }
   .lightbox-next {
     right: 0;
-    cursor: e-resize;
   }
   /* Kreuz oben rechts über allem. */
   .lightbox-x {
@@ -277,6 +278,5 @@ const breiten = [640, 960, 1280, 1600, 2000];
     line-height: 1;
     color: var(--farbe-hintergrund);
     text-decoration: none;
-    cursor: pointer;
   }
 </style>

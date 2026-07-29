@@ -362,11 +362,15 @@ const name = 'TODO_NAME';
         const punkt = document.createElement('span');
         punkt.className = 'cursor__punkt';
         // Transparente Fläche mit backdrop-filter. Düster: invert(1) (kehrt den
-        // Untergrund um). Farbseite (sonnig, hell): grayscale(1) statt Invert —
-        // der Kreis wirkt dort wie eine kleine Schwarz-Weiss-Linse über den
-        // Farbfotos. Inline gesetzt, da der CSS-Minifier den Wert verändern würde.
+        // Untergrund inkl. Farben um). Farbseite: grayscale(1) invert(1) — ein
+        // Schwarz-Weiss-Invert: nimmt den Farben die Farbe (kein greller
+        // Farb-Negativ mehr) UND invertiert, damit der Kreis auch über Weiss
+        // (→ dunkel) und Schwarz (→ hell) sichtbar bleibt und Text darunter lesbar
+        // ist. Inline gesetzt, da der CSS-Minifier den Wert verändern würde.
         const cursorFilter =
-          document.documentElement.dataset.modus === 'farbe' ? 'grayscale(1)' : 'invert(1)';
+          document.documentElement.dataset.modus === 'farbe'
+            ? 'grayscale(1) invert(1)'
+            : 'invert(1)';
         punkt.style.setProperty('backdrop-filter', cursorFilter);
         punkt.style.setProperty('-webkit-backdrop-filter', cursorFilter);
         cursor.appendChild(punkt);
@@ -580,10 +584,13 @@ const name = 'TODO_NAME';
         const kreis = document.createElement('div');
         kreis.className = 'touch-kreis';
         kreis.setAttribute('aria-hidden', 'true');
-        // Düster: invert(1); Farbseite: grayscale(1) (Schwarz-Weiss-Linse). Explizit
-        // gesetzt (beide Präfixe) — nicht vom CSS-Minifier verändert.
+        // Düster: invert(1); Farbseite: grayscale(1) invert(1) (Schwarz-Weiss-Invert,
+        // auch über Weiss/Schwarz sichtbar). Explizit gesetzt (beide Präfixe) —
+        // nicht vom CSS-Minifier verändert.
         const kreisFilter =
-          document.documentElement.dataset.modus === 'farbe' ? 'grayscale(1)' : 'invert(1)';
+          document.documentElement.dataset.modus === 'farbe'
+            ? 'grayscale(1) invert(1)'
+            : 'invert(1)';
         kreis.style.setProperty('backdrop-filter', kreisFilter);
         kreis.style.setProperty('-webkit-backdrop-filter', kreisFilter);
         document.body.appendChild(kreis);

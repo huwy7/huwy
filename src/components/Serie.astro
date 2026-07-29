@@ -1,18 +1,22 @@
 ---
 import Bild from './Bild.astro';
-import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 
 // Eine Serie als inline-Karussell (kein Untermenü): die Bilder liegen nebeneinander
 // in einem horizontalen scroll-snap-Streifen; man wischt/blättert direkt auf der
-// Hauptseite. Titelbild = erstes Bild. Klick aufs Bild öffnet die Vollbild-Ansicht
+// Hauptseite. Erstes Bild = Titelbild. Klick aufs Bild öffnet die Vollbild-Ansicht
 // (Lightbox) mit Blättern links/rechts (endlos) und ✕ zum Schliessen. Alles reines
 // CSS (:target + scroll-snap), kein JavaScript.
+//
+// Flaches Bild-Modell: Titel/Jahr/Slug + fertig sortierte Bilder-Liste kommen von
+// der Seite (Bilder werden dort aus der bilder-Sammlung nach Serie gruppiert).
 interface Props {
-  serie: CollectionEntry<'serien'> | CollectionEntry<'farbserien'>;
+  slug: string;
+  titel: string;
+  jahr: number;
+  bilder: ImageMetadata[];
 }
-const { serie } = Astro.props;
-const slug = serie.id;
-const bilder = [serie.data.titelbild, ...serie.data.bilder];
+const { slug, titel, jahr, bilder } = Astro.props;
 const n = bilder.length;
 const nachbar = (i: number, d: number) => (i + d + n) % n; // mit Loop
 
@@ -21,8 +25,8 @@ const breiten = [640, 960, 1280, 1600, 2000];
 
 <section class="serie">
   <div class="serie-kopf">
-    <span class="serie-titel">{serie.data.titel}</span>
-    <span class="serie-jahr">{serie.data.jahr}</span>
+    <span class="serie-titel">{titel}</span>
+    <span class="serie-jahr">{jahr}</span>
   </div>
 
   <div class="karussell">

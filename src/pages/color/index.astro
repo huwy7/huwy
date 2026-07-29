@@ -4,19 +4,33 @@ import Basis from '../../layouts/Basis.astro';
 import Serie from '../../components/Serie.astro';
 
 // Farbmodus — Portfolio (Startseite der farbigen Seite). Kein Untermenü mehr:
-// jede Serie liegt als inline-Karussell direkt auf der Seite, gestapelt (neueste
-// oben). Sortierung nach reihenfolge (aufsteigend). Siehe Serie.astro und
-// docs/farbmodus-ideensammlung.md.
-const serien = (await getCollection('farbserien')).sort(
+// jede Serie liegt als inline-Karussell direkt auf der Seite, gestapelt.
+// Flaches Bild-Modell: Farbserien (Metadaten) sortiert, Bilder je Serie aus der
+// farbbilder-Sammlung gefiltert/sortiert. Leere Serien fallen weg.
+const serienMeta = (await getCollection('farbserien')).sort(
   (a, b) => a.data.reihenfolge - b.data.reihenfolge,
 );
+const alleBilder = await getCollection('farbbilder');
+const serien = serienMeta
+  .map((serie) => ({
+    serie,
+    bilder: alleBilder
+      .filter((b) => b.data.serie === serie.id)
+      .sort((a, b) => a.data.reihenfolge - b.data.reihenfolge)
+      .map((b) => b.data.bild),
+  }))
+  .filter((s) => s.bilder.length > 0);
 ---
 
 <Basis titel="Portfolio — color — TODO_NAME" modus="farbe" vollhoehe>
   <h1 class="visuell-versteckt">TODO_NAME — color</h1>
 
   <div class="serien-liste">
-    {serien.map((serie) => <Serie serie={serie} />)}
+    {
+      serien.map(({ serie, bilder }) => (
+        <Serie slug={serie.id} titel={serie.data.titel} jahr={serie.data.jahr} bilder={bilder} />
+      ))
+    }
   </div>
 </Basis>
 

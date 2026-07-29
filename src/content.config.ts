@@ -2,28 +2,40 @@ import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// Gemeinsames Schema für beide Serien-Sammlungen (düster + farbig): identisch
-// einfach — Titelbild ist zugleich das erste Bild, weitere Bilder als Liste, kein
-// Alt-Text (CLAUDE.md Regel 4). Astro 7: glob-Loader statt `type: 'content'`.
-const serienSchema = ({ image }: SchemaContext) =>
+// Flaches Bild-Modell: Serien tragen nur noch Metadaten (Titel, Jahr, Reihenfolge).
+// Jedes Bild ist ein eigener Eintrag mit Serie (Slug) + Reihenfolge — so lässt es
+// sich im CMS zentral hochladen und einer Serie zuweisen, ohne verschachtelte Listen.
+const serienMetaSchema = z.object({
+  titel: z.string(),
+  jahr: z.number().int(),
+  reihenfolge: z.number().int(), // Reihenfolge der Serie auf der Seite (1 = zuoberst)
+});
+
+const bildSchema = ({ image }: SchemaContext) =>
   z.object({
-    titel: z.string(),
-    jahr: z.number().int(),
-    reihenfolge: z.number().int(), // Sortierung auf der Startseite
-    titelbild: image(),
-    bilder: z.array(image()).default([]),
+    bild: image(),
+    serie: z.string(), // Slug der zugehörigen Serie
+    reihenfolge: z.number().int(), // Position innerhalb der Serie (1 = erstes/Titelbild)
   });
 
-// Schwarzweiss-Serien (düsterer Standard-Modus).
+// Schwarzweiss (düster)
 const serien = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/serien' }),
-  schema: serienSchema,
+  schema: serienMetaSchema,
+});
+const serienbilder = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/serienbilder' }),
+  schema: bildSchema,
 });
 
-// Farbserien (farbiger Modus, /color) — eigener Bereich, gleiche Struktur.
+// Farbe
 const farbserien = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/farbserien' }),
-  schema: serienSchema,
+  schema: serienMetaSchema,
+});
+const farbbilder = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/farbbilder' }),
+  schema: bildSchema,
 });
 
-export const collections = { serien, farbserien };
+export const collections = { serien, serienbilder, farbserien, farbbilder };

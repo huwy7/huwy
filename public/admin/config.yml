@@ -1,6 +1,7 @@
-# Sveltia CMS — Konfiguration gegen die Collection aus Spezifikation 7.
-# OAuth-Vermittler: Cloudflare-Worker sveltia-cms-auth (Build-Plan Phase 6).
-# Siehe docs/cms.md.
+# Sveltia CMS — flaches Bild-Modell.
+# Serien tragen nur Metadaten (Titel/Jahr/Reihenfolge). Bilder sind eigene Einträge
+# mit Serie (Auswahl) + Reihenfolge — zentral hochladen und einer Serie zuweisen,
+# ohne verschachtelte Listen. Siehe docs/cms.md.
 
 backend:
   name: github
@@ -9,55 +10,97 @@ backend:
   # OAuth-Vermittler (Cloudflare-Worker sveltia-cms-auth).
   base_url: https://sveltia-cms-auth.nico-huwy.workers.dev
 
-# Fallback-Medienordner; die eigentliche Ablage regelt die Collection pro Serie.
-media_folder: src/assets/serien
-public_folder: /src/assets/serien
+# Fallback-Medienordner; die eigentliche Ablage regelt die Collection.
+media_folder: src/assets
+public_folder: /src/assets
 
 collections:
-  # Schwarzweiss-Serien (düsterer Standard-Modus).
+  # --- Schwarzweiss (düster) ---
+  # Serie: nur Metadaten (keine Bilder — die kommen aus „Bilder (Schwarzweiss)").
   - name: serien
     label: Serien (Schwarzweiss)
     label_singular: Serie
     folder: src/content/serien
     create: true
     slug: '{{slug}}'
-    # Bilder pro Serie relativ zur Markdown-Datei — passt zu astro:assets, das die
-    # Bildpfade relativ zur Content-Datei auflöst (Spezifikation 8).
-    media_folder: '../../assets/serien/{{slug}}'
-    public_folder: '../../assets/serien/{{slug}}'
-    # Titelbild = zugleich erstes Bild der Serie. „Weitere Bilder" ist eine
-    # einfache Upload-Liste ohne zusätzliche Textfelder.
+    identifier_field: titel
     fields:
       - { name: titel, label: Titel, widget: string }
       - { name: jahr, label: Jahr, widget: number, value_type: int }
-      - { name: reihenfolge, label: Reihenfolge, widget: number, value_type: int }
-      - { name: titelbild, label: Titelbild (= erstes Bild), widget: image }
-      - name: bilder
-        label: Weitere Bilder
-        label_singular: Bild
-        widget: list
-        required: false
-        field: { name: bild, label: Bild, widget: image }
-      - { name: body, label: Text, widget: markdown, required: false }
+      - {
+          name: reihenfolge,
+          label: Reihenfolge (1 = zuoberst),
+          widget: number,
+          value_type: int,
+        }
 
-  # Farbserien (farbiger Modus, /color) — getrennter Upload-Bereich, gleiche Felder.
+  # Bild: ein Foto, einer Serie zugeordnet, mit Position. Zentraler Upload-Bereich.
+  - name: serienbilder
+    label: Bilder (Schwarzweiss)
+    label_singular: Bild
+    folder: src/content/serienbilder
+    create: true
+    slug: '{{serie}}-{{reihenfolge}}'
+    summary: '{{fields.serie}} · {{fields.reihenfolge}}'
+    thumbnail: bild
+    media_folder: '../../assets/serienbilder'
+    public_folder: '../../assets/serienbilder'
+    fields:
+      - { name: bild, label: Bild, widget: image }
+      - name: serie
+        label: Serie
+        widget: relation
+        collection: serien
+        value_field: '{{slug}}'
+        search_fields: [titel]
+        display_fields: [titel]
+      - {
+          name: reihenfolge,
+          label: Reihenfolge in der Serie (1 = Titelbild),
+          widget: number,
+          value_type: int,
+        }
+
+  # --- Farbe ---
   - name: farbserien
-    label: Farbserien (Farbe)
+    label: Serien (Farbe)
     label_singular: Farbserie
     folder: src/content/farbserien
     create: true
     slug: '{{slug}}'
-    media_folder: '../../assets/farbserien/{{slug}}'
-    public_folder: '../../assets/farbserien/{{slug}}'
+    identifier_field: titel
     fields:
       - { name: titel, label: Titel, widget: string }
       - { name: jahr, label: Jahr, widget: number, value_type: int }
-      - { name: reihenfolge, label: Reihenfolge, widget: number, value_type: int }
-      - { name: titelbild, label: Titelbild (= erstes Bild), widget: image }
-      - name: bilder
-        label: Weitere Bilder
-        label_singular: Bild
-        widget: list
-        required: false
-        field: { name: bild, label: Bild, widget: image }
-      - { name: body, label: Text, widget: markdown, required: false }
+      - {
+          name: reihenfolge,
+          label: Reihenfolge (1 = zuoberst),
+          widget: number,
+          value_type: int,
+        }
+
+  - name: farbbilder
+    label: Bilder (Farbe)
+    label_singular: Bild
+    folder: src/content/farbbilder
+    create: true
+    slug: '{{serie}}-{{reihenfolge}}'
+    summary: '{{fields.serie}} · {{fields.reihenfolge}}'
+    thumbnail: bild
+    media_folder: '../../assets/farbbilder'
+    public_folder: '../../assets/farbbilder'
+    fields:
+      - { name: bild, label: Bild, widget: image }
+      - name: serie
+        label: Serie
+        widget: relation
+        collection: farbserien
+        value_field: '{{slug}}'
+        search_fields: [titel]
+        display_fields: [titel]
+      - {
+          name: reihenfolge,
+          label: Reihenfolge in der Serie (1 = Titelbild),
+          widget: number,
+          value_type: int,
+        }

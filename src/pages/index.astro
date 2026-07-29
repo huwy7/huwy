@@ -6,17 +6,34 @@ import Serie from '../components/Serie.astro';
 // Startseite (düsterer Standard-Modus). Kein Untermenü mehr: jede Serie liegt als
 // inline-Karussell direkt auf der Seite, gestapelt (neueste oben — der Betreiber
 // steuert die Reihenfolge über `reihenfolge`, 1 = zuoberst). Blättern und Vollbild
-// stecken in Serie.astro (reines CSS). Siehe docs/farbmodus-ideensammlung.md B2.
-const serien = (await getCollection('serien')).sort(
+// stecken in Serie.astro (reines CSS).
+//
+// Flaches Bild-Modell: Serien (Metadaten) nach reihenfolge sortiert; die Bilder je
+// Serie aus der bilder-Sammlung gefiltert und sortiert. Leere Serien fallen weg.
+const serienMeta = (await getCollection('serien')).sort(
   (a, b) => a.data.reihenfolge - b.data.reihenfolge,
 );
+const alleBilder = await getCollection('serienbilder');
+const serien = serienMeta
+  .map((serie) => ({
+    serie,
+    bilder: alleBilder
+      .filter((b) => b.data.serie === serie.id)
+      .sort((a, b) => a.data.reihenfolge - b.data.reihenfolge)
+      .map((b) => b.data.bild),
+  }))
+  .filter((s) => s.bilder.length > 0);
 ---
 
 <Basis titel="TODO_NAME" vollhoehe>
   <h1 class="visuell-versteckt">TODO_NAME</h1>
 
   <div class="serien-liste">
-    {serien.map((serie) => <Serie serie={serie} />)}
+    {
+      serien.map(({ serie, bilder }) => (
+        <Serie slug={serie.id} titel={serie.data.titel} jahr={serie.data.jahr} bilder={bilder} />
+      ))
+    }
   </div>
 </Basis>
 

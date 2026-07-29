@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Anordnen — Bilder sortieren</title>
+    <style>
+      /* Eigenständiges Admin-Werkzeug: eigene, schlichte Stile (kein Zugriff auf
+         die Tokens der Seite, da public/ nicht durch Astro läuft). Dunkler,
+         technischer Ton passend zur Seite, aber bewusst simpel gehalten. */
+      :root {
+        --bg: #0d0d0d;
+        --flaeche: #171717;
+        --flaeche-2: #202020;
+        --linie: #2e2e2e;
+        --text: #ececec;
+        --leise: #8a8a8a;
+        --akzent: #e6e6e6;
+        --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 14px;
+        line-height: 1.4;
+        -webkit-text-size-adjust: 100%;
+      }
+      h1 { font-size: 15px; font-weight: 500; margin: 0; }
+      h2 { font-size: 13px; font-weight: 500; color: var(--leise); margin: 0 0 8px; text-transform: none; }
+      a { color: var(--text); }
+
+      .kopf {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--flaeche);
+        border-bottom: 1px solid var(--linie);
+      }
+      .kopf .wachsen { flex: 1; }
+      #status { color: var(--leise); font-size: 13px; }
+      #status.ok { color: #7bb67b; }
+      #status.fehler { color: #d98a8a; }
+      #geaendert { color: #d9c27b; font-size: 13px; }
+
+      button {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text);
+        background: var(--flaeche-2);
+        border: 1px solid var(--linie);
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      button:hover:not(:disabled) { border-color: #4a4a4a; }
+      button:disabled { opacity: 0.4; cursor: default; }
+      button.primaer { background: var(--akzent); color: #111; border-color: var(--akzent); }
+
+      details.einstellungen { border-bottom: 1px solid var(--linie); background: var(--flaeche); }
+      details.einstellungen summary { padding: 10px 16px; cursor: pointer; color: var(--leise); font-size: 13px; }
+      .einstellungen-inhalt { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; padding: 0 16px 16px; }
+      .feld { display: flex; flex-direction: column; gap: 4px; }
+      .feld label { font-size: 12px; color: var(--leise); }
+      .feld small { color: var(--leise); font-size: 11px; }
+      input {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--linie);
+        border-radius: 6px;
+        padding: 6px 8px;
+      }
+      #token { width: 320px; max-width: 70vw; }
+      #branch { width: 120px; }
+
+      main { padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+      .bereich-serien { display: flex; flex-direction: column; gap: 12px; }
+      .serie-spalte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 8px; padding: 12px; }
+      .serie-kopf { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+      .griff { cursor: grab; color: var(--leise); padding: 2px 6px; user-select: none; touch-action: none; }
+      .titel-feld { flex: 1; min-width: 0; }
+      .jahr-feld { width: 72px; text-align: center; }
+
+      .kachel-liste {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-height: 96px;
+        padding: 8px;
+        border: 1px dashed var(--linie);
+        border-radius: 6px;
+      }
+      .kachel {
+        width: 120px;
+        height: 84px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--flaeche-2);
+        cursor: grab;
+        touch-action: none;
+        flex: 0 0 auto;
+      }
+      .kachel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .kachel--fehlt { display: flex; align-items: center; justify-content: center; }
+      .kachel--fehlt::after { content: "?"; color: var(--leise); }
+      .kachel.versteckt { display: none; }
+      .kachel.klon, .serie-spalte.klon {
+        position: fixed;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0.9;
+        transform: scale(1.03);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        margin: 0;
+      }
+      .platz { flex: 0 0 auto; border: 1px dashed #5a5a5a; border-radius: 4px; background: rgba(255,255,255,0.03); }
+      .serie-spalte.versteckt { display: none; }
+      body.zieht { cursor: grabbing; }
+      body.zieht * { cursor: grabbing !important; }
+
+      .hinweis { color: var(--leise); font-size: 12px; padding: 0 16px 16px; }
+      .hinweis code { background: var(--flaeche-2); padding: 1px 5px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <header class="kopf">
+      <h1>Anordnen</h1>
+      <span id="geaendert"></span>
+      <span class="wachsen"></span>
+      <span id="status"></span>
+      <button id="neuladen">Neu laden</button>
+      <button id="speichern" class="primaer" disabled>Speichern</button>
+    </header>
+
+    <details class="einstellungen">
+      <summary>Einstellungen (Login &amp; Branch)</summary>
+      <div class="einstellungen-inhalt">
+        <div class="feld">
+          <label for="token">GitHub-Token (nur zum Speichern)</label>
+          <input id="token" type="password" placeholder="ghp_… / github_pat_…" autocomplete="off" />
+          <small>Fein­granulierter Token mit „Contents: Read and write" auf huwy7/huwy. Bleibt nur lokal im Browser.</small>
+        </div>
+        <div class="feld">
+          <label for="branch">Ziel-Branch</label>
+          <input id="branch" />
+          <small>Standard <code>feature</code> (Vorschau). <code>main</code> = live.</small>
+        </div>
+        <button id="token-speichern">Übernehmen</button>
+      </div>
+    </details>
+
+    <p class="hinweis">
+      Bilder per Ziehen innerhalb einer Serie sortieren oder in eine andere Serie
+      ziehen. Serien am Griff <code>⠿</code> verschieben. Titel/Jahr direkt im Feld
+      ändern. <strong>Speichern</strong> schreibt einen Commit auf den Ziel-Branch.
+      Texte, neue Serien und Uploads laufen weiter über <a href="../">Sveltia CMS</a>.
+    </p>
+
+    <main id="board"></main>
+
+    <script type="module" src="./anordnen.js"></script>
+  </body>
+</html>

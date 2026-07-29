@@ -11,6 +11,8 @@
   --farbe-text: #ececec; /* hell, nicht rein weiss */
   --farbe-text-leise: #8a8a8a; /* AA-tauglich auf Dunkel */
   --farbe-linie: #2a2a2a;
+  --farbe-platzhalter: #8f8f8f; /* neutrales Grau für Platzhalterflächen — auf
+     dunklem wie hellem Grund sichtbar (Bild-Platzhalter, About-Seiten) */
   --farbe-rahmen: #ededed; /* ruhiges Weiss für Passepartout + Vollbild-Fläche;
      bewusst nicht rein #fff — grosse weisse Flächen (Lightbox) wirken sonst zu
      grell und springen gegen das weichere Weiss der Fotos. Ein Wert überall. */

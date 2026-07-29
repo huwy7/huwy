@@ -1,0 +1,136 @@
+---
+// Platzhalter-Inhalt für die About-Seiten (düster: „About me", farbig: „More
+// about me"). Bewusst nur Fülltext (Lorem ipsum) und graue Bild-Platzhalter mit
+// Seitenverhältnis (CLAUDE.md Regel 9) — der echte Inhalt kommt später. Gleich
+// für beide Seiten, damit wir eine Struktur zum Weiterarbeiten haben.
+//
+// spotify: nur die düstere Seite bekommt zusätzlich den Spotify-API-Platzhalter.
+interface Props {
+  spotify?: boolean;
+}
+const { spotify = false } = Astro.props;
+
+const fueller = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
+  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
+];
+---
+
+<div class="ueber">
+  {/* Block 1: Text links, Platzhalterbild rechts */}
+  <section class="ueber-block">
+    <div class="ueber-text">
+      <p>{fueller[0]}</p>
+      <p>{fueller[1]}</p>
+    </div>
+    <div class="platzhalter platzhalter--hoch" role="img" aria-label="Platzhalter-Bild"></div>
+  </section>
+
+  {/* Block 2: Platzhalterbild links, Text rechts (gespiegelt) */}
+  <section class="ueber-block ueber-block--gedreht">
+    <div class="platzhalter platzhalter--quer" role="img" aria-label="Platzhalter-Bild"></div>
+    <div class="ueber-text">
+      <p>{fueller[1]}</p>
+      <p>{fueller[0]}</p>
+    </div>
+  </section>
+
+  {
+    spotify && (
+      <section class="spotify" aria-label="Spotify — Platzhalter">
+        <div class="spotify-cover" aria-hidden="true" />
+        <div class="spotify-info">
+          <span class="spotify-label">Spotify — Platzhalter (API folgt)</span>
+          <span class="spotify-bar spotify-bar--titel" aria-hidden="true" />
+          <span class="spotify-bar spotify-bar--kuenstler" aria-hidden="true" />
+        </div>
+      </section>
+    )
+  }
+</div>
+
+<style>
+  .ueber {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rhythmus-block);
+  }
+
+  /* Textblock + Bild nebeneinander; der zweite Block gespiegelt (Bild links). */
+  .ueber-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--abstand-48);
+    align-items: start;
+  }
+
+  .ueber-text {
+    font-size: var(--groesse-16);
+    line-height: var(--zeilenhoehe-1-6);
+  }
+  .ueber-text p + p {
+    margin-block-start: var(--abstand-16);
+  }
+
+  /* Graue Bild-Platzhalter mit festem Seitenverhältnis (Regel 9). */
+  .platzhalter {
+    width: 100%;
+    background-color: var(--farbe-platzhalter);
+  }
+  .platzhalter--hoch {
+    aspect-ratio: 4 / 5;
+  }
+  .platzhalter--quer {
+    aspect-ratio: 3 / 2;
+  }
+
+  @media (max-width: 768px) {
+    /* Mobil: untereinander. Text zuerst, dann Bild — in beiden Blöcken. */
+    .ueber-block {
+      grid-template-columns: 1fr;
+      gap: var(--abstand-24);
+    }
+    .ueber-block--gedreht .platzhalter {
+      order: 2;
+    }
+  }
+
+  /* Spotify-Platzhalter (nur düster): angedeutete „Now playing"-Karte —
+     quadratisches Cover, Titel- und Künstlerzeile als graue Balken. */
+  .spotify {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-16);
+    padding: var(--abstand-16);
+    border: var(--linie-staerke) solid var(--farbe-linie);
+    max-width: 420px;
+  }
+  .spotify-cover {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    background-color: var(--farbe-platzhalter);
+  }
+  .spotify-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-8);
+    width: 100%;
+  }
+  .spotify-label {
+    font-family: var(--schrift-mono);
+    font-size: var(--groesse-12);
+    color: var(--farbe-text-leise);
+    font-variant-ligatures: none;
+  }
+  .spotify-bar {
+    height: 10px;
+    background-color: var(--farbe-platzhalter);
+  }
+  .spotify-bar--titel {
+    width: 70%;
+  }
+  .spotify-bar--kuenstler {
+    width: 45%;
+  }
+</style>

@@ -186,7 +186,12 @@ picture > source {
    Seitenverhältnis und trägt dasselbe weisse Passepartout wie die übrigen Bilder. */
 .karussell-foto {
   box-sizing: border-box;
-  max-height: 100%; /* füllt die feste Höhe der Karussell-Ansicht, ohne zu überlaufen */
+  /* Höhe direkt an die Viewport-Höhe koppeln (definite Einheit) statt max-height:
+     100% — letzteres löst über den auto-hohen Anker nicht auf, wodurch Hochformate
+     nur breitenbegrenzt würden und überliefen. So passt jedes Bild ganz in die
+     Ansicht: Querformate bleiben breit, Hochformate werden schmaler, aber immer
+     vollständig sichtbar (kein Beschnitt, kein Scrollen). */
+  max-height: var(--karussell-hoehe);
   max-width: 100%;
   width: auto;
   height: auto;

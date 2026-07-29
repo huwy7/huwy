@@ -31,6 +31,7 @@
   --groesse-16: 16px;
   --groesse-19: 19px;
   --groesse-22: 22px;
+  --groesse-28: 28px; /* nur für das Vollbild-✕ (etwas grösser, leichter zu treffen) */
 
   /* --- 3.4 Schriftschnitte (nur 400 und 500) --- */
   --gewicht-400: 400;

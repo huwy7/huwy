@@ -138,6 +138,36 @@ const breiten = [640, 960, 1280, 1600, 2000];
       setzeHash(href);
     });
   }
+
+  // Wischen in der Vollbild-Ansicht: nach links = nächstes Bild, nach rechts =
+  // vorheriges. Zusätzlich zum Tippen auf die halben Flächen. Nur wenn ein Vollbild
+  // offen ist (#lb-…). Ziel-Hash aus den Blätter-Zonen des aktuellen Bildes.
+  let wischX = 0;
+  let wischY = 0;
+  window.addEventListener(
+    'touchstart',
+    (e) => {
+      if (!location.hash.startsWith('#lb-')) return;
+      wischX = e.touches[0].clientX;
+      wischY = e.touches[0].clientY;
+    },
+    { passive: true },
+  );
+  window.addEventListener(
+    'touchend',
+    (e) => {
+      if (!location.hash.startsWith('#lb-') || !wischX) return;
+      const dx = e.changedTouches[0].clientX - wischX;
+      const dy = e.changedTouches[0].clientY - wischY;
+      wischX = 0;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return; // kein klarer Quer-Wisch
+      const aktuell = document.getElementById(location.hash.slice(1));
+      const zone = aktuell?.querySelector(dx < 0 ? '.lightbox-next' : '.lightbox-prev');
+      const ziel = zone?.getAttribute('href');
+      if (ziel) setzeHash(ziel);
+    },
+    { passive: true },
+  );
 </script>
 
 <style>
@@ -271,14 +301,22 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .lightbox-next {
     right: 0;
   }
-  /* Kreuz oben rechts über allem. */
+  /* Kreuz oben rechts über allem. Etwas grösseres Zeichen und eine grössere
+     Trefferfläche (die ganze Box ist klickbar), damit es leichter zu treffen ist —
+     bleibt aber kompakt oben rechts, sodass links/rechts genug Platz zum Blättern
+     bleibt. */
   .lightbox-x {
     position: absolute;
-    top: var(--abstand-24);
-    right: var(--abstand-24);
+    top: var(--abstand-8);
+    right: var(--abstand-8);
     z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--abstand-48);
+    height: var(--abstand-48);
     font-family: var(--schrift-mono);
-    font-size: var(--groesse-22);
+    font-size: var(--groesse-28);
     line-height: 1;
     color: var(--farbe-hintergrund);
     text-decoration: none;

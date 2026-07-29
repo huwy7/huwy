@@ -389,6 +389,7 @@ const name = 'TODO_NAME';
         let mausY = zielY;
         let sichtbar = false;
         let boxEl: Element | null = null; // aktuell umschlossenes Element (Box-Modus)
+        let morphEnde = 0; // bis wann der Box-Morph läuft (dann keine Verformung)
         const BOX_PAD = 10; // Luft rund um das Element
 
         // Auswahl der Elemente, die der Cursor als Box umschliesst: kleine
@@ -454,6 +455,10 @@ const name = 'TODO_NAME';
 
           if (boxZiel !== boxEl) {
             boxEl = boxZiel;
+            // Beim Wechsel läuft der Grössen-Morph (width/height, CSS-Transition).
+            // Solange keine elastische Verformung anwenden — sonst überlagern sich
+            // Schrumpfen/Wachsen und Dehnung zu einer „zappeligen" Bewegung.
+            morphEnde = performance.now() + 300;
             if (boxEl) zielAufBox();
             else loeseBox();
           }
@@ -526,19 +531,25 @@ const name = 'TODO_NAME';
                 boxEl = null;
                 loeseBox();
                 cursor.classList.remove('cursor--box');
+                morphEnde = performance.now() + 300;
               }
             }
             istX = lerp(istX, zielX, nachlauf);
             istY = lerp(istY, zielY, nachlauf);
             platziere();
 
-            // Verformung nur im Freimodus (im Box-Modus bestimmt CSS die Form).
+            // Verformung nur im Freimodus (im Box-Modus bestimmt CSS die Form) und
+            // erst, wenn der Box-Morph fertig ist — so snappt die Box sauber weg,
+            // ohne dass sich Schrumpfen und Dehnung überlagern.
             if (!boxEl) {
               const dx = mausX - istX;
               const dy = mausY - istY;
               const dist = Math.hypot(dx, dy);
               const druck = cursor.classList.contains('cursor--druck') ? DRUCK : 1;
-              if (dist > 0.6) {
+              if (performance.now() < morphEnde) {
+                // Während des Rück-Morphs: sauberer Kreis, keine Verformung.
+                punkt.style.transform = `translate(-50%, -50%) scale(${druck})`;
+              } else if (dist > 0.6) {
                 const s = Math.min(dist / DEHN_REF, 1) * DEHN_MAX;
                 const winkel = (Math.atan2(dy, dx) * 180) / Math.PI;
                 const sx = 1 + s;

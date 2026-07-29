@@ -1,44 +1,53 @@
 // @ts-nocheck
 /*
-  Anordnen — schlanke Drag-and-Drop-Oberfläche fürs Sortieren der Bilder.
-  Ergänzt Sveltia CMS (/admin), ersetzt es nicht: Texte, Metadaten und Uploads
-  bleiben in Sveltia; hier wird nur angeordnet, was Sveltia nicht kann —
-  Reihenfolge innerhalb einer Serie, Verschieben zwischen Serien, Reihenfolge der
-  Serien, Titel/Jahr inline.
+  Anordnen — Drag-and-Drop-Oberfläche zum Verwalten der Bilder.
+  Zwei Spalten: links die Ziele (Serien Schwarzweiss/Farbe + Über-mich-Seiten),
+  rechts ein Pool aller im Repo hochgeladenen Fotos. Fotos aus dem Pool in ein
+  Ziel ziehen ODER antippen und das Ziel wählen (mobil-freundlich).
+
+  Ergänzt Sveltia CMS (/admin), ersetzt es nicht: Texte und Uploads bleiben in
+  Sveltia; hier wird angeordnet und befüllt.
 
   Bewusste Entscheidungen (siehe CLAUDE.md):
   - Reine Vanilla-Datei, keine Dependency (Regel 1). Liegt unter public/admin und
     wird wie Sveltia unverändert durchgereicht; die öffentliche Seite bleibt ohne
     JavaScript (Regel 2 gilt der ausgelieferten Seite, nicht dem Admin-Werkzeug).
-  - Zeigen (Lesen) geht ohne Login — das Repo ist öffentlich. Nur Speichern
-    braucht einen GitHub-Token (Personal Access Token, einmal einfügen).
-  - Flaches Bild-Modell: ein Bild = eine kleine Markdown-Datei mit bild/serie/
-    reihenfolge. Anordnen ändert nur serie + reihenfolge (und benennt die Datei
-    entsprechend um). Die Bild-Assets selbst werden nie angefasst.
-  - Speichern ist EIN atomarer Commit (Git-Data-API: ein neuer Baum, ein Commit,
-    ein Ref-Update) — kein Zwischenzustand mit halb umbenannten Dateien.
+  - Lesen geht ohne Login (Repo ist öffentlich). Nur Speichern braucht einen
+    GitHub-Token (Personal Access Token, einmal einfügen).
+  - Flaches Bild-Modell: ein Bild = eine kleine Markdown-Datei (bild/serie/
+    reihenfolge). Aus dem Pool ziehen KOPIERT (Foto bleibt im Pool, es entsteht ein
+    neuer Eintrag). Die Bild-Assets selbst werden nie verändert.
+  - Speichern ist EIN atomarer Commit (Git-Data-API: Baum + Commit + Ref-Update).
 */
 
 const REPO = 'huwy7/huwy';
 const API = 'https://api.github.com';
 
-// Die zwei Bereiche und ihre Sammlungen (Serien-Metadaten + Bild-Einträge).
+// Die zwei Serien-Bereiche und ihre Sammlungen.
 const BEREICHE = [
   { id: 'sw', label: 'Schwarzweiss', serieColl: 'serien', bildColl: 'serienbilder' },
   { id: 'farbe', label: 'Farbe', serieColl: 'farbserien', bildColl: 'farbbilder' },
 ];
+// Die zwei Über-mich-Seiten (Text + Bilder-Liste, Sammlung „seiten").
+const SEITEN = [
+  { key: 'ueber-mich', label: 'Über mich (düster)' },
+  { key: 'mehr-ueber-mich', label: 'Mehr über mich (farbig)' },
+];
+const SEITEN_DIR = 'src/content/seiten';
 
 const LS_TOKEN = 'huwy-admin-token';
 const LS_BRANCH = 'huwy-admin-branch';
 
 const state = {
-  // Standard: main = live. Bildänderungen (Reihenfolge/Serien) sollen direkt
-  // live gehen — ein falsch sortiertes Bild ist schnell wieder korrigiert.
+  // Standard: main = live. Bildänderungen sollen direkt live gehen.
   branch: localStorage.getItem(LS_BRANCH) || 'main',
   token: localStorage.getItem(LS_TOKEN) || '',
-  serien: {}, // bereichId -> [{ slug, titel, jahr, reihenfolge, body, pfad }]
-  bilder: {}, // id -> { id, bereichId, bildColl, bild, serie, reihenfolge, pfad, thumb }
-  snapshot: '', // Signatur des geladenen Zustands (für „geändert?")
+  serien: {}, // bereichId -> [{ slug, titel, jahr, reihenfolge, body, pfad, neu? }]
+  serienBilder: {}, // bereichId -> { slug -> [{ assetPfad, origPfad }] }
+  seiten: {}, // key -> { pfad, body, bilder: [assetPfad] }
+  origBildPfade: new Set(), // alle geladenen Bild-md-Pfade (für Lösch-Diff)
+  neuZaehler: 0,
+  snapshot: '',
 };
 
 // ---------------------------------------------------------------------------
@@ -50,7 +59,7 @@ const el = (tag, attrs = {}, kinder = []) => {
   for (const [k, v] of Object.entries(attrs)) {
     if (k === 'class') node.className = v;
     else if (k === 'text') node.textContent = v;
-    else if (k.startsWith('data-')) node.setAttribute(k, v);
+    else if (k.startsWith('data-') || k.startsWith('aria-')) node.setAttribute(k, v);
     else node[k] = v;
   }
   for (const kind of [].concat(kinder)) if (kind) node.append(kind);
@@ -63,7 +72,7 @@ const setzeStatus = (text, art = '') => {
   s.className = art;
 };
 
-// Pfad relativ zu einem Verzeichnis auflösen (nur ../ und ./), ohne URL-API.
+// Pfad relativ zu einem Verzeichnis auflösen (nur ../ und ./).
 const aufloesen = (verzeichnis, rel) => {
   const teile = (verzeichnis + '/' + rel).split('/');
   const stapel = [];
@@ -75,9 +84,28 @@ const aufloesen = (verzeichnis, rel) => {
   return stapel.join('/');
 };
 
+// Relativer Pfad von einem Verzeichnis zu einer Zieldatei (Umkehrung).
+const relPfad = (vonDir, ziel) => {
+  const a = vonDir.split('/').filter(Boolean);
+  const b = ziel.split('/').filter(Boolean);
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  return '../'.repeat(a.length - i) + b.slice(i).join('/');
+};
+
+const kebab = (s) =>
+  s
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 const rawUrl = (pfad) => `https://raw.githubusercontent.com/${REPO}/${state.branch}/${pfad}`;
 
-// Frontmatter der kleinen Dateien parsen (nur einfache key: value-Paare).
+// Frontmatter einfacher key: value-Dateien parsen.
 const parseFrontmatter = (text) => {
   const treffer = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   const daten = {};
@@ -97,7 +125,27 @@ const parseFrontmatter = (text) => {
   return { daten, body };
 };
 
-// YAML-Wert sicher schreiben: Zahlen roh, harmlose Strings roh, sonst JSON-Quote.
+// Über-mich-Datei parsen: bilder-Liste (- bild: …) + Textkörper.
+const parseSeite = (text) => {
+  const treffer = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  const bilder = [];
+  let body = '';
+  if (treffer) {
+    for (const zeile of treffer[1].split(/\r?\n/)) {
+      const m = zeile.match(/-\s*bild:\s*(.+?)\s*$/);
+      if (!m) continue;
+      let v = m[1].trim();
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+        v = v.slice(1, -1);
+      }
+      bilder.push(v);
+    }
+    body = treffer[2].trim();
+  }
+  return { bilder, body };
+};
+
+// YAML-Wert sicher schreiben.
 const yamlWert = (v) => {
   if (typeof v === 'number') return String(v);
   const s = String(v);
@@ -107,6 +155,13 @@ const frontmatter = (obj, body = '') => {
   const zeilen = Object.entries(obj).map(([k, v]) => `${k}: ${yamlWert(v)}`);
   return `---\n${zeilen.join('\n')}\n---\n${body ? body + '\n' : ''}`;
 };
+// Über-mich-Datei schreiben (bilder-Liste + Text).
+const seiteInhalt = (bilderRel, body) => {
+  const liste = bilderRel.length
+    ? '\n' + bilderRel.map((p) => `  - bild: ${yamlWert(p)}`).join('\n')
+    : ' []';
+  return `---\nbilder:${liste}\n---\n${body ? body + '\n' : ''}`;
+};
 
 const ghHeaders = (mitToken = false) => {
   const h = { Accept: 'application/vnd.github+json' };
@@ -115,12 +170,12 @@ const ghHeaders = (mitToken = false) => {
 };
 
 // ---------------------------------------------------------------------------
-// Laden (öffentlich, ohne Token)
+// Laden
 // ---------------------------------------------------------------------------
 const ladeVerzeichnis = async (coll) => {
   const url = `${API}/repos/${REPO}/contents/src/content/${coll}?ref=${encodeURIComponent(state.branch)}`;
   const res = await fetch(url, { headers: ghHeaders(!!state.token) });
-  if (res.status === 404) return []; // Sammlung existiert (noch) nicht
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Verzeichnis ${coll}: HTTP ${res.status}`);
   const liste = await res.json();
   const dateien = liste.filter((e) => e.type === 'file' && e.name.endsWith('.md'));
@@ -132,11 +187,36 @@ const ladeVerzeichnis = async (coll) => {
   );
 };
 
+const ladeSeite = async (key) => {
+  const url = `${API}/repos/${REPO}/contents/${SEITEN_DIR}/${key}.md?ref=${encodeURIComponent(state.branch)}`;
+  const res = await fetch(url, { headers: ghHeaders(!!state.token) });
+  if (!res.ok) return { pfad: `${SEITEN_DIR}/${key}.md`, bilder: [], body: '' };
+  const meta = await res.json();
+  const text = await (await fetch(meta.download_url)).text();
+  const { bilder, body } = parseSeite(text);
+  return { pfad: meta.path, body, bilder: bilder.map((b) => aufloesen(SEITEN_DIR, b)) };
+};
+
+// Alle Foto-Assets im Repo (Pool) via rekursivem Git-Baum.
+const ladePool = async () => {
+  const url = `${API}/repos/${REPO}/git/trees/${encodeURIComponent(state.branch)}?recursive=1`;
+  const res = await fetch(url, { headers: ghHeaders(!!state.token) });
+  if (!res.ok) throw new Error(`Pool: HTTP ${res.status}`);
+  const daten = await res.json();
+  const bild = /\.(jpe?g|png|webp|avif)$/i;
+  return (daten.tree || [])
+    .filter((e) => e.type === 'blob' && e.path.startsWith('src/assets/') && bild.test(e.path))
+    .map((e) => e.path)
+    .sort();
+};
+
 const laden = async () => {
   setzeStatus('Lädt …');
   state.serien = {};
-  state.bilder = {};
-  let lauf = 0;
+  state.serienBilder = {};
+  state.seiten = {};
+  state.origBildPfade = new Set();
+
   for (const b of BEREICHE) {
     const [serienDateien, bildDateien] = await Promise.all([
       ladeVerzeichnis(b.serieColl),
@@ -153,51 +233,44 @@ const laden = async () => {
       }))
       .sort((a, z) => a.reihenfolge - z.reihenfolge);
 
+    const proSerie = {};
     for (const d of bildDateien) {
-      const dir = `src/content/${b.bildColl}`;
-      const id = `img-${lauf++}`;
-      state.bilder[id] = {
-        id,
-        bereichId: b.id,
-        bildColl: b.bildColl,
-        bild: d.daten.bild,
-        serie: d.daten.serie,
+      state.origBildPfade.add(d.pfad);
+      const serie = d.daten.serie;
+      const assetPfad = aufloesen(`src/content/${b.bildColl}`, d.daten.bild);
+      (proSerie[serie] ||= []).push({
+        assetPfad,
+        origPfad: d.pfad,
         reihenfolge: Number(d.daten.reihenfolge) || 999,
-        pfad: d.pfad,
-        thumb: rawUrl(aufloesen(dir, d.daten.bild)),
-      };
+      });
     }
+    for (const slug in proSerie) proSerie[slug].sort((a, z) => a.reihenfolge - z.reihenfolge);
+    state.serienBilder[b.id] = proSerie;
   }
-  rendern();
+
+  const seitenGeladen = await Promise.all(SEITEN.map((s) => ladeSeite(s.key)));
+  SEITEN.forEach((s, i) => (state.seiten[s.key] = seitenGeladen[i]));
+
+  const pool = await ladePool();
+  rendern(pool);
   state.snapshot = signatur();
-  setzeStatus('Geladen.', 'ok');
+  setzeStatus(`Geladen — ${pool.length} Fotos im Pool.`, 'ok');
 };
 
 // ---------------------------------------------------------------------------
 // Rendern
 // ---------------------------------------------------------------------------
-const bilderDerSerie = (bereichId, slug) =>
-  Object.values(state.bilder)
-    .filter((x) => x.bereichId === bereichId && x.serie === slug)
-    .sort((a, z) => a.reihenfolge - z.reihenfolge);
-
-const rendern = () => {
-  const wurzel = $('#board');
-  wurzel.textContent = '';
-  for (const b of BEREICHE) {
-    const serien = state.serien[b.id] || [];
-    const bereichSerien = el('div', { class: 'bereich-serien', 'data-bereich': b.id });
-    for (const serie of serien) {
-      bereichSerien.append(serieSpalte(b, serie));
-    }
-    wurzel.append(
-      el('section', { class: 'bereich' }, [
-        el('h2', { class: 'bereich-titel', text: b.label }),
-        bereichSerien,
-      ]),
-    );
-  }
-  markiereGeaendert();
+const macheKachel = (assetPfad, opt = {}) => {
+  const img = el('img', { src: rawUrl(assetPfad), alt: '', loading: 'lazy', draggable: false });
+  const attrs = {
+    class: 'kachel' + (opt.pool ? ' pool-kachel' : ''),
+    'data-bild': assetPfad,
+    title: assetPfad.replace('src/assets/', ''),
+  };
+  if (opt.origPfad) attrs['data-origpfad'] = opt.origPfad;
+  const card = el('div', attrs, [img]);
+  img.addEventListener('error', () => card.classList.add('kachel--fehlt'));
+  return card;
 };
 
 const serieSpalte = (bereich, serie) => {
@@ -225,98 +298,93 @@ const serieSpalte = (bereich, serie) => {
     class: 'kachel-liste',
     'data-serie': serie.slug,
     'data-bereich': bereich.id,
+    'data-gruppe': bereich.id,
   });
-  for (const bild of bilderDerSerie(bereich.id, serie.slug)) {
-    liste.append(kachel(bild));
+  for (const bild of state.serienBilder[bereich.id]?.[serie.slug] || []) {
+    liste.append(macheKachel(bild.assetPfad, { origPfad: bild.origPfad }));
   }
   return el('div', { class: 'serie-spalte', 'data-serie': serie.slug }, [kopf, liste]);
 };
 
-const kachel = (bild) => {
-  const img = el('img', { src: bild.thumb, alt: '', loading: 'lazy', draggable: false });
-  img.addEventListener('error', () => card.classList.add('kachel--fehlt'));
-  const card = el('div', { class: 'kachel', 'data-id': bild.id, title: bild.bild }, [img]);
-  return card;
+const seiteGalerie = (seite) => {
+  const liste = el('div', {
+    class: 'galerie-liste',
+    'data-seite': seite.key,
+    'data-gruppe': 'seiten',
+  });
+  for (const assetPfad of state.seiten[seite.key]?.bilder || []) {
+    liste.append(macheKachel(assetPfad));
+  }
+  return el('div', { class: 'galerie' }, [
+    el('div', { class: 'galerie-kopf', text: seite.label }),
+    liste,
+  ]);
 };
 
-// Kontextmenü eines Bildes (beim Antippen). Verschieben in eine wählbare Serie
-// desselben Bereichs oder Löschen. Verschieben/Löschen wirken erst beim Speichern.
-const zeigeMenu = (kachel) => {
-  const bereich = kachel.closest('.bereich-serien')?.dataset.bereich;
-  const aktuelleSerie = kachel.closest('.serie-spalte')?.dataset.serie;
-  const bild = state.bilder[kachel.dataset.id];
-
-  const hintergrund = el('div', { class: 'menu-hintergrund' });
-  const schliessen = () => hintergrund.remove();
-  // Tippen auf die dunkle Fläche (nicht auf die Karte) schliesst.
-  hintergrund.addEventListener('pointerdown', (e) => {
-    if (e.target === hintergrund) schliessen();
-  });
-
-  const karte = el('div', { class: 'menu' });
-  karte.append(el('img', { class: 'menu-vorschau', src: bild?.thumb || '', alt: '' }));
-
-  karte.append(el('div', { class: 'menu-label', text: 'Verschieben nach' }));
-  const ziele = (state.serien[bereich] || []).filter((s) => s.slug !== aktuelleSerie);
-  if (ziele.length === 0) {
-    karte.append(el('div', { class: 'menu-leer', text: 'Keine andere Serie in diesem Bereich.' }));
-  } else {
-    for (const z of ziele) {
-      const b = el('button', { type: 'button', text: z.titel || z.slug });
-      b.addEventListener('click', () => {
-        const liste = document.querySelector(
-          `.kachel-liste[data-bereich="${bereich}"][data-serie="${z.slug}"]`,
-        );
-        if (liste) {
-          liste.append(kachel);
-          markiereGeaendert();
-        }
-        schliessen();
-      });
-      karte.append(b);
-    }
+const rendern = (pool) => {
+  const board = $('#board');
+  board.textContent = '';
+  for (const b of BEREICHE) {
+    const bereichSerien = el('div', { class: 'bereich-serien', 'data-bereich': b.id });
+    for (const serie of state.serien[b.id] || []) bereichSerien.append(serieSpalte(b, serie));
+    const knopf = el('button', { class: 'neue-serie', type: 'button', text: `+ neue Serie (${b.label})` });
+    knopf.addEventListener('click', () => neueSerie(b));
+    board.append(el('section', { class: 'bereich' }, [
+      el('div', { class: 'bereich-titel-zeile' }, [el('h2', { text: b.label })]),
+      bereichSerien,
+      knopf,
+    ]));
   }
+  // Über-mich-Seiten als Ziele
+  const seitenBlock = el('section', {}, [el('h2', { text: 'Über mich' })]);
+  for (const s of SEITEN) seitenBlock.append(seiteGalerie(s));
+  board.append(seitenBlock);
 
-  const loesch = el('button', { class: 'loeschen', type: 'button', text: 'Löschen' });
-  loesch.addEventListener('click', () => {
-    if (!confirm('Dieses Bild aus dem Portfolio entfernen? Der Eintrag wird beim Speichern gelöscht (die Bilddatei selbst bleibt im Repo).')) return;
-    kachel.remove();
-    markiereGeaendert();
-    schliessen();
-  });
-  const abbrechen = el('button', { class: 'abbrechen', type: 'button', text: 'Abbrechen' });
-  abbrechen.addEventListener('click', schliessen);
-  karte.append(el('div', { class: 'menu-trenner' }), loesch, abbrechen);
-
-  hintergrund.append(karte);
-  document.body.append(hintergrund);
+  // Pool rechts
+  if (pool) {
+    const poolEl = $('#pool');
+    poolEl.textContent = '';
+    for (const assetPfad of pool) poolEl.append(macheKachel(assetPfad, { pool: true }));
+    $('#pool-anzahl').textContent = `(${pool.length})`;
+  }
+  markiereGeaendert();
 };
 
 // ---------------------------------------------------------------------------
-// Zustand aus dem DOM ableiten (Reihenfolge = Anzeige-Reihenfolge)
+// Zustand aus dem DOM ableiten
 // ---------------------------------------------------------------------------
 const domZustand = () => {
-  const eintraege = { bilder: [], serien: [] };
+  const z = { serien: [], bilder: [], seiten: [] };
+  const board = $('#board');
   for (const b of BEREICHE) {
-    const spalten = $(`.bereich-serien[data-bereich="${b.id}"]`)?.querySelectorAll('.serie-spalte') || [];
+    const spalten = board.querySelectorAll(`.bereich-serien[data-bereich="${b.id}"] .serie-spalte`);
     spalten.forEach((spalte, si) => {
       const slug = spalte.dataset.serie;
-      const titel = $('.titel-feld', spalte).value.trim();
-      const jahr = Number($('.jahr-feld', spalte).value) || new Date().getFullYear();
-      eintraege.serien.push({ bereichId: b.id, slug, titel, jahr, reihenfolge: si + 1 });
+      z.serien.push({
+        bereichId: b.id,
+        slug,
+        titel: $('.titel-feld', spalte).value.trim(),
+        jahr: Number($('.jahr-feld', spalte).value) || new Date().getFullYear(),
+        reihenfolge: si + 1,
+      });
       spalte.querySelectorAll('.kachel').forEach((k, ki) => {
-        eintraege.bilder.push({ id: k.dataset.id, slug, reihenfolge: ki + 1 });
+        z.bilder.push({ bereichId: b.id, slug, assetPfad: k.dataset.bild, reihenfolge: ki + 1, node: k });
       });
     });
   }
-  return eintraege;
+  for (const s of SEITEN) {
+    const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+    z.seiten.push({ key: s.key, bilder: [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild) });
+  }
+  return z;
 };
 
 const signatur = () => {
   const z = domZustand();
   return JSON.stringify([
     z.serien.map((s) => [s.bereichId, s.slug, s.titel, s.jahr, s.reihenfolge]),
-    z.bilder.map((x) => [x.id, x.slug, x.reihenfolge]),
+    z.bilder.map((x) => [x.bereichId, x.slug, x.assetPfad, x.reihenfolge]),
+    z.seiten.map((s) => [s.key, s.bilder]),
   ]);
 };
 
@@ -328,24 +396,30 @@ const markiereGeaendert = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Drag & Drop (Pointer-basiert → funktioniert mit Maus UND Touch)
+// Drag & Drop (Pointer-basiert → Maus UND Touch)
 // ---------------------------------------------------------------------------
-const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
+const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk }) => {
   let ctx = null;
 
   const start = (e) => {
-    const griff = griffSel ? e.target.closest(griffSel) : null;
-    if (griffSel && !griff) return;
+    if (griffSel && !e.target.closest(griffSel)) return;
     if (!griffSel && e.target.closest('input, button, .griff')) return;
     const item = e.target.closest(itemSel);
     if (!item) return;
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const zone = item.closest(zoneSel);
-    // Bereich (sw/farbe) merken: Verschieben ist nur innerhalb desselben Bereichs
-    // erlaubt — ein Schwarzweiss-Bild darf nie in eine Farbserie wandern.
-    const bereich = item.closest('.bereich-serien')?.dataset.bereich;
-    ctx = { item, zone, bereich, startX, startY, aktiv: false, klon: null, platz: null, pointerId: e.pointerId };
+    const istPool = !!item.closest('.pool-liste');
+    const startZone = item.closest(zoneSel) || item.closest('.pool-liste');
+    ctx = {
+      item,
+      istPool,
+      gruppe: startZone?.dataset.gruppe,
+      bereich: item.closest('.bereich-serien')?.dataset.bereich,
+      startX: e.clientX,
+      startY: e.clientY,
+      aktiv: false,
+      klon: null,
+      platz: null,
+      pointerId: e.pointerId,
+    };
     item.setPointerCapture(e.pointerId);
   };
 
@@ -359,6 +433,7 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
       ctx.versatzY = ctx.startY - r.top;
       ctx.klon = ctx.item.cloneNode(true);
       ctx.klon.classList.add('klon');
+      ctx.klon.classList.remove('versteckt');
       ctx.klon.style.width = r.width + 'px';
       ctx.klon.style.height = r.height + 'px';
       document.body.append(ctx.klon);
@@ -372,22 +447,16 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
     ctx.klon.style.left = e.clientX - ctx.versatzX + 'px';
     ctx.klon.style.top = e.clientY - ctx.versatzY + 'px';
 
-    ctx.klon.style.pointerEvents = 'none';
     const unten = document.elementFromPoint(e.clientX, e.clientY);
     const zone = unten?.closest(zoneSel);
-    if (!zone) return;
-    // Nur Ablagen im selben Bereich zulassen (kein sw ↔ farbe).
-    if (zone.dataset.bereich !== ctx.bereich) return;
-    const geschwister = [...zone.querySelectorAll(itemSel)].filter(
-      (x) => x !== ctx.item && x !== ctx.klon,
-    );
+    if (!zone || (zoneOk && !zoneOk(zone, ctx))) return;
+    const geschwister = [...zone.querySelectorAll(itemSel)].filter((x) => x !== ctx.item);
     let vor = null;
     for (const g of geschwister) {
       const r = g.getBoundingClientRect();
       if (achse === 'y') {
         if (e.clientY < r.top + r.height / 2) { vor = g; break; }
       } else {
-        // Wrap-Raster: gleiche Zeile → nach X, sonst Zeile darunter → davor
         if (e.clientY < r.bottom && e.clientX < r.left + r.width / 2) { vor = g; break; }
       }
     }
@@ -399,23 +468,129 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
     if (!ctx || ctx.pointerId !== e.pointerId) return;
     const c = ctx;
     ctx = null;
-    // Kein Ziehen erkannt = Tippen → Kontextmenü (Verschieben/Löschen).
     if (!c.aktiv) {
       if (onTap) onTap(c.item);
       return;
     }
-    c.platz.replaceWith(c.item);
+    const zielZone = c.platz.closest(zoneSel);
+    if (c.istPool) {
+      // Pool = Quelle: Kopie ins Ziel, Original bleibt im Pool.
+      if (zielZone) c.platz.replaceWith(macheKachel(c.item.dataset.bild));
+      else c.platz.remove();
+    } else {
+      // Verschieben: das Element selbst wandert an den Platzhalter.
+      if (zielZone) c.platz.replaceWith(c.item);
+      else c.platz.remove();
+    }
     c.item.classList.remove('versteckt');
     c.klon.remove();
     document.body.classList.remove('zieht');
     markiereGeaendert();
   };
 
-  const board = $('#board');
-  board.addEventListener('pointerdown', start);
-  board.addEventListener('pointermove', bewegen);
-  board.addEventListener('pointerup', ende);
-  board.addEventListener('pointercancel', ende);
+  const wurzel = $('#app');
+  wurzel.addEventListener('pointerdown', start);
+  wurzel.addEventListener('pointermove', bewegen);
+  wurzel.addEventListener('pointerup', ende);
+  wurzel.addEventListener('pointercancel', ende);
+};
+
+// ---------------------------------------------------------------------------
+// Kontextmenü (Antippen)
+// ---------------------------------------------------------------------------
+const alleZiele = () => {
+  const ziele = [];
+  for (const b of BEREICHE)
+    for (const s of state.serien[b.id] || [])
+      ziele.push({ label: `${b.label}: ${s.titel || s.slug}`, sel: `.kachel-liste[data-bereich="${b.id}"][data-serie="${s.slug}"]` });
+  for (const s of SEITEN) ziele.push({ label: `Über mich: ${s.label}`, sel: `.galerie-liste[data-seite="${s.key}"]` });
+  return ziele;
+};
+
+const zeigeMenu = (kachel) => {
+  const istPool = !!kachel.closest('.pool-liste');
+  const zone = kachel.closest('.kachel-liste, .galerie-liste');
+
+  const hintergrund = el('div', { class: 'menu-hintergrund' });
+  const schliessen = () => hintergrund.remove();
+  hintergrund.addEventListener('pointerdown', (e) => { if (e.target === hintergrund) schliessen(); });
+
+  const karte = el('div', { class: 'menu' });
+  karte.append(el('img', { class: 'menu-vorschau', src: rawUrl(kachel.dataset.bild), alt: '' }));
+
+  const knopf = (label, fn, klasse) => {
+    const b = el('button', { type: 'button', text: label });
+    if (klasse) b.className = klasse;
+    b.addEventListener('click', () => { fn(); schliessen(); });
+    return b;
+  };
+
+  if (istPool) {
+    karte.append(el('div', { class: 'menu-label', text: 'Hinzufügen zu' }));
+    for (const ziel of alleZiele()) {
+      karte.append(knopf(ziel.label, () => {
+        const liste = document.querySelector(ziel.sel);
+        if (liste) { liste.append(macheKachel(kachel.dataset.bild)); markiereGeaendert(); }
+      }));
+    }
+    karte.append(el('div', { class: 'menu-trenner' }), knopf('Abbrechen', () => {}, 'abbrechen'));
+  } else {
+    // Verschieben in ein Ziel derselben Gruppe + Löschen.
+    const gruppe = zone?.dataset.gruppe;
+    const aktuellSel = zone === null ? '' : zone.dataset.serie || zone.dataset.seite;
+    const ziele = alleZiele().filter((z) => {
+      const l = document.querySelector(z.sel);
+      return l && l.dataset.gruppe === gruppe && l !== zone;
+    });
+    karte.append(el('div', { class: 'menu-label', text: 'Verschieben nach' }));
+    if (ziele.length === 0) karte.append(el('div', { class: 'menu-leer', text: 'Kein anderes Ziel in dieser Gruppe.' }));
+    for (const ziel of ziele) {
+      karte.append(knopf(ziel.label, () => {
+        const liste = document.querySelector(ziel.sel);
+        if (liste) { liste.append(kachel); markiereGeaendert(); }
+      }));
+    }
+    karte.append(
+      el('div', { class: 'menu-trenner' }),
+      knopf('Löschen', () => {
+        if (!confirm('Dieses Bild hier entfernen? Der Eintrag wird beim Speichern gelöscht (das Foto bleibt im Pool/Repo).')) return;
+        kachel.remove();
+        markiereGeaendert();
+      }, 'loeschen'),
+      knopf('Abbrechen', () => {}, 'abbrechen'),
+    );
+    // aktuellSel nur zur Klarheit referenziert; keine Wirkung.
+    void aktuellSel;
+  }
+
+  hintergrund.append(karte);
+  document.body.append(hintergrund);
+};
+
+// ---------------------------------------------------------------------------
+// Neue Serie
+// ---------------------------------------------------------------------------
+const neueSerie = (bereich) => {
+  const eingabe = prompt(`Titel der neuen ${bereich.label}-Serie?`);
+  if (eingabe === null) return;
+  const titel = eingabe.trim() || 'Neue Serie';
+  let basis = kebab(titel) || 'serie';
+  const vorhanden = new Set((state.serien[bereich.id] || []).map((s) => s.slug));
+  let slug = basis;
+  let n = 2;
+  while (vorhanden.has(slug)) slug = `${basis}-${n++}`;
+  const serie = {
+    slug,
+    titel,
+    jahr: new Date().getFullYear(),
+    reihenfolge: (state.serien[bereich.id]?.length || 0) + 1,
+    body: '',
+    pfad: null,
+    neu: true,
+  };
+  (state.serien[bereich.id] ||= []).push(serie);
+  $(`#board .bereich-serien[data-bereich="${bereich.id}"]`).append(serieSpalte(bereich, serie));
+  markiereGeaendert();
 };
 
 // ---------------------------------------------------------------------------
@@ -426,7 +601,13 @@ const gh = async (pfad, opt = {}) => {
     ...opt,
     headers: { ...ghHeaders(true), 'Content-Type': 'application/json', ...(opt.headers || {}) },
   });
-  if (!res.ok) throw new Error(`GitHub ${opt.method || 'GET'} ${pfad}: HTTP ${res.status} ${await res.text()}`);
+  if (!res.ok) {
+    const txt = await res.text();
+    if (res.status === 403) {
+      throw new Error('Kein Schreibrecht (403). Der Token braucht „Contents: Read and write" auf huwy7/huwy.');
+    }
+    throw new Error(`GitHub ${opt.method || 'GET'} ${pfad}: HTTP ${res.status} ${txt}`);
+  }
   return res.json();
 };
 
@@ -434,79 +615,90 @@ const speichern = async () => {
   if (!state.token) return;
   if (!confirm(`Änderungen als Commit auf Branch „${state.branch}" speichern?`)) return;
   $('#speichern').disabled = true;
+  const board = $('#board');
   try {
     setzeStatus('Speichert …');
-    const z = domZustand();
+    const final = {};
+    const finalBildPfade = new Set();
 
-    // Zielzustand → Dateiinhalte.
-    const final = {}; // pfad -> inhalt
-    const serieMeta = {}; // "bereich/slug" -> {serieColl, body}
     for (const b of BEREICHE) {
-      for (const s of (state.serien[b.id] || [])) serieMeta[`${b.id}/${s.slug}`] = { serieColl: b.serieColl, body: s.body };
-    }
-    for (const s of z.serien) {
-      const meta = serieMeta[`${s.bereichId}/${s.slug}`];
-      const pfad = `src/content/${meta.serieColl}/${s.slug}.md`;
-      final[pfad] = frontmatter({ titel: s.titel, jahr: s.jahr, reihenfolge: s.reihenfolge }, meta.body);
-    }
-    for (const x of z.bilder) {
-      const bild = state.bilder[x.id];
-      const pfad = `src/content/${bild.bildColl}/${x.slug}-${x.reihenfolge}.md`;
-      final[pfad] = frontmatter({ bild: bild.bild, serie: x.slug, reihenfolge: x.reihenfolge });
+      const spalten = [...board.querySelectorAll(`.bereich-serien[data-bereich="${b.id}"] .serie-spalte`)];
+      spalten.forEach((spalte, si) => {
+        const slug = spalte.dataset.serie;
+        const titel = $('.titel-feld', spalte).value.trim();
+        const jahr = Number($('.jahr-feld', spalte).value) || new Date().getFullYear();
+        const body = (state.serien[b.id] || []).find((s) => s.slug === slug)?.body || '';
+        final[`src/content/${b.serieColl}/${slug}.md`] = frontmatter(
+          { titel, jahr, reihenfolge: si + 1 },
+          body,
+        );
+        [...spalte.querySelectorAll('.kachel')].forEach((k, ki) => {
+          const pfad = `src/content/${b.bildColl}/${slug}-${ki + 1}.md`;
+          final[pfad] = frontmatter({
+            bild: relPfad(`src/content/${b.bildColl}`, k.dataset.bild),
+            serie: slug,
+            reihenfolge: ki + 1,
+          });
+          finalBildPfade.add(pfad);
+          k.dataset.origpfad = pfad;
+        });
+      });
     }
 
-    // Zu löschende Dateien = ursprünglich geladen, im Ziel nicht mehr vorhanden.
-    const altePfade = new Set();
-    for (const b of BEREICHE) for (const s of (state.serien[b.id] || [])) altePfade.add(s.pfad);
-    for (const id in state.bilder) altePfade.add(state.bilder[id].pfad);
-    const geloescht = [...altePfade].filter((p) => !(p in final));
+    for (const s of SEITEN) {
+      const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+      const bilderRel = [...liste.querySelectorAll('.kachel')].map((k) => relPfad(SEITEN_DIR, k.dataset.bild));
+      final[`${SEITEN_DIR}/${s.key}.md`] = seiteInhalt(bilderRel, state.seiten[s.key]?.body || '');
+    }
+
+    const geloescht = [...state.origBildPfade].filter((p) => !(p in final));
 
     // Git-Data-API: Baum auf Basis des aktuellen Commits, dann Commit + Ref.
     const ref = await gh(`/git/ref/heads/${state.branch}`);
     const commitSha = ref.object.sha;
     const commit = await gh(`/git/commits/${commitSha}`);
-    const baumEintraege = [
-      ...Object.entries(final).map(([path, content]) => ({ path, mode: '100644', type: 'blob', content })),
-      ...geloescht.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
-    ];
     const baum = await gh('/git/trees', {
       method: 'POST',
-      body: JSON.stringify({ base_tree: commit.tree.sha, tree: baumEintraege }),
+      body: JSON.stringify({
+        base_tree: commit.tree.sha,
+        tree: [
+          ...Object.entries(final).map(([path, content]) => ({ path, mode: '100644', type: 'blob', content })),
+          ...geloescht.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
+        ],
+      }),
     });
     const neu = await gh('/git/commits', {
       method: 'POST',
       body: JSON.stringify({
-        message: 'Bilder anordnen (Reihenfolge/Serien via Admin)',
+        message: 'Bilder anordnen/befüllen (via Admin)',
         tree: baum.sha,
         parents: [commitSha],
       }),
     });
-    await gh(`/git/refs/heads/${state.branch}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ sha: neu.sha }),
-    });
+    await gh(`/git/refs/heads/${state.branch}`, { method: 'PATCH', body: JSON.stringify({ sha: neu.sha }) });
 
-    // Erfolg: den In-Memory-Zustand an das gerade Geschriebene angleichen — NICHT
-    // sofort vom Netz neu laden. Direkt nach dem Commit liefert GitHubs Datei-CDN
-    // teils noch die alte Fassung; ein sofortiges Neuladen liesse die frischen
-    // Titel/Reihenfolgen scheinbar „zurückspringen". Die aktuelle Anzeige ist
-    // bereits korrekt (sie war die Quelle des Commits) — wir markieren nur sauber.
-    for (const s of z.serien) {
-      const eintrag = (state.serien[s.bereichId] || []).find((x) => x.slug === s.slug);
-      if (eintrag) {
-        eintrag.titel = s.titel;
-        eintrag.jahr = s.jahr;
-        eintrag.reihenfolge = s.reihenfolge;
-      }
+    // In-Memory-Zustand angleichen statt neu vom Netz zu laden (CDN hinkt kurz hinterher).
+    state.origBildPfade = finalBildPfade;
+    for (const b of BEREICHE) {
+      const spalten = board.querySelectorAll(`.bereich-serien[data-bereich="${b.id}"] .serie-spalte`);
+      const neueListe = [];
+      spalten.forEach((spalte, si) => {
+        const slug = spalte.dataset.serie;
+        const vorhanden = (state.serien[b.id] || []).find((s) => s.slug === slug);
+        neueListe.push({
+          slug,
+          titel: $('.titel-feld', spalte).value.trim(),
+          jahr: Number($('.jahr-feld', spalte).value) || new Date().getFullYear(),
+          reihenfolge: si + 1,
+          body: vorhanden?.body || '',
+          pfad: `src/content/${b.serieColl}/${slug}.md`,
+        });
+      });
+      state.serien[b.id] = neueListe;
     }
-    const behalten = new Set(z.bilder.map((x) => x.id));
-    for (const id of Object.keys(state.bilder)) if (!behalten.has(id)) delete state.bilder[id];
-    for (const x of z.bilder) {
-      const b = state.bilder[x.id];
-      if (!b) continue;
-      b.serie = x.slug;
-      b.reihenfolge = x.reihenfolge;
-      b.pfad = `src/content/${b.bildColl}/${x.slug}-${x.reihenfolge}.md`;
+    for (const s of SEITEN) {
+      const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+      state.seiten[s.key].bilder = [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild);
     }
     state.snapshot = signatur();
     markiereGeaendert();
@@ -519,7 +711,7 @@ const speichern = async () => {
 };
 
 // ---------------------------------------------------------------------------
-// Einstellungen (Token + Branch)
+// Einstellungen
 // ---------------------------------------------------------------------------
 const initEinstellungen = () => {
   const tokenFeld = $('#token');
@@ -549,6 +741,23 @@ window.addEventListener('beforeunload', (e) => {
 initEinstellungen();
 $('#neuladen').addEventListener('click', () => laden().catch((e) => setzeStatus('Fehler: ' + e.message, 'fehler')));
 $('#speichern').addEventListener('click', speichern);
-ziehbar({ zoneSel: '.kachel-liste', itemSel: '.kachel', griffSel: null, achse: 'x', onTap: zeigeMenu });
-ziehbar({ zoneSel: '.bereich-serien', itemSel: '.serie-spalte', griffSel: '.griff', achse: 'y' });
+
+// Bilder/Galerie: verschieben + Pool-Kopie; nur Ziele derselben Gruppe (Pool überall).
+ziehbar({
+  zoneSel: '.kachel-liste, .galerie-liste',
+  itemSel: '.kachel',
+  griffSel: null,
+  achse: 'x',
+  onTap: zeigeMenu,
+  zoneOk: (zone, ctx) => ctx.istPool || zone.dataset.gruppe === ctx.gruppe,
+});
+// Serien als Ganzes verschieben (nur innerhalb ihres Bereichs).
+ziehbar({
+  zoneSel: '.bereich-serien',
+  itemSel: '.serie-spalte',
+  griffSel: '.griff',
+  achse: 'y',
+  zoneOk: (zone, ctx) => zone.dataset.bereich === ctx.bereich,
+});
+
 laden().catch((e) => setzeStatus('Fehler beim Laden: ' + e.message, 'fehler'));

@@ -14,32 +14,32 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
       beachten: Zusammenspiel mit dem „jede Serie = volle Bildschirmhöhe"-Layout,
       dem Zugangs-Tor und dem invertierenden Cursor.
 
-### CMS-Admin: Drag-and-Drop-Oberfläche — v1 gebaut, Rest offen
+### CMS-Admin: Drag-and-Drop-Oberfläche — v2 gebaut
 Eigenes Werkzeug unter `/admin/anordnen` (neben Sveltia, ersetzt es nicht):
 `public/admin/anordnen/`. Reine Vanilla-Datei ohne Dependency; Pointer-basiertes
 Drag & Drop (Maus + Touch). Login per GitHub-Token (nur zum Speichern), ein
 atomarer Commit auf den einstellbaren Ziel-Branch (Standard `main` = live;
 Bildänderungen sollen direkt live gehen).
 
-Erledigt in v1:
+Erledigt:
 - [x] **Reihenfolge in der Serie** per Drag & Drop.
-- [x] Bilder **zwischen Serien** per Drag & Drop verschieben (nur innerhalb eines
-      Bereichs — kein sw ↔ farbe).
+- [x] Bilder **zwischen Serien** verschieben (nur innerhalb eines Bereichs).
 - [x] **Serien-Reihenfolge** per Drag & Drop (Serie am Griff ziehen).
 - [x] **Titel/Jahr pro Serie** inline editierbar.
 - [x] Touch-/Mobil-tauglich (Pointer Events).
-- [x] **Bild antippen → Kontextmenü**: Verschieben (Zielserie wählen) oder
-      Löschen. Mobil-freundliche Alternative zum Ziehen.
+- [x] **Bild antippen → Kontextmenü** (Verschieben/Löschen bzw. Pool: Hinzufügen).
+- [x] **Zwei Spalten**: links Ziele, rechts **Pool aller Repo-Fotos**.
+- [x] **Aus dem Pool ziehen** (kopiert) in Serien und Über-mich; mobil per Antippen.
+- [x] **Neue Serie anlegen** (Schwarzweiss/Farbe) im Werkzeug.
+- [x] **Über-mich-Seiten** als Ziele — ganze Seite mit Fotos befüllbar.
 
 Noch offen:
-- [ ] **Zentraler Upload** neuer Bilder direkt im Werkzeug (aktuell noch über
-      Sveltia). Braucht Datei-Upload via GitHub-API (base64 + Commit).
-- [ ] **Serien anlegen/löschen** im Werkzeug (aktuell über Sveltia).
-- [ ] Komfort-Login via **GitHub-OAuth** statt Token (bestehenden Sveltia-Worker
-      wiederverwenden), damit kein Token mehr eingefügt werden muss.
-- Hinweis: Das **flache Bild-Modell** ist die Datengrundlage (Drag ändert nur
-  `serie` + `reihenfolge` und benennt die kleine Markdown-Datei um; die
-  Bild-Assets bleiben unangetastet).
+- [ ] **Datei-Upload** neuer Fotos direkt im Werkzeug (aktuell landen neue Fotos
+      über Sveltia im Repo, tauchen dann im Pool auf). Braucht base64-Upload + Commit.
+- [ ] **Serien löschen** im Werkzeug (anlegen geht; löschen noch über Git/Sveltia).
+- [ ] Komfort-Login via **GitHub-OAuth** statt Token.
+- Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
+  (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.
 
 ## Erledigt
 

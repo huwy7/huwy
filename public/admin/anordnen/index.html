@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Anordnen — Bilder sortieren</title>
+    <title>Anordnen — Bilder verwalten</title>
     <style>
       /* Eigenständiges Admin-Werkzeug: eigene, schlichte Stile (kein Zugriff auf
          die Tokens der Seite, da public/ nicht durch Astro läuft). Dunkler,
@@ -30,13 +30,14 @@
         -webkit-text-size-adjust: 100%;
       }
       h1 { font-size: 15px; font-weight: 500; margin: 0; }
-      h2 { font-size: 13px; font-weight: 500; color: var(--leise); margin: 0 0 8px; text-transform: none; }
+      h2 { font-size: 13px; font-weight: 500; color: var(--leise); margin: 0 0 8px; }
       a { color: var(--text); }
+      .leise { color: var(--leise); }
 
       .kopf {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 20;
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
@@ -83,12 +84,39 @@
       #token { width: 320px; max-width: 70vw; }
       #branch { width: 120px; }
 
-      main { padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+      .hinweis { color: var(--leise); font-size: 12px; padding: 8px 16px 0; }
+      .hinweis code { background: var(--flaeche-2); padding: 1px 5px; border-radius: 4px; }
+
+      /* Zwei Spalten: links die Ziele (Serien + Über-mich), rechts der Pool. */
+      .layout { display: flex; gap: 16px; align-items: flex-start; padding: 16px; }
+      .spalte-links { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 32px; }
+      .spalte-rechts {
+        flex: 0 0 300px;
+        position: sticky;
+        top: 64px;
+        align-self: flex-start;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: calc(100vh - 76px);
+      }
+      .pool-titel { display: flex; align-items: baseline; gap: 8px; }
+      .pool-hinweis { color: var(--leise); font-size: 11px; margin: 0; }
+      .pool-liste {
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+        border: 1px dashed var(--linie);
+        border-radius: 6px;
+      }
+
+      .bereich-titel-zeile { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
       .bereich-serien { display: flex; flex-direction: column; gap: 12px; }
       .serie-spalte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 8px; padding: 12px; }
       .serie-kopf { display: flex; align-items: stretch; gap: 8px; margin-bottom: 10px; }
-      /* Grosser, klar sichtbarer Greif-Button für die ganze Serie: bequeme
-         Trefferfläche (>= 44px), damit man nicht genau zielen muss. */
+      /* Grosser, klar sichtbarer Greif-Button für die ganze Serie. */
       .griff {
         cursor: grab;
         color: var(--text);
@@ -113,12 +141,16 @@
       @media (hover: hover) { .griff:hover { border-color: #4a4a4a; } }
       .titel-feld { flex: 1; min-width: 0; }
       .jahr-feld { width: 72px; text-align: center; }
+      .neue-serie { align-self: flex-start; margin-top: 4px; }
 
-      .kachel-liste {
+      .galerie { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 8px; padding: 12px; }
+      .galerie-kopf { color: var(--leise); font-size: 13px; margin-bottom: 10px; }
+
+      .kachel-liste, .galerie-liste {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        min-height: 96px;
+        min-height: 84px;
         padding: 8px;
         border: 1px dashed var(--linie);
         border-radius: 6px;
@@ -133,7 +165,8 @@
         touch-action: none;
         flex: 0 0 auto;
       }
-      .kachel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .pool-kachel { width: 92px; height: 64px; }
+      .kachel img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
       .kachel--fehlt { display: flex; align-items: center; justify-content: center; }
       .kachel--fehlt::after { content: "?"; color: var(--leise); }
       .kachel.versteckt { display: none; }
@@ -151,8 +184,12 @@
       body.zieht { cursor: grabbing; }
       body.zieht * { cursor: grabbing !important; }
 
-      .hinweis { color: var(--leise); font-size: 12px; padding: 0 16px 16px; }
-      .hinweis code { background: var(--flaeche-2); padding: 1px 5px; border-radius: 4px; }
+      /* Auf schmalen Geräten: Spalten stapeln, Pool unter die Ziele. */
+      @media (max-width: 899px) {
+        .layout { flex-direction: column; }
+        .spalte-rechts { position: static; flex: none; width: 100%; max-height: none; }
+        .pool-liste { max-height: 42vh; }
+      }
 
       /* Kontextmenü eines Bildes (beim Antippen) */
       .menu-hintergrund {
@@ -208,7 +245,7 @@
       <div class="einstellungen-inhalt">
         <div class="feld">
           <label for="token">GitHub-Token (nur zum Speichern)</label>
-          <input id="token" type="password" placeholder="ghp_… / github_pat_…" autocomplete="off" />
+          <input id="token" type="password" placeholder="github_pat_… / ghp_…" autocomplete="off" />
           <small>Fein­granulierter Token mit „Contents: Read and write" auf huwy7/huwy. Bleibt nur lokal im Browser.</small>
         </div>
         <div class="feld">
@@ -221,14 +258,22 @@
     </details>
 
     <p class="hinweis">
-      Bilder per Ziehen innerhalb einer Serie sortieren oder in eine andere Serie
-      ziehen. <strong>Antippen</strong> öffnet ein Menü zum Verschieben (Serie
-      wählen) oder Löschen. Serien am Griff <code>⠿</code> verschieben. Titel/Jahr
-      direkt im Feld ändern. <strong>Speichern</strong> schreibt einen Commit auf den Ziel-Branch.
-      Texte, neue Serien und Uploads laufen weiter über <a href="../">Sveltia CMS</a>.
+      Rechts der <strong>Pool</strong> aller Fotos: in eine Serie oder in „Über mich"
+      <strong>ziehen</strong> — oder ein Foto <strong>antippen</strong> und das Ziel
+      wählen. Bilder innerhalb/zwischen Serien ziehen, Serien am Griff verschieben,
+      Titel/Jahr im Feld ändern, mit <strong>+ neue Serie</strong> anlegen.
+      <strong>Speichern</strong> schreibt einen Commit. Texte laufen weiter über
+      <a href="../">Sveltia CMS</a>.
     </p>
 
-    <main id="board"></main>
+    <div class="layout" id="app">
+      <main id="board" class="spalte-links"></main>
+      <aside class="spalte-rechts">
+        <h2 class="pool-titel">Pool <span id="pool-anzahl" class="leise"></span></h2>
+        <p class="pool-hinweis">Alle hochgeladenen Fotos im Repo. Ziehen oder antippen → Ziel wählen.</p>
+        <div id="pool" class="pool-liste"></div>
+      </aside>
+    </div>
 
     <script type="module" src="./anordnen.js"></script>
   </body>

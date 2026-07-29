@@ -70,8 +70,9 @@ jobs:
           mkdir -p _site/feature
           cp -r feature/dist/. _site/feature/
           rm -f _site/feature/CNAME
-          # Nur EINE zentrale Admin-Seite unter /admin (aus main). Kein /feature/admin.
-          rm -rf _site/feature/admin
+          # /feature/admin bleibt erhalten: nur so lässt sich das Werkzeug in der
+          # Vorschau testen, bevor es live geht. Die Vorschau-Instanz zielt
+          # standardmässig auf den feature-Branch (siehe anordnen.js).
 
       - name: Pages-Artefakt hochladen
         uses: actions/upload-pages-artifact@v3

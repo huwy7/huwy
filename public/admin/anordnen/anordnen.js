@@ -36,11 +36,15 @@ const SEITEN = [
 const SEITEN_DIR = 'src/content/seiten';
 
 const LS_TOKEN = 'huwy-admin-token';
-const LS_BRANCH = 'huwy-admin-branch';
+// Vorschau-Instanz (/feature/admin) bekommt einen eigenen Branch-Schlüssel und
+// zielt standardmässig auf feature — so berührt Testen die Live-Seite nie.
+const istVorschau = location.pathname.includes('/feature/');
+const LS_BRANCH = istVorschau ? 'huwy-admin-branch-feature' : 'huwy-admin-branch';
+const STANDARD_BRANCH = istVorschau ? 'feature' : 'main';
 
 const state = {
-  // Standard: main = live. Bildänderungen sollen direkt live gehen.
-  branch: localStorage.getItem(LS_BRANCH) || 'main',
+  // Standard: main = live (Live-Instanz) bzw. feature (Vorschau-Instanz).
+  branch: localStorage.getItem(LS_BRANCH) || STANDARD_BRANCH,
   token: localStorage.getItem(LS_TOKEN) || '',
   serien: {}, // bereichId -> [{ slug, titel, jahr, reihenfolge, body, pfad, neu? }]
   serienBilder: {}, // bereichId -> { slug -> [{ assetPfad, origPfad }] }
@@ -720,7 +724,7 @@ const initEinstellungen = () => {
   branchFeld.value = state.branch;
   $('#token-speichern').addEventListener('click', () => {
     state.token = tokenFeld.value.trim();
-    state.branch = branchFeld.value.trim() || 'main';
+    state.branch = branchFeld.value.trim() || STANDARD_BRANCH;
     localStorage.setItem(LS_TOKEN, state.token);
     localStorage.setItem(LS_BRANCH, state.branch);
     setzeStatus('Einstellungen gespeichert.', 'ok');

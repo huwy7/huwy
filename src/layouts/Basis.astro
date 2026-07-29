@@ -426,17 +426,12 @@ const name = 'TODO_NAME';
           punkt.style.borderRadius = '';
         };
 
-        window.addEventListener('pointermove', (e) => {
-          if (e.pointerType !== 'mouse') return;
-          mausX = e.clientX;
-          mausY = e.clientY;
-          if (!sichtbar) {
-            sichtbar = true;
-            istX = mausX;
-            istY = mausY;
-            cursor.classList.add('cursor--sichtbar');
-          }
-          const ziel = e.target instanceof Element ? e.target : null;
+        // Ziel-/Modusbestimmung anhand des Elements unter dem Zeiger. Wird sowohl
+        // bei Zeigerbewegung als auch beim Scrollen aufgerufen (letzteres mit dem
+        // Element, das gerade unter der zuletzt bekannten Zeigerposition liegt) —
+        // so bleibt die Box dort, wo die Maus ist, statt beim Blättern mit dem
+        // wegscrollenden Element mitzuwandern.
+        const aktualisiere = (ziel: Element | null) => {
           const ueberBild = !!(ziel && ziel.closest('img, picture'));
           const boxZiel = ueberBild ? null : (ziel?.closest(BOX_SELEKTOR) ?? null);
 
@@ -466,7 +461,34 @@ const name = 'TODO_NAME';
             istY = zielY;
             platziere();
           }
+        };
+
+        window.addEventListener('pointermove', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          mausX = e.clientX;
+          mausY = e.clientY;
+          if (!sichtbar) {
+            sichtbar = true;
+            istX = mausX;
+            istY = mausY;
+            cursor.classList.add('cursor--sichtbar');
+          }
+          aktualisiere(e.target instanceof Element ? e.target : null);
         });
+
+        // Beim Scrollen (z. B. Karussell-Blättern) verschiebt sich der Inhalt unter
+        // dem ruhenden Zeiger. Neu bestimmen, was jetzt unter der Maus liegt, damit
+        // die Box an der Mausposition bleibt und nicht dem Bild hinterherzieht.
+        // Capture-Phase, damit auch das Scrollen innerer Container (Karussell-Spur)
+        // erfasst wird (scroll-Events steigen nicht auf).
+        window.addEventListener(
+          'scroll',
+          () => {
+            if (!sichtbar) return;
+            aktualisiere(document.elementFromPoint(mausX, mausY));
+          },
+          true,
+        );
 
         window.addEventListener('pointerdown', () => cursor.classList.add('cursor--druck'));
         window.addEventListener('pointerup', () => cursor.classList.remove('cursor--druck'));

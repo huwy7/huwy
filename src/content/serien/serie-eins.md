@@ -1,5 +1,5 @@
 ---
-titel: "Beispielserie eins"
+titel: BCN
 jahr: 2025
-reihenfolge: 1
+reihenfolge: 3
 ---

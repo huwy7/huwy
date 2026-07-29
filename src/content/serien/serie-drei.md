@@ -1,5 +1,5 @@
 ---
-titel: "Beispielserie drei"
+titel: BERN
 jahr: 2023
-reihenfolge: 3
+reihenfolge: 2
 ---

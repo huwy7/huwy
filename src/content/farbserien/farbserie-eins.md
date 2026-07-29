@@ -1,5 +1,5 @@
 ---
-titel: "Beispiel farbserie eins"
-jahr: 2025
+titel: ELBA
+jahr: 2026
 reihenfolge: 1
 ---

@@ -1,5 +1,5 @@
 ---
-titel: "Beispielserie zwei"
+titel: CDMX
 jahr: 2026
-reihenfolge: 2
+reihenfolge: 1
 ---

@@ -1,5 +1,5 @@
 ---
-bild: ../../assets/serien/serie-eins/IMG_9782.jpeg
+bild: ../../assets/serien/serie-eins/IMG_9803.jpeg
 serie: serie-eins
 reihenfolge: 3
 ---

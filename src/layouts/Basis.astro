@@ -358,6 +358,13 @@ const name = 'TODO_NAME';
             sessionStorage.setItem('tor', 'auf');
           } catch (err) {}
           document.documentElement.dataset.tor = 'auf';
+          // Nach dem Entsperren zuoberst starten: das Eingabefeld loslassen (schliesst
+          // auf Touch die Tastatur) und nach oben scrollen — sonst zeigt die Seite
+          // nach der Passworteingabe irgendwo in der Mitte, nicht am Anfang. Zusätzlich
+          // im nächsten Frame, falls das Einblenden des Inhalts noch nachverschiebt.
+          torCode.blur();
+          window.scrollTo(0, 0);
+          requestAnimationFrame(() => window.scrollTo(0, 0));
         } else {
           torCode.value = '';
           tor?.classList.add('tor--falsch');

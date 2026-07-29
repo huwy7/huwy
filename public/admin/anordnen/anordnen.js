@@ -322,6 +322,16 @@ const seiteGalerie = (seite) => {
   return el('div', { class: 'galerie' }, [
     el('div', { class: 'galerie-kopf', text: seite.label }),
     liste,
+    el('label', { class: 'seite-text-label', text: 'Text', for: `text-${seite.key}` }),
+    el('textarea', {
+      id: `text-${seite.key}`,
+      class: 'seite-text',
+      'data-seite': seite.key,
+      rows: '4',
+      placeholder: 'Text dieser Seite …',
+      value: state.seiten[seite.key]?.body || '',
+      oninput: markiereGeaendert,
+    }),
   ]);
 };
 
@@ -378,7 +388,12 @@ const domZustand = () => {
   }
   for (const s of SEITEN) {
     const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
-    z.seiten.push({ key: s.key, bilder: [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild) });
+    const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
+    z.seiten.push({
+      key: s.key,
+      bilder: [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild),
+      text: feld ? feld.value : '',
+    });
   }
   return z;
 };
@@ -388,7 +403,7 @@ const signatur = () => {
   return JSON.stringify([
     z.serien.map((s) => [s.bereichId, s.slug, s.titel, s.jahr, s.reihenfolge]),
     z.bilder.map((x) => [x.bereichId, x.slug, x.assetPfad, x.reihenfolge]),
-    z.seiten.map((s) => [s.key, s.bilder]),
+    z.seiten.map((s) => [s.key, s.bilder, s.text]),
   ]);
 };
 
@@ -651,8 +666,9 @@ const speichern = async () => {
 
     for (const s of SEITEN) {
       const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+      const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
       const bilderRel = [...liste.querySelectorAll('.kachel')].map((k) => relPfad(SEITEN_DIR, k.dataset.bild));
-      final[`${SEITEN_DIR}/${s.key}.md`] = seiteInhalt(bilderRel, state.seiten[s.key]?.body || '');
+      final[`${SEITEN_DIR}/${s.key}.md`] = seiteInhalt(bilderRel, (feld?.value || '').trim());
     }
 
     const geloescht = [...state.origBildPfade].filter((p) => !(p in final));
@@ -702,7 +718,9 @@ const speichern = async () => {
     }
     for (const s of SEITEN) {
       const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+      const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
       state.seiten[s.key].bilder = [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild);
+      state.seiten[s.key].body = (feld?.value || '').trim();
     }
     state.snapshot = signatur();
     markiereGeaendert();

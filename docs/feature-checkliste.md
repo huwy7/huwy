@@ -14,6 +14,13 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
       beachten: Zusammenspiel mit dem „jede Serie = volle Bildschirmhöhe"-Layout,
       dem Zugangs-Tor und dem invertierenden Cursor.
 
+### Leitprinzip für `/admin/anordnen` (verbindlich)
+**Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
+Betreiber als Endkunde **so einfach wie möglich zu bedienen** und **so schlicht wie
+möglich in der Ansicht** sein. Grosse Funktion, kleine/ruhige Oberfläche. Keine
+technischen Begriffe, keine überladenen Panels — im Zweifel weglassen oder hinter
+einer klaren Aktion verstecken.
+
 ### CMS-Admin: Drag-and-Drop-Oberfläche — v2 gebaut
 Eigenes Werkzeug unter `/admin/anordnen` (neben Sveltia, ersetzt es nicht):
 `public/admin/anordnen/`. Reine Vanilla-Datei ohne Dependency; Pointer-basiertes
@@ -34,8 +41,12 @@ Erledigt:
 - [x] **Über-mich-Seiten** als Ziele — ganze Seite mit Fotos befüllbar.
 - [x] **Foto-Upload direkt im Werkzeug** (Datei-/Foto-Picker → base64 → ein Commit
       nach `src/assets/pool/`, sofort im Pool). Sveltia für Uploads nicht mehr nötig.
+- [x] **Über-mich-Text bearbeiten** (Textfeld je Seite, wird beim Speichern
+      geschrieben). Damit deckt das Werkzeug alles ab — Sveltia nur noch optional.
 
 Noch offen:
+- [ ] **Umzug auf `/admin`** + Sveltia/OAuth-Worker abschalten (kurze URL, ein
+      Werkzeug). Erst wenn der Betreiber grünes Licht gibt.
 - [ ] **Serien löschen** im Werkzeug (anlegen geht; löschen noch über Git/Sveltia).
 - [ ] **Foto aus dem Pool/Repo löschen** (aktuell bleibt ein Asset liegen, wenn es
       aus allen Zielen entfernt wird).

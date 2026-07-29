@@ -224,6 +224,27 @@ const name = 'TODO_NAME';
         color: var(--farbe-text);
       }
 
+      /* Mobil: der lange spanische Button passt nicht neben die Navigation. Statt
+         eines schiefen Umbruchs (eine Zeile links, eine rechts) wird die Kopfzeile
+         zu einer sauberen Spalte — beide Zeilen bündig an einer Seite. Düster
+         linksbündig (wie der übrige Inhalt), farbig rechtsbündig (Menü bleibt
+         rechts, wie gewünscht). */
+      @media (max-width: 768px) {
+        .kopf {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--abstand-8);
+        }
+        :root[data-modus='farbe'] .kopf {
+          align-items: flex-end;
+        }
+        /* Der Rechtsbündig-Trick vom Desktop (space-between-Umbruch) stört in der
+           Spalte — hier richtet align-items aus. */
+        .kopf > :last-child {
+          margin-inline-start: 0;
+        }
+      }
+
       .inhalt {
         flex: 1 0 auto;
         max-width: var(--container);

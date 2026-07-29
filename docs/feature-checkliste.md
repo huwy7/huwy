@@ -18,7 +18,8 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 Eigenes Werkzeug unter `/admin/anordnen` (neben Sveltia, ersetzt es nicht):
 `public/admin/anordnen/`. Reine Vanilla-Datei ohne Dependency; Pointer-basiertes
 Drag & Drop (Maus + Touch). Login per GitHub-Token (nur zum Speichern), ein
-atomarer Commit auf den einstellbaren Ziel-Branch (Standard `feature`).
+atomarer Commit auf den einstellbaren Ziel-Branch (Standard `main` = live;
+Bildänderungen sollen direkt live gehen).
 
 Erledigt in v1:
 - [x] **Reihenfolge in der Serie** per Drag & Drop.

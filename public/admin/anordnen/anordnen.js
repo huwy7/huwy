@@ -32,7 +32,9 @@ const LS_TOKEN = 'huwy-admin-token';
 const LS_BRANCH = 'huwy-admin-branch';
 
 const state = {
-  branch: localStorage.getItem(LS_BRANCH) || 'feature',
+  // Standard: main = live. Bildänderungen (Reihenfolge/Serien) sollen direkt
+  // live gehen — ein falsch sortiertes Bild ist schnell wieder korrigiert.
+  branch: localStorage.getItem(LS_BRANCH) || 'main',
   token: localStorage.getItem(LS_TOKEN) || '',
   serien: {}, // bereichId -> [{ slug, titel, jahr, reihenfolge, body, pfad }]
   bilder: {}, // id -> { id, bereichId, bildColl, bild, serie, reihenfolge, pfad, thumb }
@@ -443,7 +445,7 @@ const initEinstellungen = () => {
   branchFeld.value = state.branch;
   $('#token-speichern').addEventListener('click', () => {
     state.token = tokenFeld.value.trim();
-    state.branch = branchFeld.value.trim() || 'feature';
+    state.branch = branchFeld.value.trim() || 'main';
     localStorage.setItem(LS_TOKEN, state.token);
     localStorage.setItem(LS_BRANCH, state.branch);
     setzeStatus('Einstellungen gespeichert.', 'ok');

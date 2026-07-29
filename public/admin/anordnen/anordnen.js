@@ -486,8 +486,31 @@ const speichern = async () => {
       body: JSON.stringify({ sha: neu.sha }),
     });
 
-    setzeStatus(`Gespeichert auf ${state.branch} (${neu.sha.slice(0, 7)}). Neu laden …`, 'ok');
-    await laden();
+    // Erfolg: den In-Memory-Zustand an das gerade Geschriebene angleichen — NICHT
+    // sofort vom Netz neu laden. Direkt nach dem Commit liefert GitHubs Datei-CDN
+    // teils noch die alte Fassung; ein sofortiges Neuladen liesse die frischen
+    // Titel/Reihenfolgen scheinbar „zurückspringen". Die aktuelle Anzeige ist
+    // bereits korrekt (sie war die Quelle des Commits) — wir markieren nur sauber.
+    for (const s of z.serien) {
+      const eintrag = (state.serien[s.bereichId] || []).find((x) => x.slug === s.slug);
+      if (eintrag) {
+        eintrag.titel = s.titel;
+        eintrag.jahr = s.jahr;
+        eintrag.reihenfolge = s.reihenfolge;
+      }
+    }
+    const behalten = new Set(z.bilder.map((x) => x.id));
+    for (const id of Object.keys(state.bilder)) if (!behalten.has(id)) delete state.bilder[id];
+    for (const x of z.bilder) {
+      const b = state.bilder[x.id];
+      if (!b) continue;
+      b.serie = x.slug;
+      b.reihenfolge = x.reihenfolge;
+      b.pfad = `src/content/${b.bildColl}/${x.slug}-${x.reihenfolge}.md`;
+    }
+    state.snapshot = signatur();
+    markiereGeaendert();
+    setzeStatus(`Gespeichert auf ${state.branch} (${neu.sha.slice(0, 7)}).`, 'ok');
   } catch (err) {
     console.error(err);
     setzeStatus('Fehler beim Speichern: ' + err.message, 'fehler');

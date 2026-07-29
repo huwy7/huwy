@@ -4,7 +4,6 @@ import '../styles/schriften.css';
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import torBild from '../assets/tor.jpeg';
-import farbeBild from '../assets/farbe-hintergrund.jpeg';
 
 interface Props {
   titel: string;
@@ -39,19 +38,9 @@ const torAvif = await getImage({ src: torBild, format: 'avif', quality: 62 });
 const torWebp = await getImage({ src: torBild, format: 'webp', quality: 80 });
 const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url("${torWebp.src}") type("image/webp"))`;
 
-// Verwischter Seitenhintergrund im Farbmodus: ein warmes Sonnenuntergangs-Foto,
-// analog zum düsteren Blur-Hund. Wird nur verwischt gezeigt (global.css) — darum
-// klein gerendert (Download minimal). Grundton warm, keine Graustufen. Nur im
-// Farbmodus geladen; der Sperrbildschirm (#tor) behält überall den Hund.
-const farbeAvif = await getImage({ src: farbeBild, width: 1280, format: 'avif', quality: 58 });
-const farbeWebp = await getImage({ src: farbeBild, width: 1280, format: 'webp', quality: 72 });
-const farbeHintergrund = `image-set(url("${farbeAvif.src}") type("image/avif"), url("${farbeWebp.src}") type("image/webp"))`;
-
-// --tor-bg trägt den Sperrbildschirm-Hund (beide Modi). Im Farbmodus zusätzlich
-// --farbe-bg für den verwischten Sonnenuntergang; nur dort wird die Datei geladen.
-const bodyStil = farbe
-  ? `--tor-bg: ${torHintergrund}; --farbe-bg: ${farbeHintergrund}`
-  : `--tor-bg: ${torHintergrund}`;
+// --tor-bg trägt den Sperrbildschirm-Hund (beide Modi). Der Farbmodus hat einen
+// schlichten weissen Grund (global.css) — kein eigenes Hintergrundbild mehr.
+const bodyStil = `--tor-bg: ${torHintergrund}`;
 
 // Aktive Navigation: Portfolio umfasst Startseite und Serienseiten (die Galerie),
 // About me die gleichnamige Seite — je Modus mit eigenem Pfad-Präfix.
@@ -372,11 +361,14 @@ const name = 'TODO_NAME';
         cursor.setAttribute('aria-hidden', 'true');
         const punkt = document.createElement('span');
         punkt.className = 'cursor__punkt';
-        // Transparent invertierend statt gefüllt — der Kreis kehrt den Untergrund
-        // um (inkl. Text) und bleibt überall sichtbar. Inline gesetzt, da der
-        // CSS-Minifier backdrop-filter/invert(1) verändern würde.
-        punkt.style.setProperty('backdrop-filter', 'invert(1)');
-        punkt.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
+        // Transparente Fläche mit backdrop-filter. Düster: invert(1) (kehrt den
+        // Untergrund um). Farbseite (sonnig, hell): grayscale(1) statt Invert —
+        // der Kreis wirkt dort wie eine kleine Schwarz-Weiss-Linse über den
+        // Farbfotos. Inline gesetzt, da der CSS-Minifier den Wert verändern würde.
+        const cursorFilter =
+          document.documentElement.dataset.modus === 'farbe' ? 'grayscale(1)' : 'invert(1)';
+        punkt.style.setProperty('backdrop-filter', cursorFilter);
+        punkt.style.setProperty('-webkit-backdrop-filter', cursorFilter);
         cursor.appendChild(punkt);
         document.body.appendChild(cursor);
         wurzel.classList.add('cursor-aktiv');
@@ -588,9 +580,12 @@ const name = 'TODO_NAME';
         const kreis = document.createElement('div');
         kreis.className = 'touch-kreis';
         kreis.setAttribute('aria-hidden', 'true');
-        // Explizit invert(1) und beide Präfixe — nicht vom CSS-Minifier verändert.
-        kreis.style.setProperty('backdrop-filter', 'invert(1)');
-        kreis.style.setProperty('-webkit-backdrop-filter', 'invert(1)');
+        // Düster: invert(1); Farbseite: grayscale(1) (Schwarz-Weiss-Linse). Explizit
+        // gesetzt (beide Präfixe) — nicht vom CSS-Minifier verändert.
+        const kreisFilter =
+          document.documentElement.dataset.modus === 'farbe' ? 'grayscale(1)' : 'invert(1)';
+        kreis.style.setProperty('backdrop-filter', kreisFilter);
+        kreis.style.setProperty('-webkit-backdrop-filter', kreisFilter);
         document.body.appendChild(kreis);
 
         let zielX = 0;

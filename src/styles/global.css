@@ -88,26 +88,20 @@ body::after {
    finale warme/sonnige, verwaschene Look (eigenes Bild + Palette) kommt später —
    siehe docs/farbmodus-ideensammlung.md. Nur der Farbmodus (data-modus="farbe")
    ist betroffen; die düstere Seite bleibt unverändert. */
+/* Sonnen-/Farbseite als HELLES, ruhiges Thema: weisser Grund, dunkler Text. Die
+   Farbfotos tragen die Farbe — der Grund bleibt bewusst weiss (Farbe im Grund war
+   zu viel). --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕, Tor);
+   nur der Seitengrund wird hell gesetzt. Die düstere Seite bleibt unverändert. */
 :root[data-modus='farbe'] {
-  --farbe-hintergrund: #17110a;
+  --farbe-text: #1c1a17; /* dunkler Text auf hellem Grund */
 }
-/* Farbmodus: statt des Hundes ein warmer Sonnenuntergang, gleiche Blur-Stärke
-   (72px) wie düster, aber ohne Graustufen — der warme Ton bleibt. Bewusst HELL
-   gehalten (kaum gedimmt), gemütlich statt düster. */
-:root[data-modus='farbe'] body::before {
-  background-image: var(--farbe-bg);
-  filter: blur(72px) brightness(1.08) contrast(0.96) saturate(1.1);
+:root[data-modus='farbe'] body {
+  background-color: var(--farbe-rahmen); /* ruhiges Weiss */
 }
-
-/* Feiner Film-Grain statt des groben Korns (korn-fein.png, 1px-Körnung), fast
-   ohne Vignette — der helle, sonnige Grund soll nach vorne kommen. Nur ein Hauch
-   Korn für die gemütliche Textur. */
+/* Kein Sonnenuntergang, kein Korn/Vignette — sauberer heller Grund. */
+:root[data-modus='farbe'] body::before,
 :root[data-modus='farbe'] body::after {
-  background-image:
-    radial-gradient(ellipse at center, transparent 82%, rgba(60, 34, 10, 0.1) 100%),
-    url('/korn-fein.png');
-  background-repeat: no-repeat, repeat;
-  opacity: 0.45;
+  display: none;
 }
 
 img,

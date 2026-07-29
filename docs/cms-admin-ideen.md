@@ -35,6 +35,15 @@ Checkliste für später, nicht sofort.
 - [ ] Inline-Titel = `titel` der Serien-Metadaten bearbeiten.
 - [ ] Mobil-tauglich (Touch-Drag) mitdenken.
 
+## Weitere Feature-Ideen (später, nicht CMS)
+
+- [ ] **Sticky Header**: Die Kopfzeile (Portfolio, About me / More about me,
+      Umschalt-Button) bleibt beim Scrollen **immer sichtbar** — egal wohin man
+      scrollt. Aktuell scrollt die Kopfzeile mit weg. Umsetzung z. B. `position:
+      sticky` (oder `fixed`) am Header; dabei beachten: Zusammenspiel mit dem
+      „jede Serie = volle Bildschirmhöhe"-Layout, dem Zugangs-Tor und dem
+      invertierenden Cursor.
+
 ## Kleinere, bereits erledigte Verbesserungen (Vollbild)
 
 - [x] **Swipe** in der Vollbild-Ansicht (links/rechts blättern) zusätzlich zum Tippen.

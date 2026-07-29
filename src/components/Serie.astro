@@ -97,6 +97,45 @@ const breiten = [640, 960, 1280, 1600, 2000];
   }
 </section>
 
+<script>
+  // Blättern und Vollbild ohne Seiten-Sprung. Die reinen-CSS-Anker (#k-…, #lb-…)
+  // würden die Seite vertikal zum Ziel scrollen (das Bild „springt"). Deshalb die
+  // Klicks abfangen: Weiterschalten bewegt nur den horizontalen Streifen, Öffnen
+  // und Schliessen der Vollbild-Ansicht setzen den Hash, behalten aber die
+  // Scrollposition. Ohne JS bleiben die Anker als Fallback (dann mit Sprung).
+  // Progressive Enhancement — die Seite selbst bewegt sich nie.
+  const reduziert = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Hash setzen (steuert :target), ohne dass die Seite dabei scrollt.
+  const setzeHash = (href: string) => {
+    const y = window.scrollY;
+    location.hash = href.startsWith('#') ? href.slice(1) : href;
+    window.scrollTo(0, y);
+  };
+
+  for (const pfeil of document.querySelectorAll('.karussell-pfeil')) {
+    pfeil.addEventListener('click', (e) => {
+      const href = pfeil.getAttribute('href') || '';
+      const ziel = document.getElementById(href.slice(1));
+      const spur = ziel?.parentElement;
+      if (!ziel || !spur) return;
+      e.preventDefault();
+      const delta = ziel.getBoundingClientRect().left - spur.getBoundingClientRect().left;
+      spur.scrollBy({ left: delta, behavior: reduziert ? 'auto' : 'smooth' });
+    });
+  }
+
+  // Vollbild öffnen (Klick aufs Bild) und schliessen (✕): Hash ohne Sprung setzen.
+  for (const link of document.querySelectorAll('.karussell-oeffnen, .lightbox-x')) {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+      e.preventDefault();
+      setzeHash(href);
+    });
+  }
+</script>
+
 <style>
   .serie-kopf {
     display: flex;

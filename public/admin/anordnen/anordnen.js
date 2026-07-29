@@ -202,7 +202,10 @@ const rendern = () => {
 
 const serieSpalte = (bereich, serie) => {
   const kopf = el('div', { class: 'serie-kopf' }, [
-    el('span', { class: 'griff', text: '⠿', title: 'Serie verschieben' }),
+    el('div', { class: 'griff', title: 'Serie verschieben', 'aria-label': 'Serie verschieben' }, [
+      el('span', { text: '⠿' }),
+      el('span', { class: 'griff-text', text: 'Serie' }),
+    ]),
     el('input', {
       class: 'titel-feld',
       value: serie.titel,

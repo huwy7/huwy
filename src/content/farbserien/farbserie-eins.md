@@ -2,7 +2,7 @@
 titel: Beispiel farbserie eins
 jahr: 2025
 reihenfolge: 1
-titelbild: ../../assets/farbserien/farbserie-eins/titel.png
+titelbild: ../../assets/farbserien/farbserie-eins/_DSF7708.jpeg
 bilder:
   - ../../assets/farbserien/farbserie-eins/a-hoch.png
   - ../../assets/farbserien/farbserie-eins/b-quer.png

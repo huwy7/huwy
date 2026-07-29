@@ -65,7 +65,10 @@ const name = 'TODO_NAME';
 <html lang="de" data-modus={modus}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="generator" content={Astro.generator} />
     <title>{titel}</title>
     {beschreibung && <meta name="description" content={beschreibung} />}
@@ -285,6 +288,17 @@ const name = 'TODO_NAME';
       }
       html[data-tor='auf'] #tor {
         display: none;
+      }
+      /* Solange gesperrt (Tor sichtbar): den eigentlichen Inhalt ausblenden und
+         den Body nicht scrollen. Sonst blitzt beim Drehen des Geräts (iOS legt
+         fixe Elemente kurz neu an) die echte Seite hinter dem Tor auf. Der Grund
+         (Hund/Grain aus body::before/::after) bleibt — er gehört zum Tor-Look. */
+      html:not([data-tor='auf']) body {
+        overflow: hidden;
+      }
+      html:not([data-tor='auf']) .kopf,
+      html:not([data-tor='auf']) .inhalt {
+        visibility: hidden;
       }
       /* Eingabefeld als Box mit Invert-Effekt: weisse Fläche + mix-blend-mode:
          difference wirkt wie eine transparente, invertierte Box (dasselbe Prinzip
@@ -638,14 +652,36 @@ const name = 'TODO_NAME';
         window.addEventListener('touchend', ende, { passive: true });
         window.addEventListener('touchcancel', ende, { passive: true });
 
-        // Nachlauf: der Kreis zieht der Berührung mit etwas Verzögerung nach.
+        // Nachlauf + elastische Verformung wie beim Desktop-Cursor: der Kreis zieht
+        // sich bei Bewegung in die Richtung lang wie ein Wasserballon (ein Objekt,
+        // kein Schweif) und relaxt im Stillstand zum Kreis. Grundlage ist der
+        // Rückstand zur Berührung (zielX/Y − istX/Y).
         if (!spurReduziert.matches) {
           const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
           const nachlauf = 0.18;
+          const DEHN_REF = 90; // Rückstand (px) für nahezu maximale Dehnung
+          const DEHN_MAX = 1.1; // maximale Zusatz-Längung
+          const QUETSCH = 0.4; // seitliche Stauchung (Volumen-Anmutung)
+          const VORNE = 0.32; // Versatz der Spitze Richtung Berührung
           const schritt = () => {
             istX = lerp(istX, zielX, nachlauf);
             istY = lerp(istY, zielY, nachlauf);
-            setze();
+            const dx = zielX - istX;
+            const dy = zielY - istY;
+            const dist = Math.hypot(dx, dy);
+            if (dist > 0.6) {
+              const s = Math.min(dist / DEHN_REF, 1) * DEHN_MAX;
+              const winkel = (Math.atan2(dy, dx) * 180) / Math.PI;
+              const sx = 1 + s;
+              const sy = 1 - Math.min(s, 1) * QUETSCH;
+              const vx = dx * VORNE;
+              const vy = dy * VORNE;
+              kreis.style.transform =
+                `translate3d(${istX + vx}px, ${istY + vy}px, 0) ` +
+                `rotate(${winkel}deg) scale(${sx}, ${sy})`;
+            } else {
+              setze();
+            }
             requestAnimationFrame(schritt);
           };
           requestAnimationFrame(schritt);

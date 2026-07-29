@@ -23,11 +23,16 @@ const { titel, beschreibung, ogBild, modus = 'duester', vollhoehe = false } = As
 
 // Modus-abhängige Navigation. Farbmodus ist gespiegelt (Menü rechts, Umschalt-
 // Button links); Beschriftungen englisch, nur der Umschalt-Button spanisch.
+// Alle internen Ziele über die Astro-Basis aufbauen, damit die /feature-Vorschau
+// in sich navigiert und main ('/') unverändert bleibt. BASE_URL kann mit oder ohne
+// End-Slash kommen ('/' bei main, '/feature' beim Feature-Branch) — darum den
+// End-Slash abziehen und die Pfade mit führendem Slash anhängen.
+const b = import.meta.env.BASE_URL.replace(/\/$/, ''); // '' oder '/feature'
 const farbe = modus === 'farbe';
-const portfolioZiel = farbe ? '/color' : '/';
-const aboutZiel = farbe ? '/color/ueber-mich' : '/ueber-mich';
+const portfolioZiel = farbe ? `${b}/color` : `${b}/`;
+const aboutZiel = farbe ? `${b}/color/ueber-mich` : `${b}/ueber-mich`;
 const aboutLabel = farbe ? 'More about me' : 'About me';
-const switchZiel = farbe ? '/' : '/color';
+const switchZiel = farbe ? `${b}/` : `${b}/color`;
 // Spanisch, augenzwinkernd — als Einladung/Frage. Nur diese Buttons sind spanisch.
 const switchLabel = farbe ? 'A mí me gusta la noche' : '¿A quién le gusta el sol?';
 
@@ -42,13 +47,11 @@ const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url(
 // schlichten weissen Grund (global.css) — kein eigenes Hintergrundbild mehr.
 const bodyStil = `--tor-bg: ${torHintergrund}`;
 
-// Aktive Navigation: Portfolio umfasst Startseite und Serienseiten (die Galerie),
-// About me die gleichnamige Seite — je Modus mit eigenem Pfad-Präfix.
-const pfad = Astro.url.pathname;
-const istPortfolio = farbe
-  ? pfad === '/color' || pfad.startsWith('/color/serien')
-  : pfad === '/' || pfad.startsWith('/serien');
-const istUeber = farbe ? pfad.startsWith('/color/ueber-mich') : pfad.startsWith('/ueber-mich');
+// Aktive Navigation (nur aria-current, keine farbliche Hervorhebung mehr). Den
+// Basis-Pfad abziehen, damit die Erkennung auch unter /feature stimmt.
+const rel = (Astro.url.pathname.slice(b.length) || '/').replace(/(.)\/$/, '$1');
+const istPortfolio = farbe ? rel === '/color' : rel === '/';
+const istUeber = farbe ? rel === '/color/ueber-mich' : rel === '/ueber-mich';
 
 // Absolute URLs für Kanonik und Open Graph.
 const kanonisch = new URL(Astro.url.pathname, Astro.site);

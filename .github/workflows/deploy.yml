@@ -1,11 +1,15 @@
 name: Deploy auf GitHub Pages
 
+# Baut BEIDE Branches in EIN Pages-Artefakt:
+#   - main  -> Wurzel "/"        (Live-Seite)
+#   - feature -> Unterordner "/feature" (abgesicherte Vorschau)
+# Ausgelöst durch Pushes auf main ODER feature. main wird immer aus dem
+# main-Branch gebaut — ein Push auf feature ändert die Live-Seite also nie.
 on:
   push:
-    branches: [main]
+    branches: [main, feature]
   workflow_dispatch:
 
-# Rechte, die die Pages-Bereitstellung braucht.
 permissions:
   contents: read
   pages: write
@@ -20,21 +24,57 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Node einrichten
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - name: Abhängigkeiten installieren
-        run: npm ci
-      - name: Bauen
-        run: npm run build
+
+      # --- main -> Wurzel ---
+      - name: main auschecken
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+      - name: main bauen (Basis /)
+        working-directory: main
+        run: |
+          npm ci
+          npm run build
+      - name: main in die Wurzel legen
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -r main/dist/. _site/
+
+      # --- feature -> /feature (darf die Live-Seite NIE blockieren) ---
+      - name: feature auschecken
+        id: featco
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: feature
+          path: feature
+      - name: feature bauen (Basis /feature)
+        id: featbuild
+        if: steps.featco.outcome == 'success'
+        continue-on-error: true
+        working-directory: feature
+        env:
+          BASE_PATH: /feature
+        run: |
+          npm ci
+          npm run build
+      - name: feature nach /feature legen
+        if: steps.featbuild.outcome == 'success'
+        run: |
+          mkdir -p _site/feature
+          cp -r feature/dist/. _site/feature/
+          rm -f _site/feature/CNAME
+
       - name: Pages-Artefakt hochladen
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./_site
 
   deploy:
     needs: build

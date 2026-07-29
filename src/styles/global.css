@@ -337,11 +337,13 @@ a {
      Punkt im Box-Modus zum Rechteck wird. Die Skalierung läuft über eine Custom
      Property, damit sie sich nicht mit dem Zentrier-translate beisst. */
   transform: translate(-50%, -50%) scale(var(--cursor-skala, 1));
+  /* Kein transform-Übergang: im Freimodus setzt das Skript die Verformung pro
+     Frame (elastische Dehnung) — ein Übergang würde sie verschmieren. Grösse und
+     Radius (Box-Modus) bleiben weich. */
   transition:
     width var(--cursor-morph) ease,
     height var(--cursor-morph) ease,
-    border-radius var(--cursor-morph) ease,
-    transform var(--cursor-uebergang) ease;
+    border-radius var(--cursor-morph) ease;
 }
 
 .cursor--aktiv .cursor__punkt {

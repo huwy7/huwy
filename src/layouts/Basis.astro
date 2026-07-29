@@ -385,9 +385,13 @@ const name = 'TODO_NAME';
         // Auswahl der Elemente, die der Cursor als Box umschliesst: kleine
         // interaktive Elemente. Serienkarten (.serien-link) sind ausgenommen —
         // dort wirkt der Bild-Invert, kein grosser Kasten um die ganze Karte.
+        // .lightbox-zone (die grossen Blätter-Flächen im Vollbild) sind bewusst
+        // ausgenommen — sonst würde der Cursor zu einem riesigen Kasten um die halbe
+        // Bildschirmfläche. Im Vollbild bleibt so der normale kleine Kreis wie sonst.
         const BOX_SELEKTOR =
-          'a:not(.serien-link):not(.lightbox-flaeche), button, [role="button"], input, label, summary';
-        const INTERAKTIV_SELEKTOR = 'a, button, [role="button"], input, label, summary';
+          'a:not(.serien-link):not(.lightbox-flaeche):not(.lightbox-zone), button, [role="button"], input, label, summary';
+        const INTERAKTIV_SELEKTOR =
+          'a:not(.lightbox-zone), button, [role="button"], input, label, summary';
 
         const platziere = () => {
           cursor.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;
@@ -493,6 +497,17 @@ const name = 'TODO_NAME';
         if (!reduziert.matches) {
           const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
           const nachlauf = 0.15; // kleiner = weicherer, längerer Nachlauf
+          // Elastische Verformung im Freimodus: Der Kreis zieht sich bei Bewegung
+          // in die Bewegungsrichtung lang wie ein Wasserballon (ein Objekt, kein
+          // Schweif) und relaxt im Stillstand zum Kreis. Grundlage ist der Rückstand
+          // zum echten Zeiger (mausX/Y − istX/Y): schnell = grosser Rückstand =
+          // starke Dehnung. Ein leichter Versatz nach vorne verankert die „Spitze"
+          // beim Zeiger, sodass sich der Schwanz nach hinten dehnt.
+          const DEHN_REF = 90; // Rückstand (px) für nahezu maximale Dehnung
+          const DEHN_MAX = 1.1; // maximale Zusatz-Längung (scaleX bis 1 + 1.1)
+          const QUETSCH = 0.4; // seitliche Stauchung (Volumen-Anmutung)
+          const VORNE = 0.32; // Versatz der Spitze Richtung Zeiger
+          const DRUCK = 0.7; // Verkleinerung beim Klicken (wie --cursor-skala-druck)
           const schritt = () => {
             // Box beim Scrollen an das Element gebunden halten; verschwindet das
             // Element (z. B. Navigation), zurück in den Freimodus.
@@ -507,6 +522,30 @@ const name = 'TODO_NAME';
             istX = lerp(istX, zielX, nachlauf);
             istY = lerp(istY, zielY, nachlauf);
             platziere();
+
+            // Verformung nur im Freimodus (im Box-Modus bestimmt CSS die Form).
+            if (!boxEl) {
+              const dx = mausX - istX;
+              const dy = mausY - istY;
+              const dist = Math.hypot(dx, dy);
+              const druck = cursor.classList.contains('cursor--druck') ? DRUCK : 1;
+              if (dist > 0.6) {
+                const s = Math.min(dist / DEHN_REF, 1) * DEHN_MAX;
+                const winkel = (Math.atan2(dy, dx) * 180) / Math.PI;
+                const sx = 1 + s;
+                const sy = 1 - Math.min(s, 1) * QUETSCH;
+                const vx = (dx / dist) * dist * VORNE;
+                const vy = (dy / dist) * dist * VORNE;
+                punkt.style.transform =
+                  `translate(-50%, -50%) translate(${vx}px, ${vy}px) ` +
+                  `rotate(${winkel}deg) scale(${sx * druck}, ${sy * druck})`;
+              } else {
+                punkt.style.transform = `translate(-50%, -50%) scale(${druck})`;
+              }
+            } else {
+              // Box-Modus: Inline-Transform entfernen, damit die CSS-Form greift.
+              punkt.style.transform = '';
+            }
             requestAnimationFrame(schritt);
           };
           requestAnimationFrame(schritt);

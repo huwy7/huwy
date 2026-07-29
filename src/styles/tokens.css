@@ -81,7 +81,7 @@
      bei unterschiedlichen Seitenverhältnissen ruhig bleibt; Bild wird darin zentriert */
 
   /* --- 4a. Invertierter Cursor (bewusste Ausnahme, siehe CLAUDE.md) --- */
-  --cursor-groesse: 24px;
+  --cursor-groesse: 36px; /* Durchmesser des Frei-Kreises (Radius +50% ggü. 24px) */
   --cursor-skala-aktiv: 1.8; /* Vergrösserung über interaktiven Elementen */
   --cursor-skala-bild: 0.28; /* kleiner Punkt über Fotos */
   --cursor-skala-druck: 0.7; /* beim Klicken */

@@ -70,6 +70,8 @@ jobs:
           mkdir -p _site/feature
           cp -r feature/dist/. _site/feature/
           rm -f _site/feature/CNAME
+          # Nur EINE zentrale Admin-Seite unter /admin (aus main). Kein /feature/admin.
+          rm -rf _site/feature/admin
 
       - name: Pages-Artefakt hochladen
         uses: actions/upload-pages-artifact@v3

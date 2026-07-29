@@ -356,10 +356,14 @@ a {
   --cursor-skala: 1;
 }
 
-/* Nativen Zeiger nur verstecken, solange das Cursor-Skript aktiv ist. */
+/* Nativen Zeiger verstecken, solange das Cursor-Skript aktiv ist. !important, damit
+   KEIN Element (auch nicht mit eigener cursor-Regel, z. B. Vollbild-Flächen) je
+   einen nativen Zeiger durchscheinen lässt — der eigene Ball ist der einzige
+   Zeiger. Ohne .cursor-aktiv (kein JS / Touch) greift die Regel nicht, dann sind
+   die nativen Zeiger normal. */
 html.cursor-aktiv,
 html.cursor-aktiv * {
-  cursor: none;
+  cursor: none !important;
 }
 
 /* --- Invertierender Touch-Kreis (CLAUDE.md 4a) ---

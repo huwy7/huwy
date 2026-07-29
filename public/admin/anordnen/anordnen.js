@@ -236,6 +236,59 @@ const kachel = (bild) => {
   return card;
 };
 
+// Kontextmenü eines Bildes (beim Antippen). Verschieben in eine wählbare Serie
+// desselben Bereichs oder Löschen. Verschieben/Löschen wirken erst beim Speichern.
+const zeigeMenu = (kachel) => {
+  const bereich = kachel.closest('.bereich-serien')?.dataset.bereich;
+  const aktuelleSerie = kachel.closest('.serie-spalte')?.dataset.serie;
+  const bild = state.bilder[kachel.dataset.id];
+
+  const hintergrund = el('div', { class: 'menu-hintergrund' });
+  const schliessen = () => hintergrund.remove();
+  // Tippen auf die dunkle Fläche (nicht auf die Karte) schliesst.
+  hintergrund.addEventListener('pointerdown', (e) => {
+    if (e.target === hintergrund) schliessen();
+  });
+
+  const karte = el('div', { class: 'menu' });
+  karte.append(el('img', { class: 'menu-vorschau', src: bild?.thumb || '', alt: '' }));
+
+  karte.append(el('div', { class: 'menu-label', text: 'Verschieben nach' }));
+  const ziele = (state.serien[bereich] || []).filter((s) => s.slug !== aktuelleSerie);
+  if (ziele.length === 0) {
+    karte.append(el('div', { class: 'menu-leer', text: 'Keine andere Serie in diesem Bereich.' }));
+  } else {
+    for (const z of ziele) {
+      const b = el('button', { type: 'button', text: z.titel || z.slug });
+      b.addEventListener('click', () => {
+        const liste = document.querySelector(
+          `.kachel-liste[data-bereich="${bereich}"][data-serie="${z.slug}"]`,
+        );
+        if (liste) {
+          liste.append(kachel);
+          markiereGeaendert();
+        }
+        schliessen();
+      });
+      karte.append(b);
+    }
+  }
+
+  const loesch = el('button', { class: 'loeschen', type: 'button', text: 'Löschen' });
+  loesch.addEventListener('click', () => {
+    if (!confirm('Dieses Bild aus dem Portfolio entfernen? Der Eintrag wird beim Speichern gelöscht (die Bilddatei selbst bleibt im Repo).')) return;
+    kachel.remove();
+    markiereGeaendert();
+    schliessen();
+  });
+  const abbrechen = el('button', { class: 'abbrechen', type: 'button', text: 'Abbrechen' });
+  abbrechen.addEventListener('click', schliessen);
+  karte.append(el('div', { class: 'menu-trenner' }), loesch, abbrechen);
+
+  hintergrund.append(karte);
+  document.body.append(hintergrund);
+};
+
 // ---------------------------------------------------------------------------
 // Zustand aus dem DOM ableiten (Reihenfolge = Anzeige-Reihenfolge)
 // ---------------------------------------------------------------------------
@@ -274,7 +327,7 @@ const markiereGeaendert = () => {
 // ---------------------------------------------------------------------------
 // Drag & Drop (Pointer-basiert → funktioniert mit Maus UND Touch)
 // ---------------------------------------------------------------------------
-const ziehbar = ({ zoneSel, itemSel, griffSel, achse }) => {
+const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
   let ctx = null;
 
   const start = (e) => {
@@ -343,7 +396,11 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse }) => {
     if (!ctx || ctx.pointerId !== e.pointerId) return;
     const c = ctx;
     ctx = null;
-    if (!c.aktiv) return;
+    // Kein Ziehen erkannt = Tippen → Kontextmenü (Verschieben/Löschen).
+    if (!c.aktiv) {
+      if (onTap) onTap(c.item);
+      return;
+    }
     c.platz.replaceWith(c.item);
     c.item.classList.remove('versteckt');
     c.klon.remove();
@@ -466,6 +523,6 @@ window.addEventListener('beforeunload', (e) => {
 initEinstellungen();
 $('#neuladen').addEventListener('click', () => laden().catch((e) => setzeStatus('Fehler: ' + e.message, 'fehler')));
 $('#speichern').addEventListener('click', speichern);
-ziehbar({ zoneSel: '.kachel-liste', itemSel: '.kachel', griffSel: null, achse: 'x' });
+ziehbar({ zoneSel: '.kachel-liste', itemSel: '.kachel', griffSel: null, achse: 'x', onTap: zeigeMenu });
 ziehbar({ zoneSel: '.bereich-serien', itemSel: '.serie-spalte', griffSel: '.griff', achse: 'y' });
 laden().catch((e) => setzeStatus('Fehler beim Laden: ' + e.message, 'fehler'));

@@ -1,5 +1,5 @@
 ---
-titel: Beispielserie zwei
-jahr: 2024
+titel: "Beispielserie zwei"
+jahr: 2026
 reihenfolge: 2
 ---

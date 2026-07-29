@@ -1,5 +1,5 @@
 ---
-titel: Beispiel farbserie eins
+titel: "Beispiel farbserie eins"
 jahr: 2025
 reihenfolge: 1
 ---

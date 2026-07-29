@@ -1,5 +1,5 @@
 ---
-titel: Beispielserie eins
-jahr: 2023
+titel: "Beispielserie eins"
+jahr: 2025
 reihenfolge: 1
 ---

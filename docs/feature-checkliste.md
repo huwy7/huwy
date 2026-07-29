@@ -28,6 +28,8 @@ Erledigt in v1:
 - [x] **Serien-Reihenfolge** per Drag & Drop (Serie am Griff ziehen).
 - [x] **Titel/Jahr pro Serie** inline editierbar.
 - [x] Touch-/Mobil-tauglich (Pointer Events).
+- [x] **Bild antippen → Kontextmenü**: Verschieben (Zielserie wählen) oder
+      Löschen. Mobil-freundliche Alternative zum Ziehen.
 
 Noch offen:
 - [ ] **Zentraler Upload** neuer Bilder direkt im Werkzeug (aktuell noch über

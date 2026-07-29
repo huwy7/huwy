@@ -202,7 +202,10 @@ const rendern = () => {
 
 const serieSpalte = (bereich, serie) => {
   const kopf = el('div', { class: 'serie-kopf' }, [
-    el('span', { class: 'griff', text: '⠿', title: 'Serie verschieben' }),
+    el('div', { class: 'griff', title: 'Serie verschieben', 'aria-label': 'Serie verschieben' }, [
+      el('span', { text: '⠿' }),
+      el('span', { class: 'griff-text', text: 'Serie' }),
+    ]),
     el('input', {
       class: 'titel-feld',
       value: serie.titel,
@@ -234,6 +237,59 @@ const kachel = (bild) => {
   img.addEventListener('error', () => card.classList.add('kachel--fehlt'));
   const card = el('div', { class: 'kachel', 'data-id': bild.id, title: bild.bild }, [img]);
   return card;
+};
+
+// Kontextmenü eines Bildes (beim Antippen). Verschieben in eine wählbare Serie
+// desselben Bereichs oder Löschen. Verschieben/Löschen wirken erst beim Speichern.
+const zeigeMenu = (kachel) => {
+  const bereich = kachel.closest('.bereich-serien')?.dataset.bereich;
+  const aktuelleSerie = kachel.closest('.serie-spalte')?.dataset.serie;
+  const bild = state.bilder[kachel.dataset.id];
+
+  const hintergrund = el('div', { class: 'menu-hintergrund' });
+  const schliessen = () => hintergrund.remove();
+  // Tippen auf die dunkle Fläche (nicht auf die Karte) schliesst.
+  hintergrund.addEventListener('pointerdown', (e) => {
+    if (e.target === hintergrund) schliessen();
+  });
+
+  const karte = el('div', { class: 'menu' });
+  karte.append(el('img', { class: 'menu-vorschau', src: bild?.thumb || '', alt: '' }));
+
+  karte.append(el('div', { class: 'menu-label', text: 'Verschieben nach' }));
+  const ziele = (state.serien[bereich] || []).filter((s) => s.slug !== aktuelleSerie);
+  if (ziele.length === 0) {
+    karte.append(el('div', { class: 'menu-leer', text: 'Keine andere Serie in diesem Bereich.' }));
+  } else {
+    for (const z of ziele) {
+      const b = el('button', { type: 'button', text: z.titel || z.slug });
+      b.addEventListener('click', () => {
+        const liste = document.querySelector(
+          `.kachel-liste[data-bereich="${bereich}"][data-serie="${z.slug}"]`,
+        );
+        if (liste) {
+          liste.append(kachel);
+          markiereGeaendert();
+        }
+        schliessen();
+      });
+      karte.append(b);
+    }
+  }
+
+  const loesch = el('button', { class: 'loeschen', type: 'button', text: 'Löschen' });
+  loesch.addEventListener('click', () => {
+    if (!confirm('Dieses Bild aus dem Portfolio entfernen? Der Eintrag wird beim Speichern gelöscht (die Bilddatei selbst bleibt im Repo).')) return;
+    kachel.remove();
+    markiereGeaendert();
+    schliessen();
+  });
+  const abbrechen = el('button', { class: 'abbrechen', type: 'button', text: 'Abbrechen' });
+  abbrechen.addEventListener('click', schliessen);
+  karte.append(el('div', { class: 'menu-trenner' }), loesch, abbrechen);
+
+  hintergrund.append(karte);
+  document.body.append(hintergrund);
 };
 
 // ---------------------------------------------------------------------------
@@ -274,7 +330,7 @@ const markiereGeaendert = () => {
 // ---------------------------------------------------------------------------
 // Drag & Drop (Pointer-basiert → funktioniert mit Maus UND Touch)
 // ---------------------------------------------------------------------------
-const ziehbar = ({ zoneSel, itemSel, griffSel, achse }) => {
+const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap }) => {
   let ctx = null;
 
   const start = (e) => {
@@ -343,7 +399,11 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse }) => {
     if (!ctx || ctx.pointerId !== e.pointerId) return;
     const c = ctx;
     ctx = null;
-    if (!c.aktiv) return;
+    // Kein Ziehen erkannt = Tippen → Kontextmenü (Verschieben/Löschen).
+    if (!c.aktiv) {
+      if (onTap) onTap(c.item);
+      return;
+    }
     c.platz.replaceWith(c.item);
     c.item.classList.remove('versteckt');
     c.klon.remove();
@@ -426,8 +486,31 @@ const speichern = async () => {
       body: JSON.stringify({ sha: neu.sha }),
     });
 
-    setzeStatus(`Gespeichert auf ${state.branch} (${neu.sha.slice(0, 7)}). Neu laden …`, 'ok');
-    await laden();
+    // Erfolg: den In-Memory-Zustand an das gerade Geschriebene angleichen — NICHT
+    // sofort vom Netz neu laden. Direkt nach dem Commit liefert GitHubs Datei-CDN
+    // teils noch die alte Fassung; ein sofortiges Neuladen liesse die frischen
+    // Titel/Reihenfolgen scheinbar „zurückspringen". Die aktuelle Anzeige ist
+    // bereits korrekt (sie war die Quelle des Commits) — wir markieren nur sauber.
+    for (const s of z.serien) {
+      const eintrag = (state.serien[s.bereichId] || []).find((x) => x.slug === s.slug);
+      if (eintrag) {
+        eintrag.titel = s.titel;
+        eintrag.jahr = s.jahr;
+        eintrag.reihenfolge = s.reihenfolge;
+      }
+    }
+    const behalten = new Set(z.bilder.map((x) => x.id));
+    for (const id of Object.keys(state.bilder)) if (!behalten.has(id)) delete state.bilder[id];
+    for (const x of z.bilder) {
+      const b = state.bilder[x.id];
+      if (!b) continue;
+      b.serie = x.slug;
+      b.reihenfolge = x.reihenfolge;
+      b.pfad = `src/content/${b.bildColl}/${x.slug}-${x.reihenfolge}.md`;
+    }
+    state.snapshot = signatur();
+    markiereGeaendert();
+    setzeStatus(`Gespeichert auf ${state.branch} (${neu.sha.slice(0, 7)}).`, 'ok');
   } catch (err) {
     console.error(err);
     setzeStatus('Fehler beim Speichern: ' + err.message, 'fehler');
@@ -466,6 +549,6 @@ window.addEventListener('beforeunload', (e) => {
 initEinstellungen();
 $('#neuladen').addEventListener('click', () => laden().catch((e) => setzeStatus('Fehler: ' + e.message, 'fehler')));
 $('#speichern').addEventListener('click', speichern);
-ziehbar({ zoneSel: '.kachel-liste', itemSel: '.kachel', griffSel: null, achse: 'x' });
+ziehbar({ zoneSel: '.kachel-liste', itemSel: '.kachel', griffSel: null, achse: 'x', onTap: zeigeMenu });
 ziehbar({ zoneSel: '.bereich-serien', itemSel: '.serie-spalte', griffSel: '.griff', achse: 'y' });
 laden().catch((e) => setzeStatus('Fehler beim Laden: ' + e.message, 'fehler'));

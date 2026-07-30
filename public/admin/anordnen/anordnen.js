@@ -109,6 +109,13 @@ const kebab = (s) =>
 
 const rawUrl = (pfad) => `https://raw.githubusercontent.com/${REPO}/${state.branch}/${pfad}`;
 
+// Verkleinerte Vorschau NUR fürs Werkzeug (Performance): ein On-the-fly-Resizer
+// (wsrv.nl) holt das Original vom öffentlichen Repo und liefert ein kleines WebP.
+// Die öffentliche Website nutzt weiterhin astro:assets (passende Grösse je Gerät).
+// Fällt der Dienst aus, greift in macheKachel der Fallback aufs Original.
+const vorschauUrl = (pfad, w) =>
+  `https://wsrv.nl/?url=ssl:raw.githubusercontent.com/${REPO}/${state.branch}/${pfad}&w=${w}&q=70&output=webp&we`;
+
 // Frontmatter einfacher key: value-Dateien parsen.
 const parseFrontmatter = (text) => {
   const treffer = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
@@ -282,7 +289,7 @@ const laden = async () => {
 // Rendern
 // ---------------------------------------------------------------------------
 const macheKachel = (assetPfad, opt = {}) => {
-  const img = el('img', { src: rawUrl(assetPfad), alt: '', loading: 'lazy', draggable: false });
+  const img = el('img', { src: vorschauUrl(assetPfad, 240), alt: '', loading: 'lazy', draggable: false });
   const attrs = {
     class: 'kachel' + (opt.pool ? ' pool-kachel' : ''),
     'data-bild': assetPfad,
@@ -290,7 +297,15 @@ const macheKachel = (assetPfad, opt = {}) => {
   };
   if (opt.origPfad) attrs['data-origpfad'] = opt.origPfad;
   const card = el('div', attrs, [img]);
-  img.addEventListener('error', () => card.classList.add('kachel--fehlt'));
+  img.addEventListener('error', () => {
+    // Resizer aus? Einmal das Original versuchen, sonst als fehlend markieren.
+    if (!img.dataset.fallback) {
+      img.dataset.fallback = '1';
+      img.src = rawUrl(assetPfad);
+    } else {
+      card.classList.add('kachel--fehlt');
+    }
+  });
   return card;
 };
 
@@ -614,7 +629,7 @@ const zeigeMenu = (kachel) => {
   hintergrund.addEventListener('pointerdown', (e) => { if (e.target === hintergrund) schliessen(); });
 
   const karte = el('div', { class: 'menu' });
-  karte.append(el('img', { class: 'menu-vorschau', src: rawUrl(kachel.dataset.bild), alt: '' }));
+  karte.append(el('img', { class: 'menu-vorschau', src: vorschauUrl(kachel.dataset.bild, 480), alt: '' }));
 
   const knopf = (label, fn, klasse) => {
     const b = el('button', { type: 'button', text: label });
@@ -686,7 +701,7 @@ const zeigeGalerieMenu = (item) => {
   const schliessen = () => hintergrund.remove();
   hintergrund.addEventListener('pointerdown', (e) => { if (e.target === hintergrund) schliessen(); });
   const karte = el('div', { class: 'menu' });
-  karte.append(el('img', { class: 'menu-vorschau', src: rawUrl(foto.dataset.bild), alt: '' }));
+  karte.append(el('img', { class: 'menu-vorschau', src: vorschauUrl(foto.dataset.bild, 480), alt: '' }));
   const knopf = (label, fn, klasse) => {
     const b = el('button', { type: 'button', text: label });
     if (klasse) b.className = klasse;

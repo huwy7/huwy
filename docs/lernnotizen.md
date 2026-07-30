@@ -45,6 +45,13 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 - **Über-mich-Modell:** `bilder` ist eine Liste aus `{ bild, text? }` (Text
   optional, pro Bild). Website rendert die Reihen abwechselnd (Bild rechts/links).
   Serien dagegen bleiben eine reine Bilderreihe.
+- **Admin-Vorschauen NICHT als Vollbild laden** (Performance): `public/` läuft
+  nicht durch Astro, also gibt es dort keine fertigen Grössen. Lösung: kleine
+  Vorschau über einen On-the-fly-Resizer (wsrv.nl: `?url=ssl:raw.githubusercontent…
+  &w=240&output=webp&q=70&we`), mit `onerror`-Fallback aufs Original. Gilt nur im
+  Admin-Werkzeug; die **öffentliche Website** nutzt weiter `astro:assets` (passende
+  Grösse je Gerät). Externer Dienst ist hier ok, weil das Admin ohnehin extern
+  hängt (GitHub-API, Sveltia-CDN) und das Repo öffentlich ist.
 
 ## Deploy / Branch-Modell
 

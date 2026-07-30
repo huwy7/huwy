@@ -198,8 +198,8 @@ picture > source {
    die ganze Seite füllt. Steht global (das <img> kommt aus der Bild-Komponente). */
 .ueber-foto {
   display: block;
-  max-width: min(58%, 640px);
-  max-height: 80vh;
+  max-width: min(100%, 560px);
+  max-height: 76vh;
   width: auto;
   height: auto;
 }

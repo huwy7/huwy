@@ -41,7 +41,9 @@ Erledigt:
 - [x] **Über-mich-Seiten** als Ziele — ganze Seite mit Fotos befüllbar.
 - [x] **Foto-Upload direkt im Werkzeug** (Datei-/Foto-Picker → base64 → ein Commit
       nach `src/assets/pool/`, sofort im Pool). Sveltia für Uploads nicht mehr nötig.
-- [x] **Über-mich-Text bearbeiten** (Textfeld je Seite bzw. je Foto, siehe unten).
+- [x] **Über-mich: Text je Foto** (optional) + Anzeige abwechselnd links/rechts.
+      Im Werkzeug als Reihen „Foto + Text daneben" (untereinander), damit klar ist,
+      welcher Text zu welchem Foto gehört. Serien bleiben eine Bilderreihe.
 - [x] **Foto aus dem Pool/Repo löschen** — mit Hinweis, wo es verwendet wird
       (hilft Doppel erkennen); löscht Asset + Verwendungen in einem Commit.
 - [x] **Halten zum Ziehen** (Touch): erst nach kurzem Halten ziehbar, sonst scrollt

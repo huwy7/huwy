@@ -39,6 +39,12 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   unterstützt** (sharp) → im Upload nur JPG/PNG/WebP zulassen, sonst bricht der Build.
 - **Astro scoped styles erreichen `Bild.astro`s `<img>` nicht** → solche Regeln
   müssen in `global.css`.
+- **Mehrzeiligen/Sonderzeichen-Text in YAML als doppelt-gequoteten Skalar mit
+  `\n`-Escapes schreiben** (`JSON.stringify(text)`): round-trip-sicher, Astros
+  YAML-Parser löst `\n`/`\"` korrekt auf. Beim Parsen `JSON.parse` für `"…"`.
+- **Über-mich-Modell:** `bilder` ist eine Liste aus `{ bild, text? }` (Text
+  optional, pro Bild). Website rendert die Reihen abwechselnd (Bild rechts/links).
+  Serien dagegen bleiben eine reine Bilderreihe.
 
 ## Deploy / Branch-Modell
 

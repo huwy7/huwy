@@ -129,24 +129,31 @@ const parseFrontmatter = (text) => {
   return { daten, body };
 };
 
-// Über-mich-Datei parsen: bilder-Liste (- bild: …) + Textkörper.
-const parseSeite = (text) => {
-  const treffer = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  const bilder = [];
-  let body = '';
-  if (treffer) {
-    for (const zeile of treffer[1].split(/\r?\n/)) {
-      const m = zeile.match(/-\s*bild:\s*(.+?)\s*$/);
-      if (!m) continue;
-      let v = m[1].trim();
-      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-        v = v.slice(1, -1);
-      }
-      bilder.push(v);
-    }
-    body = treffer[2].trim();
+// Einen YAML-Skalar entpacken ("..." mit \n-Escapes, '...' oder roh).
+const yamlSkalar = (v) => {
+  v = v.trim();
+  if (v.startsWith('"')) {
+    try { return JSON.parse(v); } catch { return v.slice(1, -1); }
   }
-  return { bilder, body };
+  if (v.startsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+  return v;
+};
+
+// Über-mich-Datei parsen: Liste aus { bild, text? }. Jeder Eintrag beginnt mit
+// „- bild: …", eine optionale „text: …"-Zeile darunter gehört zum selben Eintrag.
+const parseSeite = (text) => {
+  const treffer = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  const eintraege = [];
+  if (treffer) {
+    let cur = null;
+    for (const zeile of treffer[1].split(/\r?\n/)) {
+      const mb = zeile.match(/^\s*-\s*bild:\s*(.+?)\s*$/);
+      if (mb) { cur = { bild: yamlSkalar(mb[1]), text: '' }; eintraege.push(cur); continue; }
+      const mt = zeile.match(/^\s*text:\s*(.*)$/);
+      if (mt && cur) cur.text = yamlSkalar(mt[1]);
+    }
+  }
+  return { eintraege };
 };
 
 // YAML-Wert sicher schreiben.
@@ -159,12 +166,17 @@ const frontmatter = (obj, body = '') => {
   const zeilen = Object.entries(obj).map(([k, v]) => `${k}: ${yamlWert(v)}`);
   return `---\n${zeilen.join('\n')}\n---\n${body ? body + '\n' : ''}`;
 };
-// Über-mich-Datei schreiben (bilder-Liste + Text).
-const seiteInhalt = (bilderRel, body) => {
-  const liste = bilderRel.length
-    ? '\n' + bilderRel.map((p) => `  - bild: ${yamlWert(p)}`).join('\n')
-    : ' []';
-  return `---\nbilder:${liste}\n---\n${body ? body + '\n' : ''}`;
+// Über-mich-Datei schreiben: Liste aus { bild, text? } (Text nur, wenn gesetzt).
+const seiteInhalt = (eintraege) => {
+  if (!eintraege.length) return `---\nbilder: []\n---\n`;
+  const liste = eintraege
+    .map((e) => {
+      let s = `  - bild: ${yamlWert(e.bild)}`;
+      if (e.text && e.text.trim()) s += `\n    text: ${yamlWert(e.text.trim())}`;
+      return s;
+    })
+    .join('\n');
+  return `---\nbilder:\n${liste}\n---\n`;
 };
 
 const ghHeaders = (mitToken = false) => {
@@ -194,11 +206,14 @@ const ladeVerzeichnis = async (coll) => {
 const ladeSeite = async (key) => {
   const url = `${API}/repos/${REPO}/contents/${SEITEN_DIR}/${key}.md?ref=${encodeURIComponent(state.branch)}`;
   const res = await fetch(url, { headers: ghHeaders(!!state.token) });
-  if (!res.ok) return { pfad: `${SEITEN_DIR}/${key}.md`, bilder: [], body: '' };
+  if (!res.ok) return { pfad: `${SEITEN_DIR}/${key}.md`, eintraege: [] };
   const meta = await res.json();
   const text = await (await fetch(meta.download_url)).text();
-  const { bilder, body } = parseSeite(text);
-  return { pfad: meta.path, body, bilder: bilder.map((b) => aufloesen(SEITEN_DIR, b)) };
+  const { eintraege } = parseSeite(text);
+  return {
+    pfad: meta.path,
+    eintraege: eintraege.map((e) => ({ assetPfad: aufloesen(SEITEN_DIR, e.bild), text: e.text || '' })),
+  };
 };
 
 // Alle Foto-Assets im Repo (Pool) via rekursivem Git-Baum.
@@ -310,28 +325,32 @@ const serieSpalte = (bereich, serie) => {
   return el('div', { class: 'serie-spalte', 'data-serie': serie.slug }, [kopf, liste]);
 };
 
+// Eine Über-mich-Reihe: Foto (zum Ziehen/Antippen) + Textfeld daneben. So sieht
+// man im Werkzeug, welcher Text zu welchem Foto gehört. Reihen liegen untereinander.
+const macheGalerieItem = (assetPfad, text = '') => {
+  const foto = macheKachel(assetPfad);
+  const feld = el('textarea', {
+    class: 'item-text',
+    rows: '3',
+    placeholder: 'Text zu diesem Foto (optional) …',
+    value: text,
+    oninput: markiereGeaendert,
+  });
+  return el('div', { class: 'galerie-item' }, [foto, feld]);
+};
+
 const seiteGalerie = (seite) => {
   const liste = el('div', {
     class: 'galerie-liste',
     'data-seite': seite.key,
     'data-gruppe': 'seiten',
   });
-  for (const assetPfad of state.seiten[seite.key]?.bilder || []) {
-    liste.append(macheKachel(assetPfad));
+  for (const e of state.seiten[seite.key]?.eintraege || []) {
+    liste.append(macheGalerieItem(e.assetPfad, e.text));
   }
   return el('div', { class: 'galerie' }, [
-    el('div', { class: 'galerie-kopf', text: seite.label }),
+    el('div', { class: 'galerie-kopf', text: `${seite.label} — Foto + Text daneben, wechselt links/rechts` }),
     liste,
-    el('label', { class: 'seite-text-label', text: 'Text', for: `text-${seite.key}` }),
-    el('textarea', {
-      id: `text-${seite.key}`,
-      class: 'seite-text',
-      'data-seite': seite.key,
-      rows: '4',
-      placeholder: 'Text dieser Seite …',
-      value: state.seiten[seite.key]?.body || '',
-      oninput: markiereGeaendert,
-    }),
   ]);
 };
 
@@ -388,11 +407,12 @@ const domZustand = () => {
   }
   for (const s of SEITEN) {
     const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
-    const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
     z.seiten.push({
       key: s.key,
-      bilder: [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild),
-      text: feld ? feld.value : '',
+      eintraege: [...liste.querySelectorAll('.galerie-item')].map((item) => ({
+        assetPfad: $('.kachel', item)?.dataset.bild,
+        text: $('.item-text', item)?.value || '',
+      })),
     });
   }
   return z;
@@ -403,7 +423,7 @@ const signatur = () => {
   return JSON.stringify([
     z.serien.map((s) => [s.bereichId, s.slug, s.titel, s.jahr, s.reihenfolge]),
     z.bilder.map((x) => [x.bereichId, x.slug, x.assetPfad, x.reihenfolge]),
-    z.seiten.map((s) => [s.key, s.bilder, s.text]),
+    z.seiten.map((s) => [s.key, s.eintraege.map((e) => [e.assetPfad, e.text])]),
   ]);
 };
 
@@ -421,7 +441,7 @@ const HALTE_MS = 280; // Touch: so lange halten, bis Ziehen startet (sonst = Scr
 const SCROLL_SCHWELLE = 12; // Bewegung während des Haltens = Scrollen → Drag verwerfen
 const ZIEH_SCHWELLE = 6;
 
-const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk, langHalten }) => {
+const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk, langHalten, ausschluss }) => {
   let ctx = null;
 
   const timerAus = () => { if (ctx && ctx.timer) { clearTimeout(ctx.timer); ctx.timer = null; } };
@@ -453,6 +473,7 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk, langHalten 
     if (!griffSel && e.target.closest('input, button, textarea, .griff')) return;
     const item = e.target.closest(itemSel);
     if (!item) return;
+    if (ausschluss && item.closest(ausschluss)) return; // z. B. Serien-Kacheln in Über-mich-Reihen auslassen
     const startZone = item.closest(zoneSel) || item.closest('.pool-liste');
     ctx = {
       item,
@@ -583,7 +604,14 @@ const zeigeMenu = (kachel) => {
     for (const ziel of alleZiele()) {
       karte.append(knopf(ziel.label, () => {
         const liste = document.querySelector(ziel.sel);
-        if (liste) { liste.append(macheKachel(kachel.dataset.bild)); markiereGeaendert(); }
+        if (!liste) return;
+        // Über-mich bekommt eine Reihe (Foto + Textfeld), Serien eine reine Kachel.
+        liste.append(
+          liste.classList.contains('galerie-liste')
+            ? macheGalerieItem(kachel.dataset.bild)
+            : macheKachel(kachel.dataset.bild),
+        );
+        markiereGeaendert();
       }));
     }
     karte.append(
@@ -620,6 +648,47 @@ const zeigeMenu = (kachel) => {
     void aktuellSel;
   }
 
+  hintergrund.append(karte);
+  document.body.append(hintergrund);
+};
+
+// Menü für eine Über-mich-Reihe (Antippen des Fotos): auf die andere Seite
+// verschieben oder Reihe löschen. Der Text zieht dabei mit.
+const zeigeGalerieMenu = (item) => {
+  const foto = $('.kachel', item);
+  const aktuell = item.closest('.galerie-liste')?.dataset.seite;
+
+  const hintergrund = el('div', { class: 'menu-hintergrund' });
+  const schliessen = () => hintergrund.remove();
+  hintergrund.addEventListener('pointerdown', (e) => { if (e.target === hintergrund) schliessen(); });
+  const karte = el('div', { class: 'menu' });
+  karte.append(el('img', { class: 'menu-vorschau', src: rawUrl(foto.dataset.bild), alt: '' }));
+  const knopf = (label, fn, klasse) => {
+    const b = el('button', { type: 'button', text: label });
+    if (klasse) b.className = klasse;
+    b.addEventListener('click', () => { fn(); schliessen(); });
+    return b;
+  };
+
+  const andere = SEITEN.filter((s) => s.key !== aktuell);
+  if (andere.length) {
+    karte.append(el('div', { class: 'menu-label', text: 'Verschieben nach' }));
+    for (const s of andere) {
+      karte.append(knopf(`Über mich: ${s.label}`, () => {
+        const ziel = document.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
+        if (ziel) { ziel.append(item); markiereGeaendert(); }
+      }));
+    }
+  }
+  karte.append(
+    el('div', { class: 'menu-trenner' }),
+    knopf('Aus „Über mich" entfernen', () => {
+      if (!confirm('Diese Reihe (Foto + Text) hier entfernen? Wird beim Speichern übernommen; das Foto bleibt im Pool.')) return;
+      item.remove();
+      markiereGeaendert();
+    }, 'loeschen'),
+    knopf('Abbrechen', () => {}, 'abbrechen'),
+  );
   hintergrund.append(karte);
   document.body.append(hintergrund);
 };
@@ -705,9 +774,11 @@ const speichern = async (opt = {}) => {
 
     for (const s of SEITEN) {
       const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
-      const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
-      const bilderRel = [...liste.querySelectorAll('.kachel')].map((k) => relPfad(SEITEN_DIR, k.dataset.bild));
-      final[`${SEITEN_DIR}/${s.key}.md`] = seiteInhalt(bilderRel, (feld?.value || '').trim());
+      const eintraege = [...liste.querySelectorAll('.galerie-item')].map((item) => ({
+        bild: relPfad(SEITEN_DIR, $('.kachel', item).dataset.bild),
+        text: $('.item-text', item)?.value || '',
+      }));
+      final[`${SEITEN_DIR}/${s.key}.md`] = seiteInhalt(eintraege);
     }
 
     const geloescht = [...state.origBildPfade].filter((p) => !(p in final));
@@ -758,9 +829,10 @@ const speichern = async (opt = {}) => {
     }
     for (const s of SEITEN) {
       const liste = board.querySelector(`.galerie-liste[data-seite="${s.key}"]`);
-      const feld = board.querySelector(`.seite-text[data-seite="${s.key}"]`);
-      state.seiten[s.key].bilder = [...liste.querySelectorAll('.kachel')].map((k) => k.dataset.bild);
-      state.seiten[s.key].body = (feld?.value || '').trim();
+      state.seiten[s.key].eintraege = [...liste.querySelectorAll('.galerie-item')].map((item) => ({
+        assetPfad: $('.kachel', item).dataset.bild,
+        text: $('.item-text', item)?.value || '',
+      }));
     }
     state.snapshot = signatur();
     markiereGeaendert();
@@ -941,15 +1013,27 @@ $('#datei').addEventListener('change', (e) => {
   e.target.value = '';
 });
 
-// Bilder/Galerie: verschieben + Pool-Kopie; nur Ziele derselben Gruppe (Pool überall).
+// Serien-Kacheln + Pool: verschieben/kopieren in Serien (Pool überall). Kacheln in
+// Über-mich-Reihen sind ausgenommen (die haben ihre eigene Reihen-Logik unten).
 ziehbar({
-  zoneSel: '.kachel-liste, .galerie-liste',
+  zoneSel: '.kachel-liste',
   itemSel: '.kachel',
   griffSel: null,
+  ausschluss: '.galerie-item',
   achse: 'x',
   onTap: zeigeMenu,
   langHalten: true,
   zoneOk: (zone, ctx) => ctx.istPool || zone.dataset.gruppe === ctx.gruppe,
+});
+// Über-mich-Reihen (Foto + Text) untereinander sortieren; Foto = Greiffläche.
+ziehbar({
+  zoneSel: '.galerie-liste',
+  itemSel: '.galerie-item',
+  griffSel: '.kachel',
+  achse: 'y',
+  onTap: zeigeGalerieMenu,
+  langHalten: true,
+  zoneOk: () => true,
 });
 // Serien als Ganzes verschieben (nur innerhalb ihres Bereichs).
 ziehbar({

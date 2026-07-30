@@ -44,7 +44,9 @@ const seiten = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/seiten' }),
   schema: ({ image }: SchemaContext) =>
     z.object({
-      bilder: z.array(z.object({ bild: image() })).default([]),
+      // Jedes Bild optional mit eigenem Text daneben (auf der Seite abwechselnd
+      // links/rechts). Text ist optional — ein Bild darf auch ohne Text stehen.
+      bilder: z.array(z.object({ bild: image(), text: z.string().optional() })).default([]),
     }),
 });
 

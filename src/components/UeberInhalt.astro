@@ -2,36 +2,41 @@
 import Bild from './Bild.astro';
 import type { ImageMetadata } from 'astro';
 
-// Inhalt der About-Seiten. Text kommt als Slot (gerendertes Markdown aus dem CMS),
-// die Bilder als flexible Liste (abwechselnd rechts/links, Format dynamisch =
-// echtes Seitenverhältnis, Grösse passend zur Seite — nicht seitenfüllend).
+// Inhalt der About-Seiten. Jedes Bild steht in einer eigenen Reihe zusammen mit
+// seinem (optionalen) Text daneben; die Reihen wechseln sich ab: erstes Bild
+// rechts / Text links, zweites Bild links / Text rechts, usw. Ohne Text bleibt
+// die Textseite einfach leer. Format der Bilder dynamisch (echtes Seitenverhältnis).
 // spotify: nur die düstere Seite bekommt zusätzlich den Spotify-API-Platzhalter.
 interface Props {
-  bilder: ImageMetadata[];
+  eintraege: { bild: ImageMetadata; text?: string }[];
   spotify?: boolean;
 }
-const { bilder, spotify = false } = Astro.props;
+const { eintraege, spotify = false } = Astro.props;
 const breiten = [640, 960, 1280];
 ---
 
 <div class="ueber">
-  <div class="ueber-text fliesstext">
-    <slot />
-  </div>
-
   {
-    bilder.length > 0 && (
+    eintraege.length > 0 && (
       <div class="ueber-galerie">
-        {bilder.map((bild, i) => (
-          <div class:list={['ueber-bild', i % 2 === 0 ? 'ueber-bild--rechts' : 'ueber-bild--links']}>
-            <Bild
-              class="ueber-foto"
-              src={bild}
-              alt=""
-              widths={breiten}
-              sizes="(max-width: 768px) 100vw, 640px"
-              loading="lazy"
-            />
+        {eintraege.map((e, i) => (
+          <div class:list={['ueber-reihe', i % 2 === 0 ? 'foto-rechts' : 'foto-links']}>
+            <div class="ueber-text-zelle fliesstext">
+              {e.text &&
+                e.text
+                  .split(/\n{2,}/)
+                  .map((absatz) => <p>{absatz}</p>)}
+            </div>
+            <div class="ueber-foto-zelle">
+              <Bild
+                class="ueber-foto"
+                src={e.bild}
+                alt=""
+                widths={breiten}
+                sizes="(max-width: 768px) 100vw, 45vw"
+                loading="lazy"
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -53,34 +58,53 @@ const breiten = [640, 960, 1280];
 </div>
 
 <style>
-  .ueber-text {
-    font-size: var(--groesse-16);
-    line-height: var(--zeilenhoehe-1-6);
-  }
-  .ueber-text :global(p + p) {
-    margin-block-start: var(--abstand-16);
-  }
-
-  /* Bilder abwechselnd rechts/links, mit vertikalem Rhythmus. Die Grösse steckt in
-     .ueber-foto (global, weil das <img> aus der Bild-Komponente kommt). */
+  /* Jede Reihe: Text und Bild nebeneinander, abwechselnd links/rechts. */
   .ueber-galerie {
     display: flex;
     flex-direction: column;
     gap: var(--rhythmus-block);
     margin-block-start: var(--rhythmus-block);
   }
-  .ueber-bild {
+  .ueber-reihe {
+    display: flex;
+    gap: var(--abstand-32);
+    align-items: center;
+  }
+  /* foto-rechts: Text links, Bild rechts (DOM-Reihenfolge Text→Bild).
+     foto-links: umgekehrt via row-reverse. */
+  .foto-links {
+    flex-direction: row-reverse;
+  }
+  .ueber-text-zelle {
+    flex: 1 1 0;
+    min-width: 0;
+    font-size: var(--groesse-16);
+    line-height: var(--zeilenhoehe-1-6);
+  }
+  .ueber-text-zelle :global(p + p) {
+    margin-block-start: var(--abstand-16);
+  }
+  .ueber-foto-zelle {
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
   }
-  .ueber-bild--rechts {
+  .foto-rechts .ueber-foto-zelle {
     justify-content: flex-end;
   }
-  .ueber-bild--links {
+  .foto-links .ueber-foto-zelle {
     justify-content: flex-start;
   }
   @media (max-width: 768px) {
-    /* Mobil: volle Breite, Ausrichtung egal. */
-    .ueber-bild {
+    /* Mobil: gestapelt, Bild zuerst, Text darunter — beide volle Breite. */
+    .ueber-reihe,
+    .ueber-reihe.foto-links {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--abstand-24);
+    }
+    .ueber-foto-zelle {
+      order: -1;
       justify-content: center;
     }
   }

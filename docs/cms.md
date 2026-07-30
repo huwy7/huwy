@@ -1,15 +1,20 @@
 # CMS — Sveltia (Build-Plan Phase 6)
 
-Sveltia CMS liegt unter `/admin` und ist gegen die Collection `serien`
+> **Aktuell:** Die Hauptoberfläche ist das eigene Werkzeug unter **`/admin`**
+> (`public/admin/`, siehe `docs/feature-checkliste.md`). Sveltia liegt seither als
+> **Rückfall** unter **`/admin/cms`**. Die Pfadangaben unten sind entsprechend zu
+> lesen: `public/admin/cms/index.html` und `public/admin/cms/config.yml`.
+
+Sveltia CMS liegt unter `/admin/cms` und ist gegen die Collection `serien`
 (Spezifikation 7) konfiguriert. Es ist Komfort, keine Abhängigkeit: Serien lassen
 sich jederzeit per Markdown-Datei und Commit pflegen, und die Seite baut und
 funktioniert unverändert, wenn `/admin` gelöscht wird.
 
 ## Dateien
 
-- `public/admin/index.html` — lädt Sveltia CMS (`@sveltia/cms`) vom CDN. Nur im
+- `public/admin/cms/index.html` — lädt Sveltia CMS (`@sveltia/cms`) vom CDN. Nur im
   `/admin`, nicht auf der öffentlichen Seite.
-- `public/admin/config.yml` — Backend, Medienordner und die Felder der Collection.
+- `public/admin/cms/config.yml` — Backend, Medienordner und die Felder der Collection.
 
 Die Felder: `titel`, `jahr`, `reihenfolge`, `titelbild` (zugleich das **erste
 Bild** der Serie) und die einfache Bild-Liste `bilder` (weitere Bilder, reine

@@ -510,9 +510,15 @@ const name = 'TODO_NAME';
         };
 
         // Ziel = Mitte des Elements; Punkt auf dessen Grösse/Radius bringen.
+        // Rückgabe false, wenn das Element nicht (mehr) dargestellt wird — dann
+        // liefert getBoundingClientRect() lauter Nullen, und die Box dürfte diese
+        // Nullposition NICHT übernehmen (der Cursor liefe sonst in die linke obere
+        // Ecke). Genau das passierte nach dem Entsperren: der Cursor umschloss das
+        // Eingabefeld des Tors, und das Tor wird danach auf display:none gesetzt.
         const zielAufBox = () => {
-          if (!boxEl) return;
+          if (!boxEl) return true;
           const r = boxEl.getBoundingClientRect();
+          if (r.width === 0 && r.height === 0) return false;
           const w = r.width + BOX_PAD * 2;
           const h = r.height + BOX_PAD * 2;
           punkt.style.width = `${w}px`;
@@ -520,6 +526,7 @@ const name = 'TODO_NAME';
           punkt.style.borderRadius = `${Math.min(w, h) / 2}px`;
           zielX = r.left + r.width / 2;
           zielY = r.top + r.height / 2;
+          return true;
         };
 
         // Box lösen: Punkt zurück auf den Kreis (Werte kommen wieder aus dem CSS;
@@ -528,6 +535,16 @@ const name = 'TODO_NAME';
           punkt.style.width = '';
           punkt.style.height = '';
           punkt.style.borderRadius = '';
+        };
+
+        // Box aufgeben und zurück in den Freimodus (Ziel = Zeigerposition).
+        const boxAufgeben = () => {
+          boxEl = null;
+          loeseBox();
+          cursor.classList.remove('cursor--box');
+          morphEnde = performance.now() + 300;
+          zielX = mausX;
+          zielY = mausY;
         };
 
         // Ziel-/Modusbestimmung anhand des Elements unter dem Zeiger. Wird sowohl
@@ -556,8 +573,9 @@ const name = 'TODO_NAME';
             // Solange keine elastische Verformung anwenden — sonst überlagern sich
             // Schrumpfen/Wachsen und Dehnung zu einer „zappeligen" Bewegung.
             morphEnde = performance.now() + 300;
-            if (boxEl) zielAufBox();
-            else loeseBox();
+            if (boxEl) {
+              if (!zielAufBox()) boxAufgeben();
+            } else loeseBox();
           }
           if (!boxEl) {
             zielX = mausX;
@@ -565,7 +583,7 @@ const name = 'TODO_NAME';
           }
 
           if (reduziert.matches) {
-            if (boxEl) zielAufBox();
+            if (boxEl && !zielAufBox()) boxAufgeben();
             istX = zielX;
             istY = zielY;
             platziere();
@@ -621,16 +639,9 @@ const name = 'TODO_NAME';
           const DRUCK = 0.7; // Verkleinerung beim Klicken (wie --cursor-skala-druck)
           const schritt = () => {
             // Box beim Scrollen an das Element gebunden halten; verschwindet das
-            // Element (z. B. Navigation), zurück in den Freimodus.
-            if (boxEl) {
-              if (boxEl.isConnected) zielAufBox();
-              else {
-                boxEl = null;
-                loeseBox();
-                cursor.classList.remove('cursor--box');
-                morphEnde = performance.now() + 300;
-              }
-            }
+            // Element (aus dem DOM entfernt ODER ausgeblendet, z. B. das Tor nach
+            // dem Entsperren), zurück in den Freimodus an die Zeigerposition.
+            if (boxEl && (!boxEl.isConnected || !zielAufBox())) boxAufgeben();
             istX = lerp(istX, zielX, nachlauf);
             istY = lerp(istY, zielY, nachlauf);
             platziere();

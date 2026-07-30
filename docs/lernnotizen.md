@@ -54,6 +54,14 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   `opacity` auf `body::before` (dasselbe Bild, blur+grain) über, dann Inhalt weich
   ein. Rest-Risiko: die URLs stehen in `data-*` im DOM (statische Seite, kein echter
   Schutz — siehe zugang.md); es lädt aber nichts mehr automatisch.
+- **Cursor-Box an einem ausgeblendeten Element**: `getBoundingClientRect()` liefert
+  bei `display:none` lauter Nullen — die Box darf diese Position NICHT übernehmen,
+  sonst wandert der Cursor in die linke obere Ecke (passierte nach dem Entsperren,
+  weil der Cursor das Tor-Eingabefeld umschloss). Bei Rechteck 0/0 die Box lösen.
+- **Admin-Tor**: `public/admin/tor.js` sperrt beide Admin-Seiten mit demselben Code
+  und derselben Sitzung wie die öffentliche Seite; das eigentliche Admin-Skript wird
+  erst nach dem Entsperren nachgeladen (`data-laden`), damit dahinter nichts läuft.
+  Auch das ist kein echter Schutz — Schreiben braucht weiterhin Token bzw. Login.
 - **Admin-Vorschauen NICHT als Vollbild laden** (Performance): `public/` läuft
   nicht durch Astro, also gibt es dort keine fertigen Grössen. Lösung: kleine
   Vorschau über einen On-the-fly-Resizer (wsrv.nl: `?url=ssl:raw.githubusercontent…
@@ -83,7 +91,7 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 
 ---
 
-## Leitprinzip `/admin/anordnen`
+## Leitprinzip `/admin`
 
 **Viel möglich, aber übersichtlich.** Grosse Funktion, kleine/ruhige Ansicht,
 einfache Bedienung. Keine technischen Begriffe, keine überladenen Panels — im
@@ -93,4 +101,4 @@ Zweifel weglassen oder hinter einer klaren Aktion verstecken.
 
 - Aus dem Pool/Repo Fotos wirklich löschen inkl. Hinweis, wo sie verwendet werden.
 - Serien löschen im Werkzeug (anlegen geht schon).
-- OAuth-Login statt Token; Umzug des Werkzeugs auf `/admin`, Sveltia abschalten.
+- OAuth-Login statt Token; Sveltia (`/admin/cms`) ganz abschalten.

@@ -14,7 +14,7 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
       beachten: Zusammenspiel mit dem „jede Serie = volle Bildschirmhöhe"-Layout,
       dem Zugangs-Tor und dem invertierenden Cursor.
 
-### Leitprinzip für `/admin/anordnen` (verbindlich)
+### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
 Betreiber als Endkunde **so einfach wie möglich zu bedienen** und **so schlicht wie
 möglich in der Ansicht** sein. Grosse Funktion, kleine/ruhige Oberfläche. Keine
@@ -22,8 +22,8 @@ technischen Begriffe, keine überladenen Panels — im Zweifel weglassen oder hi
 einer klaren Aktion verstecken.
 
 ### CMS-Admin: Drag-and-Drop-Oberfläche — v2 gebaut
-Eigenes Werkzeug unter `/admin/anordnen` (neben Sveltia, ersetzt es nicht):
-`public/admin/anordnen/`. Reine Vanilla-Datei ohne Dependency; Pointer-basiertes
+Eigenes Werkzeug unter `/admin` (Hauptoberfläche; das alte Sveltia-CMS liegt
+als Rückfall unter `/admin/cms`): `public/admin/`. Reine Vanilla-Datei ohne Dependency; Pointer-basiertes
 Drag & Drop (Maus + Touch). Login per GitHub-Token (nur zum Speichern), ein
 atomarer Commit auf den einstellbaren Ziel-Branch (Standard `main` = live;
 Bildänderungen sollen direkt live gehen).
@@ -46,6 +46,10 @@ Erledigt:
       welcher Text zu welchem Foto gehört. Serien bleiben eine Bilderreihe.
 - [x] **Foto aus dem Pool/Repo löschen** — mit Hinweis, wo es verwendet wird
       (hilft Doppel erkennen); löscht Asset + Verwendungen in einem Commit.
+- [x] **Umzug auf `/admin`**: das Werkzeug ist die Hauptoberfläche, Sveltia liegt
+      unter `/admin/cms`. Alte URL `/admin/anordnen` leitet weiter.
+- [x] **Zugangs-Tor auch im Admin** (gleicher Code/Sitzung wie die Seite); das
+      Admin-Skript lädt erst nach dem Entsperren.
 - [x] **Halten zum Ziehen** (Touch): erst nach kurzem Halten ziehbar, sonst scrollt
       man normal über die Fotos. Maus zieht sofort.
 
@@ -53,8 +57,8 @@ Erledigt:
       Metadaten-Datei + Bild-Einträge, Fotos bleiben im Pool).
 
 Noch offen:
-- [ ] **Umzug auf `/admin`** + Sveltia/OAuth-Worker abschalten (kurze URL, ein
-      Werkzeug). Erst wenn der Betreiber grünes Licht gibt.
+- [ ] Sveltia (`/admin/cms`) samt OAuth-Worker ganz abschalten, sobald das
+      Werkzeug im Alltag trägt.
 - [ ] Komfort-Login via **GitHub-OAuth** statt Token.
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.

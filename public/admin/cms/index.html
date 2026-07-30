@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Inhalte verwalten</title>
+  </head>
+  <body>
+    <!-- Zugangs-Tor: dieselbe Sperre wie auf der Seite. Sveltia CMS (Paket
+         @sveltia/cms) wird erst NACH dem Entsperren geladen (data-laden), damit
+         hinter dem Tor nichts läuft. Kein echter Schutz — der wirkliche Schutz ist
+         der GitHub-Login von Sveltia. Siehe docs/zugang.md. -->
+    <script src="../tor.js" data-laden="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+  </body>
+</html>

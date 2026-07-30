@@ -523,16 +523,20 @@ const name = 'TODO_NAME';
         let morphEnde = 0; // bis wann der Box-Morph läuft (dann keine Verformung)
         const BOX_PAD = 10; // Luft rund um das Element
 
-        // Auswahl der Elemente, die der Cursor als Box umschliesst: kleine
-        // interaktive Elemente. Serienkarten (.serien-link) sind ausgenommen —
-        // dort wirkt der Bild-Invert, kein grosser Kasten um die ganze Karte.
-        // .lightbox-zone (die grossen Blätter-Flächen im Vollbild) sind bewusst
-        // ausgenommen — sonst würde der Cursor zu einem riesigen Kasten um die halbe
-        // Bildschirmfläche. Im Vollbild bleibt so der normale kleine Kreis wie sonst.
+        // Auswahl der Elemente, die der Cursor als Box umschliesst: nur KLEINE
+        // interaktive Elemente. Ausgenommen sind die grossen, unsichtbaren
+        // Blätter-Flächen — `.blaettern` am Bild und `.lightbox-zone` im Vollbild
+        // (je eine halbe Bildschirmseite). Über ihnen soll gar kein Effekt
+        // auftreten, sondern der normale Kreis wie über dem Bild; sonst würde der
+        // Cursor zu einem riesigen Kasten. Ebenso ausgenommen: Serienkarten
+        // (.serien-link), dort wirkt der Bild-Invert.
+        // ACHTUNG: Diese Flächen sind <button>, nicht <a> — der Ausschluss muss
+        // deshalb am button-Teil des Selektors stehen (früher stand er nur beim a,
+        // wodurch im Vollbild wieder eine bildschirmgrosse Box entstand).
+        const OHNE = ':not(.blaettern):not(.lightbox-zone)';
         const BOX_SELEKTOR =
-          'a:not(.serien-link):not(.lightbox-flaeche):not(.lightbox-zone), button, [role="button"], input, label, summary';
-        const INTERAKTIV_SELEKTOR =
-          'a:not(.lightbox-zone), button, [role="button"], input, label, summary';
+          `a:not(.serien-link):not(.lightbox-flaeche), button${OHNE}, [role="button"]${OHNE}, input, label, summary`;
+        const INTERAKTIV_SELEKTOR = `a, button${OHNE}, [role="button"]${OHNE}, input, label, summary`;
 
         const platziere = () => {
           cursor.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;

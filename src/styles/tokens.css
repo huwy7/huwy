@@ -74,7 +74,7 @@
      nicht durch Farbe, sondern weil er länger und dicker ist. */
   --strich-staerke: 2px;
   --strich-staerke-aktiv: 4px;
-  --zaehler-breite: 96px; /* feste Gesamtbreite; die Striche teilen sie unter sich auf */
+  --zaehler-breite: 64px; /* feste Gesamtbreite; die Striche teilen sie unter sich auf */
   --zaehler-wachstum: 1.8; /* Anteil des aktiven Strichs gegenüber einem inaktiven */
   --zaehler-tempo: 160ms; /* kurz und knackig — der Wechsel soll „schnappen" */
   --fokus-breite: 2px; /* 9 Fokusring */

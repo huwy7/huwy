@@ -64,14 +64,17 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   je Gerät anders. Besser: Höhe aus dem Bild (Deckel per `max-height` am Foto) und
   `align-items: flex-start`, damit bei gemischten Formaten in einer Serie jedes Bild
   an derselben Stelle beginnt. Ergebnis: überall exakt derselbe Titel-Bild-Abstand.
-- **Gleichmässige Abstände statt Zentrierung**: `justify-content: center` in einer
-  100svh-Sektion lässt die Lücke zur Kopfzeile wachsen, je schmaler das Gerät ist
-  (das Bild wird niedriger, die freie Fläche verteilt sich). Stattdessen oben
-  ausrichten mit festem `padding-block-start`. Für alle Sektionen ausser der ersten
-  die Höhe der sticky Kopfzeile addieren (`calc(var(--header-hoehe) + …)`) — sonst
-  liegt ihr Titel beim Scrollen hinter der Kopfzeile. Die Kopfzeile dafür auf feste
-  `min-height: var(--header-hoehe)` setzen, damit sie auch bei zweizeiligem
-  Umschalt-Button gleich hoch bleibt.
+- **Serie mittig in der SICHTBAREN Fläche**: Jede Serie ist 100svh hoch und ihr
+  Inhalt vertikal zentriert. Damit die Mitte unter der sticky Kopfzeile stimmt,
+  bekommen alle Sektionen `padding-block-start: var(--header-hoehe)`; die ERSTE
+  stattdessen `min-height: calc(100svh - var(--header-hoehe))` und kein Padding
+  (dort steht die Kopfzeile schon im Fluss darüber). Ergebnis: Abstand über und
+  unter der Serie exakt gleich, auf jedem Gerät. Die Kopfzeile braucht dafür eine
+  feste Höhe (`min-height: var(--header-hoehe)`), sonst stimmt die Rechnung nicht —
+  Innenabstände so wählen, dass auch ein zweizeiliger Button darunter passt.
+- **Mehrzeiliges neben einzeiligem ausrichten**: `align-items: baseline` (nicht
+  `center`) — dann liegt die erste Zeile des umbrechenden Elements auf derselben
+  Höhe wie die einzeiligen Nachbarn, nur die zweite Zeile hängt darunter.
 - **Schriftgrössen nicht per Breakpoint verkleinern** (Wunsch des Betreibers:
   überall identisch). Passt ein langer Text nicht daneben, lieber NUR dieses Element
   umbrechen lassen (`white-space: normal` + `text-align` an seiner Seite).

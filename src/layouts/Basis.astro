@@ -177,7 +177,10 @@ const name = 'TODO_NAME';
         display: flex;
         flex-wrap: wrap; /* langer spanischer Button rutscht bei Bedarf in eine 2. Zeile */
         justify-content: space-between;
-        align-items: center;
+        /* baseline statt center: bricht der Umschalt-Button auf zwei Zeilen um,
+           liegt seine ERSTE Zeile auf derselben Höhe wie die einzeilige Navigation
+           (gleiche Oberkante); nur die zweite Zeile hängt darunter. */
+        align-items: baseline;
         gap: var(--abstand-8) var(--abstand-24);
         /* Der Schleier läuft über die volle Breite (sonst endete er sichtbar an der
            Container-Kante). Der Inhalt bleibt trotzdem exakt am selben Raster wie
@@ -188,7 +191,10 @@ const name = 'TODO_NAME';
            umbricht). Nur so ist der Abstand von der Kopfzeile zum Serientitel
            überall identisch — die Serien rechnen mit --header-hoehe. */
         min-height: var(--header-hoehe);
-        padding-block: var(--abstand-16);
+        /* Oben mehr Abstand als unten: bei baseline-Ausrichtung sitzt die erste
+           Zeile damit ungefähr mittig in der festen Kopfhöhe, und die zweite Zeile
+           des Umschalt-Buttons hat darunter Platz, ohne die Höhe zu verändern. */
+        padding-block: var(--abstand-32) var(--abstand-8);
       }
 
       /* Beim Umbruch (schmale Screens) rutscht das zweite Element in eine zweite

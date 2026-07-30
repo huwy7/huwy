@@ -214,16 +214,25 @@ const breiten = [640, 960, 1280, 1600, 2000];
      scrollt man zu ihnen, liegt die Kopfzeile über dem Seitenanfang — so bleibt
      der sichtbare Abstand unter der Kopfzeile überall gleich klein. */
   .serie {
+    /* Eine Bildschirmhöhe pro Serie, Inhalt darin vertikal ZENTRIERT — der freie
+       Raum verteilt sich gleichmässig über und unter der Serie, statt sich unten
+       zu sammeln. Die Höhe der sticky Kopfzeile wird als Innenabstand abgezogen,
+       damit die Serie in der tatsächlich sichtbaren Fläche (unter der Kopfzeile)
+       mittig sitzt und nicht dahinter rutscht. */
     min-height: 100vh;
     min-height: 100svh;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    padding-block-start: calc(var(--header-hoehe) + var(--abstand-16));
+    justify-content: center;
+    padding-block-start: var(--header-hoehe);
   }
+  /* Bei der ersten Serie steht die Kopfzeile bereits im Fluss darüber; die Sektion
+     füllt darum nur die restliche Bildschirmhöhe und braucht keinen Zusatzabstand.
+     So sitzt auch sie mittig in der sichtbaren Fläche. */
   .serie:first-of-type {
-    /* Hier steht die Kopfzeile bereits im Fluss darüber. */
-    padding-block-start: var(--abstand-16);
+    min-height: calc(100vh - var(--header-hoehe));
+    min-height: calc(100svh - var(--header-hoehe));
+    padding-block-start: 0;
   }
   .serie-kopf {
     display: flex;

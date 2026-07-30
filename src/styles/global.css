@@ -209,6 +209,17 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
+/* Farbseite: die ganze Seite ist weiss — das weisse Passepartout wäre unsichtbar,
+   würde das Bild aber um die Rahmenbreite einrücken (der linke Bildrand läge dann
+   nicht unter dem Serientitel). Darum auf der Farbseite kein Rahmen: das Bild sitzt
+   bündig, sein linker Rand fluchtet mit dem Titel. Farbbilder sind dadurch um die
+   Rahmenbreite grösser als die düsteren — bewusst, für einheitliche Ausrichtung
+   (düster mit Rahmen, farbig ohne Rahmen, beide fluchten aussen mit dem Titel). */
+:root[data-modus='farbe'] .karussell-foto {
+  padding: 0;
+  background-color: transparent;
+}
+
 /* About-Bilder: Format dynamisch (echtes Seitenverhältnis), Grösse passend zur
    Seite — etwa halbe Spaltenbreite, gedeckelt, damit ein Upload nicht plötzlich
    die ganze Seite füllt. Steht global (das <img> kommt aus der Bild-Komponente). */

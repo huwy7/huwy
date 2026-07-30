@@ -74,7 +74,9 @@ const breiten = [640, 960, 1280, 1600, 2000];
     n > 1 && (
       <div class="zaehler" role="tablist" aria-label="Bilder der Serie">
         {bilder.map((_, i) => (
-          <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`} />
+          <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`}>
+              <span class="zaehler-linie" />
+            </button>
         ))}
       </div>
     )
@@ -100,7 +102,9 @@ const breiten = [640, 960, 1280, 1600, 2000];
           <button class="lightbox-zone lightbox-next" type="button" data-richtung="1" aria-label="Weiter" />
           <div class="zaehler zaehler--lightbox" role="tablist" aria-label="Bilder der Serie">
             {bilder.map((_, i) => (
-              <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`} />
+              <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`}>
+              <span class="zaehler-linie" />
+            </button>
             ))}
           </div>
         </>
@@ -140,6 +144,14 @@ const breiten = [640, 960, 1280, 1600, 2000];
       requestAnimationFrame(zurueck);
     });
   };
+
+  // Invertierung der Zähler-Striche inline setzen (wie beim Cursor): Graustufen +
+  // Umkehr, damit über farbigen Fotos keine bunten Striche entstehen.
+  const strichFilter = 'grayscale(1) invert(1)';
+  for (const linie of document.querySelectorAll<HTMLElement>('.zaehler-linie')) {
+    linie.style.setProperty('backdrop-filter', strichFilter);
+    linie.style.setProperty('-webkit-backdrop-filter', strichFilter);
+  }
 
   for (const serie of document.querySelectorAll<HTMLElement>('.serie')) {
     const slug = serie.dataset.serie || '';
@@ -327,35 +339,48 @@ const breiten = [640, 960, 1280, 1600, 2000];
     gap: var(--abstand-8);
     margin-block-start: var(--abstand-24);
   }
+  /* Knopf = grosse Trefferfläche (unsichtbar), Linie = der sichtbare Strich. */
   .zaehler-strich {
-    width: var(--abstand-24);
-    /* content-box: die Höhe meint den sichtbaren Strich. Mit dem globalen
-       border-box würde der Innenabstand (Trefferfläche) die 2px auffressen und
-       der Strich wäre unsichtbar. */
-    box-sizing: content-box;
-    height: var(--strich-staerke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--strich-breite-aktiv);
     padding: var(--abstand-8) 0;
     border: none;
     background: none;
     cursor: pointer;
-    background-clip: content-box;
-    background-color: var(--farbe-text);
-    opacity: 0.35;
-    transition: opacity 200ms ease;
   }
-  .zaehler-strich.ist-aktiv {
-    opacity: 1;
+  /* Die Linie hat KEINE eigene Farbe: sie invertiert ihren Untergrund in
+     Graustufen (backdrop-filter, per JS inline gesetzt — der CSS-Minifier würde
+     den Wert sonst verändern). Dadurch ist sie auf Dunkel wie auf Weiss sichtbar
+     und erzeugt über farbigen Fotos keine bunten Ränder. Der aktive Strich
+     unterscheidet sich nicht über die Farbe, sondern weil er länger und dicker
+     ist — beim Blättern wächst der neue und der alte schrumpft. */
+  .zaehler-linie {
+    display: block;
+    width: var(--strich-breite);
+    height: var(--strich-staerke);
+    transition:
+      width 220ms ease,
+      height 220ms ease;
   }
-  @media (hover: hover) and (pointer: fine) {
-    .zaehler-strich:hover {
-      opacity: 0.7;
+  .ist-aktiv .zaehler-linie {
+    width: var(--strich-breite-aktiv);
+    height: var(--strich-staerke-aktiv);
+  }
+  /* Ohne backdrop-filter (alte Browser) bleibt der Strich sichtbar: dann als
+     einfache Fläche in der Textfarbe. */
+  @supports not (backdrop-filter: invert(1)) {
+    .zaehler-linie {
+      background-color: var(--farbe-text);
+      opacity: 0.5;
     }
-    .zaehler-strich.ist-aktiv:hover {
+    .ist-aktiv .zaehler-linie {
       opacity: 1;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .zaehler-strich {
+    .zaehler-linie {
       transition: none;
     }
   }
@@ -419,9 +444,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     bottom: var(--abstand-16);
     z-index: 3;
     margin-block-start: 0;
-  }
-  .zaehler--lightbox .zaehler-strich {
-    background-color: var(--farbe-hintergrund);
   }
 
   /* Kreuz oben rechts über allem, mit grosser Trefferfläche. */

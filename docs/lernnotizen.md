@@ -89,6 +89,11 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   `height: 2px; padding: 8px 0` wird unsichtbar — die 2px enthalten den Innenabstand,
   die Inhaltshöhe wird 0. Für „dünne Linie mit grosser Trefferfläche" am Element
   `box-sizing: content-box` setzen (+ `background-clip: content-box`).
+- **Element soll sich dem Untergrund anpassen** (Striche, Cursor, Puls): keine
+  eigene Farbe vergeben, sondern `backdrop-filter: grayscale(1) invert(1)` — der
+  Graustufen-Anteil verhindert bunte Ränder über farbigen Fotos. Unterscheidung
+  (z. B. aktiv/inaktiv) dann NICHT über Farbe, sondern über Grösse/Stärke lösen.
+  Wert inline per JS setzen und einen `@supports not`-Rückfall mitgeben.
 - **Vollbild als Streifen statt Ebenen**: Eine Ebene je Bild (`:target`, display
   none/block) schaltet hart um. Ein einziger scroll-snap-Streifen je Serie —
   aufgebaut wie das Karussell — schiebt das nächste Foto seitlich herein und bringt

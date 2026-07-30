@@ -69,7 +69,13 @@
      Werte aus Spezifikation Abschnitt 6 (Seiten) und 9 (Barrierefreiheit). */
   --header-hoehe: 80px; /* 6.1 Header */
   --linie-staerke: 1px; /* 6.1 Trennlinie über der Fusszeile */
-  --strich-staerke: 2px; /* Zähler unter dem Bild (ein Strich je Foto) */
+  /* Zähler unter dem Bild (ein Strich je Foto). Die Striche sind transparent und
+     invertieren ihren Untergrund (Graustufen) — der aktive unterscheidet sich
+     nicht durch Farbe, sondern weil er länger und dicker ist. */
+  --strich-staerke: 2px;
+  --strich-staerke-aktiv: 4px;
+  --strich-breite: 20px;
+  --strich-breite-aktiv: 32px;
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
 

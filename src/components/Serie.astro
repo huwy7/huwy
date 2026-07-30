@@ -82,16 +82,12 @@ const breiten = [640, 960, 1280, 1600, 2000];
   {
     bilder.map((bild, i) => (
       <div id={`lb-${slug}-${i}`} class="lightbox">
-        <a
-          class="lightbox-zone lightbox-prev"
-          href={`#lb-${slug}-${nachbar(i, -1)}`}
-          aria-label="Zurück"
-        />
-        <a
-          class="lightbox-zone lightbox-next"
-          href={`#lb-${slug}-${nachbar(i, 1)}`}
-          aria-label="Weiter"
-        />
+        <a class="lightbox-zone lightbox-prev" href={`#lb-${slug}-${nachbar(i, -1)}`} aria-label="Zurück">
+          {n > 1 && <span class="lightbox-pfeil">‹</span>}
+        </a>
+        <a class="lightbox-zone lightbox-next" href={`#lb-${slug}-${nachbar(i, 1)}`} aria-label="Weiter">
+          {n > 1 && <span class="lightbox-pfeil">›</span>}
+        </a>
         <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
         <a class="lightbox-x" href={`#k-${slug}-${i}`} aria-label="Schliessen">
           ×
@@ -111,10 +107,21 @@ const breiten = [640, 960, 1280, 1600, 2000];
   const reduziert = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Hash setzen (steuert :target), ohne dass die Seite dabei scrollt.
+  // WICHTIG: Der Browser führt sein Anker-Scrolling teils erst NACH dem Setzen des
+  // Hash aus (eigener Frame). Ein einmaliges Zurücksetzen direkt danach reicht
+  // deshalb nicht — beim Schliessen der ersten Serie sprang die Seite sonst nach
+  // unten (Kopfzeile weg), weil das Ziel #k-… oben im Viewport ausgerichtet wurde.
+  // Darum die Position zusätzlich in den nächsten zwei Frames wiederherstellen.
   const setzeHash = (href: string) => {
     const y = window.scrollY;
     location.hash = href.startsWith('#') ? href.slice(1) : href;
-    window.scrollTo(0, y);
+    const zurueck = () => window.scrollTo(0, y);
+    zurueck();
+    requestAnimationFrame(() => {
+      zurueck();
+      messeRand();
+      requestAnimationFrame(zurueck);
+    });
   };
 
   for (const pfeil of document.querySelectorAll('.karussell-pfeil')) {
@@ -138,6 +145,29 @@ const breiten = [640, 960, 1280, 1600, 2000];
       setzeHash(href);
     });
   }
+
+  // Breite des weissen Randes neben dem Vollbild messen und als --lb-rand setzen,
+  // damit die Blätter-Pfeile mittig zwischen Bildkante und Bildschirmrand sitzen.
+  // Der Rand hängt vom Bildformat ab (Hochformat = breiter Rand), darum je Bild neu.
+  const messeRand = () => {
+    const id = location.hash.slice(1);
+    if (!id.startsWith('lb-')) return;
+    const bild = document.getElementById(id)?.querySelector('img');
+    if (!bild) return;
+    const r = bild.getBoundingClientRect();
+    if (r.width > 0) {
+      document.documentElement.style.setProperty('--lb-rand', `${Math.max(Math.round(r.left), 0)}px`);
+    }
+  };
+
+  addEventListener('hashchange', messeRand);
+  addEventListener('resize', messeRand);
+  addEventListener('orientationchange', messeRand);
+  // Falls das Bild erst nach dem Öffnen fertig lädt: dann nachmessen.
+  for (const bild of document.querySelectorAll('.lightbox img')) {
+    bild.addEventListener('load', messeRand);
+  }
+  messeRand();
 
   // Wischen in der Vollbild-Ansicht: nach links = nächstes Bild, nach rechts =
   // vorheriges. Zusätzlich zum Tippen auf die halben Flächen. Nur wenn ein Vollbild
@@ -291,6 +321,44 @@ const breiten = [640, 960, 1280, 1600, 2000];
     bottom: 0;
     width: 50%;
     z-index: 1;
+    display: flex;
+    align-items: center;
+  }
+  /* Dezente Pfeile im weissen Rand — NICHT über dem Bild. Sie sitzen mittig im
+     Streifen zwischen Bildkante und Bildschirmrand (dieser Streifen ist
+     --abstand-48 breit, siehe .lightbox-bild in global.css). Dunkel auf Weiss,
+     zurückhaltend: sie sollen zeigen, dass man blättern kann, ohne zu drängen. */
+  .lightbox-pfeil {
+    /* Breite = weisser Streifen zwischen Bildkante und Bildschirmrand. Den misst
+       das Skript je Bild (--lb-rand), weil er vom Bildformat abhängt; der Pfeil
+       zentriert sich darin und sitzt so genau mittig im weissen Rand. Ohne JS
+       greift der Mindestrand (--abstand-48) — dann sitzt der Pfeil am Rand. */
+    width: var(--lb-rand, var(--abstand-48));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--schrift-mono);
+    font-size: var(--groesse-28);
+    line-height: 1;
+    color: var(--farbe-hintergrund);
+    opacity: 0.45;
+    transition: opacity 200ms ease;
+  }
+  .lightbox-prev .lightbox-pfeil {
+    margin-inline-end: auto;
+  }
+  .lightbox-next .lightbox-pfeil {
+    margin-inline-start: auto;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .lightbox-zone:hover .lightbox-pfeil {
+      opacity: 0.9;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox-pfeil {
+      transition: none;
+    }
   }
   /* Keine nativen Zeiger (kein w-/e-resize-Pfeil, kein Hand-Zeiger) im Vollbild —
      der eigene Cursor-Ball ist der einzige Zeiger. Ohne aktives Cursor-Skript

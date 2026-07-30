@@ -4,9 +4,13 @@ import type { ImageMetadata } from 'astro';
 
 // Eine Serie als inline-Karussell (kein Untermenü): die Bilder liegen nebeneinander
 // in einem horizontalen scroll-snap-Streifen; man wischt/blättert direkt auf der
-// Hauptseite. Erstes Bild = Titelbild. Klick aufs Bild öffnet die Vollbild-Ansicht
-// (Lightbox) mit Blättern links/rechts (endlos) und ✕ zum Schliessen. Alles reines
-// CSS (:target + scroll-snap), kein JavaScript.
+// Hauptseite. Erstes Bild = Titelbild. Klick aufs Bild öffnet die Vollbild-Ansicht,
+// die genauso aufgebaut ist — ein Streifen, der seitlich weitergeschoben wird
+// (wie ein analoger Film, der durch den Rahmen läuft), kein hartes Umschalten.
+//
+// Statt Pfeilen zeigt ein Zähler unter dem Bild, wie viele Fotos die Serie hat und
+// wo man gerade ist: ein feiner Strich je Bild, der aktive hell. Er ist anklickbar;
+// zusätzlich blättern die (unsichtbaren) Flächen links/rechts.
 //
 // Flaches Bild-Modell: Titel/Jahr/Slug + fertig sortierte Bilder-Liste kommen von
 // der Seite (Bilder werden dort aus der bilder-Sammlung nach Serie gruppiert).
@@ -18,12 +22,11 @@ interface Props {
 }
 const { slug, titel, jahr, bilder } = Astro.props;
 const n = bilder.length;
-const nachbar = (i: number, d: number) => (i + d + n) % n; // mit Loop
 
 const breiten = [640, 960, 1280, 1600, 2000];
 ---
 
-<section class="serie">
+<section class="serie" data-serie={slug}>
   <div class="serie-kopf">
     <span class="serie-titel">{titel}</span>
     <span class="serie-jahr">{jahr}</span>
@@ -38,8 +41,9 @@ const breiten = [640, 960, 1280, 1600, 2000];
                 Blätter-Zonen an den Bildkanten, egal ob Quer- oder Hochformat. */}
             <div class="karussell-buehne">
               <a
-                href={`#lb-${slug}-${i}`}
+                href={`#lb-${slug}`}
                 class="karussell-oeffnen"
+                data-index={i}
                 aria-label="Bild als Vollbild öffnen"
               >
                 <Bild
@@ -54,20 +58,9 @@ const breiten = [640, 960, 1280, 1600, 2000];
               </a>
               {n > 1 && (
                 <>
-                  <a
-                    class="karussell-pfeil karussell-prev"
-                    href={`#k-${slug}-${nachbar(i, -1)}`}
-                    aria-label="Vorheriges Bild"
-                  >
-                    <span class="karussell-zeichen">‹</span>
-                  </a>
-                  <a
-                    class="karussell-pfeil karussell-next"
-                    href={`#k-${slug}-${nachbar(i, 1)}`}
-                    aria-label="Nächstes Bild"
-                  >
-                    <span class="karussell-zeichen">›</span>
-                  </a>
+                  {/* Unsichtbare Blätter-Flächen an den Bildkanten. */}
+                  <button class="blaettern blaettern-prev" type="button" data-richtung="-1" aria-label="Vorheriges Bild" />
+                  <button class="blaettern blaettern-next" type="button" data-richtung="1" aria-label="Nächstes Bild" />
                 </>
               )}
             </div>
@@ -77,148 +70,162 @@ const breiten = [640, 960, 1280, 1600, 2000];
     </ul>
   </div>
 
-  {/* Vollbild-Ansichten (reines CSS via :target). Links/rechts blättern (endlos),
-      ✕ schliesst und bringt zurück zum Bild im Karussell. */}
   {
-    bilder.map((bild, i) => (
-      <div id={`lb-${slug}-${i}`} class="lightbox">
-        <a class="lightbox-zone lightbox-prev" href={`#lb-${slug}-${nachbar(i, -1)}`} aria-label="Zurück">
-          {n > 1 && <span class="lightbox-pfeil">‹</span>}
-        </a>
-        <a class="lightbox-zone lightbox-next" href={`#lb-${slug}-${nachbar(i, 1)}`} aria-label="Weiter">
-          {n > 1 && <span class="lightbox-pfeil">›</span>}
-        </a>
-        <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
-        <a class="lightbox-x" href={`#k-${slug}-${i}`} aria-label="Schliessen">
-          ×
-        </a>
+    n > 1 && (
+      <div class="zaehler" role="tablist" aria-label="Bilder der Serie">
+        {bilder.map((_, i) => (
+          <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`} />
+        ))}
       </div>
-    ))
+    )
   }
+
+  {/* Vollbild-Ansicht: EIN Streifen je Serie (nicht eine Ebene je Bild). Dadurch
+      schiebt sich beim Blättern das nächste Foto seitlich herein, statt hart
+      umzuschalten — dasselbe Verhalten wie im Karussell. */}
+  <div id={`lb-${slug}`} class="lightbox">
+    <div class="lightbox-spur">
+      {
+        bilder.map((bild) => (
+          <div class="lightbox-ansicht">
+            <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
+          </div>
+        ))
+      }
+    </div>
+    {
+      n > 1 && (
+        <>
+          <button class="lightbox-zone lightbox-prev" type="button" data-richtung="-1" aria-label="Zurück" />
+          <button class="lightbox-zone lightbox-next" type="button" data-richtung="1" aria-label="Weiter" />
+          <div class="zaehler zaehler--lightbox" role="tablist" aria-label="Bilder der Serie">
+            {bilder.map((_, i) => (
+              <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`} />
+            ))}
+          </div>
+        </>
+      )
+    }
+    <button class="lightbox-x" type="button" aria-label="Schliessen">×</button>
+  </div>
 </section>
 
 <script>
-  // Blättern und Vollbild ohne Seiten-Sprung. Die reinen-CSS-Anker (#k-…, #lb-…)
-  // würden die Seite vertikal zum Ziel scrollen (das Bild „springt"). Deshalb die
-  // Klicks abfangen: Weiterschalten bewegt nur den horizontalen Streifen, Öffnen
-  // und Schliessen der Vollbild-Ansicht setzen den Hash, behalten aber die
-  // Scrollposition. Ohne JS bleiben die Anker als Fallback (dann mit Sprung).
-  // Progressive Enhancement — die Seite selbst bewegt sich nie.
+  // Karussell und Vollbild sind beide horizontale scroll-snap-Streifen. Geblättert
+  // wird immer gleich: den Streifen um eine Ansichtsbreite weiterschieben. Dadurch
+  // wandert das nächste Foto seitlich herein — auf der Seite wie im Vollbild.
   const reduziert = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const weich = reduziert ? ('auto' as ScrollBehavior) : ('smooth' as ScrollBehavior);
 
-  // Hash setzen (steuert :target), ohne dass die Seite dabei scrollt.
+  // Aktuelle Position eines Streifens als Index.
+  const index = (spur: HTMLElement) =>
+    spur.clientWidth ? Math.round(spur.scrollLeft / spur.clientWidth) : 0;
+
+  const zuIndex = (spur: HTMLElement, i: number, verhalten: ScrollBehavior = weich) => {
+    const max = spur.children.length - 1;
+    const ziel = Math.min(Math.max(i, 0), max);
+    spur.scrollTo({ left: ziel * spur.clientWidth, behavior: verhalten });
+  };
+
+  // Hash setzen (steuert :target beim Vollbild), ohne dass die Seite scrollt.
   // WICHTIG: Der Browser führt sein Anker-Scrolling teils erst NACH dem Setzen des
-  // Hash aus (eigener Frame). Ein einmaliges Zurücksetzen direkt danach reicht
-  // deshalb nicht — beim Schliessen der ersten Serie sprang die Seite sonst nach
-  // unten (Kopfzeile weg), weil das Ziel #k-… oben im Viewport ausgerichtet wurde.
-  // Darum die Position zusätzlich in den nächsten zwei Frames wiederherstellen.
-  const setzeHash = (href: string) => {
+  // Hash aus (eigener Frame) — darum die Position in den nächsten Frames halten.
+  const setzeHash = (wert: string) => {
     const y = window.scrollY;
-    location.hash = href.startsWith('#') ? href.slice(1) : href;
+    location.hash = wert;
     const zurueck = () => window.scrollTo(0, y);
     zurueck();
     requestAnimationFrame(() => {
       zurueck();
-      messeRand();
       requestAnimationFrame(zurueck);
     });
   };
 
-  for (const pfeil of document.querySelectorAll('.karussell-pfeil')) {
-    pfeil.addEventListener('click', (e) => {
-      const href = pfeil.getAttribute('href') || '';
-      const ziel = document.getElementById(href.slice(1));
-      const spur = ziel?.parentElement;
-      if (!ziel || !spur) return;
-      e.preventDefault();
-      const delta = ziel.getBoundingClientRect().left - spur.getBoundingClientRect().left;
-      spur.scrollBy({ left: delta, behavior: reduziert ? 'auto' : 'smooth' });
-    });
-  }
+  for (const serie of document.querySelectorAll<HTMLElement>('.serie')) {
+    const slug = serie.dataset.serie || '';
+    const karussell = serie.querySelector<HTMLElement>('.karussell-spur');
+    const lightbox = serie.querySelector<HTMLElement>('.lightbox');
+    const lbSpur = serie.querySelector<HTMLElement>('.lightbox-spur');
+    if (!karussell) continue;
 
-  // Vollbild öffnen (Klick aufs Bild) und schliessen (✕): Hash ohne Sprung setzen.
-  for (const link of document.querySelectorAll('.karussell-oeffnen, .lightbox-x')) {
-    link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
-      if (!href) return;
-      e.preventDefault();
-      setzeHash(href);
-    });
-  }
+    const striche = {
+      karussell: serie.querySelectorAll<HTMLElement>('.zaehler:not(.zaehler--lightbox) .zaehler-strich'),
+      lightbox: serie.querySelectorAll<HTMLElement>('.zaehler--lightbox .zaehler-strich'),
+    };
 
-  // Breite des weissen Randes neben dem Vollbild messen und als --lb-rand setzen,
-  // damit die Blätter-Pfeile mittig zwischen Bildkante und Bildschirmrand sitzen.
-  // Der Rand hängt vom Bildformat ab (Hochformat = breiter Rand), darum je Bild neu.
-  const messeRand = () => {
-    const id = location.hash.slice(1);
-    if (!id.startsWith('lb-')) return;
-    const bild = document.getElementById(id)?.querySelector('img');
-    if (!bild) return;
-    const r = bild.getBoundingClientRect();
-    if (r.width > 0) {
-      document.documentElement.style.setProperty('--lb-rand', `${Math.max(Math.round(r.left), 0)}px`);
+    const markiere = (liste: NodeListOf<HTMLElement>, i: number) => {
+      liste.forEach((s, j) => {
+        s.classList.toggle('ist-aktiv', j === i);
+        s.setAttribute('aria-selected', j === i ? 'true' : 'false');
+      });
+    };
+
+    // Zähler folgt dem Streifen.
+    karussell.addEventListener('scroll', () => markiere(striche.karussell, index(karussell)), {
+      passive: true,
+    });
+    markiere(striche.karussell, 0);
+    striche.karussell.forEach((s) =>
+      s.addEventListener('click', () => zuIndex(karussell, Number(s.dataset.index))),
+    );
+
+    // Blätter-Flächen am Bild.
+    for (const knopf of serie.querySelectorAll<HTMLElement>('.blaettern')) {
+      knopf.addEventListener('click', () =>
+        zuIndex(karussell, index(karussell) + Number(knopf.dataset.richtung)),
+      );
     }
-  };
 
-  addEventListener('hashchange', messeRand);
-  addEventListener('resize', messeRand);
-  addEventListener('orientationchange', messeRand);
-  // Falls das Bild erst nach dem Öffnen fertig lädt: dann nachmessen.
-  for (const bild of document.querySelectorAll('.lightbox img')) {
-    bild.addEventListener('load', messeRand);
+    if (!lightbox || !lbSpur) continue;
+
+    // Vollbild öffnen: Hash setzen (macht die Ebene sichtbar), dann den Streifen
+    // ohne Animation auf das angeklickte Bild stellen.
+    for (const oeffnen of serie.querySelectorAll<HTMLElement>('.karussell-oeffnen')) {
+      oeffnen.addEventListener('click', (e) => {
+        e.preventDefault();
+        const i = Number(oeffnen.dataset.index) || 0;
+        setzeHash(`lb-${slug}`);
+        requestAnimationFrame(() => {
+          zuIndex(lbSpur, i, 'auto');
+          markiere(striche.lightbox, i);
+        });
+      });
+    }
+
+    lbSpur.addEventListener('scroll', () => markiere(striche.lightbox, index(lbSpur)), {
+      passive: true,
+    });
+    striche.lightbox.forEach((s) =>
+      s.addEventListener('click', () => zuIndex(lbSpur, Number(s.dataset.index))),
+    );
+    for (const zone of serie.querySelectorAll<HTMLElement>('.lightbox-zone')) {
+      zone.addEventListener('click', () =>
+        zuIndex(lbSpur, index(lbSpur) + Number(zone.dataset.richtung)),
+      );
+    }
+
+    // Schliessen: zurück zum selben Bild im Karussell (ohne Sprung).
+    const schliessen = () => {
+      const i = index(lbSpur);
+      zuIndex(karussell, i, 'auto');
+      setzeHash(`k-${slug}-${i}`);
+    };
+    serie.querySelector('.lightbox-x')?.addEventListener('click', schliessen);
+
+    // Tastatur im Vollbild: links/rechts blättern, Escape schliesst.
+    addEventListener('keydown', (e) => {
+      if (location.hash !== `#lb-${slug}`) return;
+      if (e.key === 'ArrowRight') zuIndex(lbSpur, index(lbSpur) + 1);
+      else if (e.key === 'ArrowLeft') zuIndex(lbSpur, index(lbSpur) - 1);
+      else if (e.key === 'Escape') schliessen();
+    });
   }
-  messeRand();
-
-  // Wischen in der Vollbild-Ansicht: nach links = nächstes Bild, nach rechts =
-  // vorheriges. Zusätzlich zum Tippen auf die halben Flächen. Nur wenn ein Vollbild
-  // offen ist (#lb-…). Ziel-Hash aus den Blätter-Zonen des aktuellen Bildes.
-  let wischX = 0;
-  let wischY = 0;
-  window.addEventListener(
-    'touchstart',
-    (e) => {
-      if (!location.hash.startsWith('#lb-')) return;
-      wischX = e.touches[0].clientX;
-      wischY = e.touches[0].clientY;
-    },
-    { passive: true },
-  );
-  window.addEventListener(
-    'touchend',
-    (e) => {
-      if (!location.hash.startsWith('#lb-') || !wischX) return;
-      const dx = e.changedTouches[0].clientX - wischX;
-      const dy = e.changedTouches[0].clientY - wischY;
-      wischX = 0;
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return; // kein klarer Quer-Wisch
-      const aktuell = document.getElementById(location.hash.slice(1));
-      const zone = aktuell?.querySelector(dx < 0 ? '.lightbox-next' : '.lightbox-prev');
-      const ziel = zone?.getAttribute('href');
-      if (ziel) setzeHash(ziel);
-    },
-    { passive: true },
-  );
 </script>
 
 <style>
-  /* Jede Serie füllt (mindestens) eine Bildschirmhöhe und liegt darin vertikal
-     zentriert. So ist immer nur eine Serie im Blick — die obere/untere Serie ist
-     ausserhalb des Sichtfensters. Gleichmässiger Abstand für maximale Übersicht;
-     auch die letzte Serie bekommt genug Raum. 100svh statt 100vh, damit die
-     Adressleiste auf Mobil nichts abschneidet. */
-  /* Jede Serie füllt eine Bildschirmhöhe, damit beim Scrollen immer nur EINE
-     Serie zu sehen ist. Der Inhalt sitzt oben mit minimalem, festem Abstand
-     (nicht zentriert) — sonst wächst die Lücke zur Kopfzeile, je schmaler das
-     Gerät ist (das Bild wird dort niedriger, die freie Fläche verteilt sich).
-     Für alle Serien ausser der ersten kommt die Höhe der sticky Kopfzeile dazu:
-     scrollt man zu ihnen, liegt die Kopfzeile über dem Seitenanfang — so bleibt
-     der sichtbare Abstand unter der Kopfzeile überall gleich klein. */
+  /* Eine Bildschirmhöhe pro Serie, Inhalt darin vertikal zentriert — siehe
+     .serie-kopf für die Formel, die dabei nur das BILD mittig setzt. */
   .serie {
-    /* Eine Bildschirmhöhe pro Serie, Inhalt darin vertikal ZENTRIERT — der freie
-       Raum verteilt sich gleichmässig über und unter der Serie, statt sich unten
-       zu sammeln. Die Höhe der sticky Kopfzeile wird als Innenabstand abgezogen,
-       damit die Serie in der tatsächlich sichtbaren Fläche (unter der Kopfzeile)
-       mittig sitzt und nicht dahinter rutscht. */
     min-height: 100vh;
     min-height: 100svh;
     display: flex;
@@ -226,23 +233,17 @@ const breiten = [640, 960, 1280, 1600, 2000];
     justify-content: center;
     padding-block-start: var(--header-hoehe);
   }
-  /* Bei der ersten Serie steht die Kopfzeile bereits im Fluss darüber; die Sektion
-     füllt darum nur die restliche Bildschirmhöhe und braucht keinen Zusatzabstand.
-     So sitzt auch sie mittig in der sichtbaren Fläche. */
+  /* Bei der ersten Serie steht die Kopfzeile bereits im Fluss darüber. */
   .serie:first-of-type {
     min-height: calc(100vh - var(--header-hoehe));
     min-height: calc(100svh - var(--header-hoehe));
     padding-block-start: 0;
   }
-  /* Letzte Serie: etwas Scroll-Reserve nach unten. Die Sektionen sind 100svh hoch
-     (kleines Sichtfenster, Browserleiste eingeblendet). Blendet die Leiste beim
-     Scrollen aus, wird das Sichtfenster höher (100lvh) — dann reicht die Seite
-     nicht mehr weit genug, um die letzte Serie ganz nach oben und damit mittig zu
-     bringen. Die Differenz beider Höhen ist genau die Höhe der Leiste. Ohne
-     Browserleiste (App vom Home-Bildschirm, Desktop) ist sie 0. */
+  /* Letzte Serie: Scroll-Reserve für die ein-/ausblendende Browserleiste. */
   .serie:last-of-type {
     padding-block-end: calc(100lvh - 100svh);
   }
+
   .serie-kopf {
     display: flex;
     gap: var(--abstand-16);
@@ -252,18 +253,14 @@ const breiten = [640, 960, 1280, 1600, 2000];
     line-height: var(--zeilenhoehe-1-4);
     font-variant-ligatures: none;
     margin-block-end: var(--abstand-24);
-    /* Der Titel wird aus der Zentrierung herausgerechnet: sein eigener Platz
-       (eine Zeile + Abstand zum Bild) wird als negativer Aussenabstand wieder
-       abgezogen. Dadurch zentriert die Sektion faktisch nur das BILD — die
-       Bildmitte liegt exakt in der Mitte des sichtbaren Bereichs, der Titel sitzt
-       im festen Abstand darüber. Die Formel arbeitet mit den Tokens, passt sich
-       also automatisch an, wenn Schriftgrösse oder Abstand geändert werden. */
+    /* Titel und Zähler werden aus der Zentrierung herausgerechnet: ihr Platz wird
+       als negativer Aussenabstand wieder abgezogen. Dadurch zentriert die Sektion
+       faktisch nur das BILD — die Bildmitte liegt exakt in der Mitte des sichtbaren
+       Bereichs. Die Formel arbeitet mit den Tokens, passt sich also automatisch an. */
     margin-block-start: calc(
       -1 * (var(--groesse-14) * var(--zeilenhoehe-1-4) + var(--abstand-24))
     );
   }
-  /* Jahr in derselben Farbe wie der Titel (weiss) — keine gedämpfte Zweitfarbe;
-     erbt die Textfarbe. */
 
   /* Inline-Karussell: horizontaler scroll-snap-Streifen, ein Bild pro Ansicht. */
   .karussell {
@@ -282,25 +279,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .karussell-spur::-webkit-scrollbar {
     display: none;
   }
-  /* Die Ansicht schrumpft auf das Bild (keine feste Höhe). Sonst entstand auf
-     schmalen Hochkant-Geräten viel Leerraum: ein Querformat ist dort nur ein
-     Bruchteil der früheren Festhöhe hoch, das Bild schwamm in der Mitte und der
-     Abstand zum Titel wuchs je nach Gerät. Jetzt sitzt der Titel überall im selben
-     festen Abstand über dem Bild; die Höhe deckelt --karussell-hoehe am Foto. */
   .karussell-bild {
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: flex;
     /* Zentriert: enthält eine Serie Quer- UND Hochformate, ist der Streifen so hoch
-       wie das höchste Bild. Zentriert liegt damit JEDES Bild — auch ein flacheres —
-       mittig im Streifen und dadurch mittig im sichtbaren Bereich. Der Abstand zum
-       Titel fällt je nach Bildformat unterschiedlich aus; das ist so gewollt. */
+       wie das höchste Bild. Zentriert liegt damit jedes Bild mittig im Streifen. */
     align-items: center;
     justify-content: center;
   }
-  /* Bühne = Bezugsrahmen der Pfeile. Als Flex-Kind der Ansicht schrumpft sie auf
-     die tatsächliche Bildbreite/-höhe; die Pfeile sitzen so an den Bildkanten,
-     dynamisch je Quer-/Hochformat. */
   .karussell-buehne {
     position: relative;
     max-width: 100%;
@@ -312,58 +299,68 @@ const breiten = [640, 960, 1280, 1600, 2000];
     text-decoration: none;
   }
 
-  /* Blätter-Zonen an den Bildkanten (nur bei mehr als einem Bild). Reines CSS:
-     sie zeigen auf das Nachbar-Bild im Streifen (Anker), der Streifen scrollt hin.
-     Der Pfeil selbst ist deutlich sichtbar (heller Chevron mit dunklem Halo, damit
-     er auf hellen wie dunklen Bildpartien lesbar bleibt). */
-  /* Die Trefferfläche bleibt gross (22% der Bildbreite, volle Höhe), das sichtbare
-     Zeichen sitzt aber ganz aussen im weissen Passepartout — nicht mehr auf dem
-     Foto. Es ist grau und zurückhaltend, damit es das Bild nicht stört. Auf der
-     Farbseite gibt es keinen Rahmen; dort liegt das Zeichen an derselben Stelle,
-     also so weit aussen wie möglich. */
-  .karussell-pfeil {
+  /* Unsichtbare Blätter-Flächen an den Bildkanten — kein sichtbarer Pfeil mehr,
+     der das Bild stört. Wohin man blättern kann, zeigt der Zähler unten. */
+  .blaettern {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 22%;
-    display: flex;
-    align-items: center;
     z-index: 2;
-    text-decoration: none;
-    padding-inline: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
   }
-  .karussell-zeichen {
-    width: var(--rahmen-breite);
+  .blaettern-prev {
+    left: 0;
+  }
+  .blaettern-next {
+    right: 0;
+  }
+
+  /* Zähler: ein feiner Strich je Bild, der aktive hell. Zeigt Anzahl und Position
+     und lädt zum Blättern ein — ohne etwas über das Foto zu legen. */
+  .zaehler {
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-family: var(--schrift-mono);
-    font-size: var(--groesse-16);
-    line-height: 1;
-    color: var(--farbe-text-leise);
-    opacity: 0.85;
+    gap: var(--abstand-8);
+    margin-block-start: var(--abstand-24);
+  }
+  .zaehler-strich {
+    width: var(--abstand-24);
+    /* content-box: die Höhe meint den sichtbaren Strich. Mit dem globalen
+       border-box würde der Innenabstand (Trefferfläche) die 2px auffressen und
+       der Strich wäre unsichtbar. */
+    box-sizing: content-box;
+    height: var(--strich-staerke);
+    padding: var(--abstand-8) 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    background-clip: content-box;
+    background-color: var(--farbe-text);
+    opacity: 0.35;
     transition: opacity 200ms ease;
   }
-  .karussell-prev {
-    left: 0;
-    justify-content: flex-start;
-  }
-  .karussell-next {
-    right: 0;
-    justify-content: flex-end;
+  .zaehler-strich.ist-aktiv {
+    opacity: 1;
   }
   @media (hover: hover) and (pointer: fine) {
-    .karussell-pfeil:hover .karussell-zeichen {
+    .zaehler-strich:hover {
+      opacity: 0.7;
+    }
+    .zaehler-strich.ist-aktiv:hover {
       opacity: 1;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .karussell-zeichen {
+    .zaehler-strich {
       transition: none;
     }
   }
 
-  /* --- Vollbild-Ansicht (Lightbox) --- weiss, Bild zentriert. */
+  /* --- Vollbild-Ansicht --- weisse Fläche, Bilder als Streifen. */
   .lightbox {
     position: fixed;
     inset: 0;
@@ -374,66 +371,60 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .lightbox:target {
     display: block;
   }
-  /* Halbe Flächen zum Blättern: links zurück, rechts weiter. Die weisse Fläche
-     schliesst NICHT (Schliessen nur über ✕). */
+  .lightbox-spur {
+    display: flex;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lightbox-spur::-webkit-scrollbar {
+    display: none;
+  }
+  .lightbox-ansicht {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Halbe Flächen zum Blättern (unsichtbar). Die weisse Fläche schliesst NICHT —
+     Schliessen nur über das ✕. */
   .lightbox-zone {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 50%;
     z-index: 1;
-    display: flex;
-    align-items: center;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
   }
-  /* Dezente Pfeile im weissen Rand — NICHT über dem Bild. Sie sitzen mittig im
-     Streifen zwischen Bildkante und Bildschirmrand (dieser Streifen ist
-     --abstand-48 breit, siehe .lightbox-bild in global.css). Dunkel auf Weiss,
-     zurückhaltend: sie sollen zeigen, dass man blättern kann, ohne zu drängen. */
-  .lightbox-pfeil {
-    /* Breite = weisser Streifen zwischen Bildkante und Bildschirmrand. Den misst
-       das Skript je Bild (--lb-rand), weil er vom Bildformat abhängt; der Pfeil
-       zentriert sich darin und sitzt so genau mittig im weissen Rand. Ohne JS
-       greift der Mindestrand (--abstand-48) — dann sitzt der Pfeil am Rand. */
-    width: var(--lb-rand, var(--abstand-48));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--schrift-mono);
-    font-size: var(--groesse-28);
-    line-height: 1;
-    color: var(--farbe-hintergrund);
-    opacity: 0.45;
-    transition: opacity 200ms ease;
-  }
-  .lightbox-prev .lightbox-pfeil {
-    margin-inline-end: auto;
-  }
-  .lightbox-next .lightbox-pfeil {
-    margin-inline-start: auto;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .lightbox-zone:hover .lightbox-pfeil {
-      opacity: 0.9;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .lightbox-pfeil {
-      transition: none;
-    }
-  }
-  /* Keine nativen Zeiger (kein w-/e-resize-Pfeil, kein Hand-Zeiger) im Vollbild —
-     der eigene Cursor-Ball ist der einzige Zeiger. Ohne aktives Cursor-Skript
-     greift der Standardzeiger. */
   .lightbox-prev {
     left: 0;
   }
   .lightbox-next {
     right: 0;
   }
-  /* Kreuz oben rechts über allem. Etwas grösseres Zeichen und eine grössere
-     Trefferfläche (die ganze Box ist klickbar), damit es leichter zu treffen ist —
-     bleibt aber kompakt oben rechts, sodass links/rechts genug Platz zum Blättern
-     bleibt. */
+
+  /* Zähler im Vollbild: unten mittig, dunkel auf der weissen Fläche. */
+  .zaehler--lightbox {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: var(--abstand-16);
+    z-index: 3;
+    margin-block-start: 0;
+  }
+  .zaehler--lightbox .zaehler-strich {
+    background-color: var(--farbe-hintergrund);
+  }
+
+  /* Kreuz oben rechts über allem, mit grosser Trefferfläche. */
   .lightbox-x {
     position: absolute;
     top: var(--abstand-8);
@@ -444,10 +435,13 @@ const breiten = [640, 960, 1280, 1600, 2000];
     justify-content: center;
     width: var(--abstand-48);
     height: var(--abstand-48);
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
     font-family: var(--schrift-mono);
     font-size: var(--groesse-28);
     line-height: 1;
     color: var(--farbe-hintergrund);
-    text-decoration: none;
   }
 </style>

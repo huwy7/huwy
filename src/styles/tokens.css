@@ -69,6 +69,7 @@
      Werte aus Spezifikation Abschnitt 6 (Seiten) und 9 (Barrierefreiheit). */
   --header-hoehe: 80px; /* 6.1 Header */
   --linie-staerke: 1px; /* 6.1 Trennlinie über der Fusszeile */
+  --strich-staerke: 2px; /* Zähler unter dem Bild (ein Strich je Foto) */
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
 

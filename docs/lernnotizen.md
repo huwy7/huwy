@@ -85,6 +85,15 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   dann zentriert die Sektion faktisch nur das Bild. Formel aus Tokens gebaut, passt
   sich also automatisch an. Zusätzlich `align-items: center` im Karussell, damit
   auch in Serien mit gemischten Formaten jedes einzelne Bild mittig liegt.
+- **Globales `box-sizing: border-box` frisst dünne Elemente**: Ein Strich mit
+  `height: 2px; padding: 8px 0` wird unsichtbar — die 2px enthalten den Innenabstand,
+  die Inhaltshöhe wird 0. Für „dünne Linie mit grosser Trefferfläche" am Element
+  `box-sizing: content-box` setzen (+ `background-clip: content-box`).
+- **Vollbild als Streifen statt Ebenen**: Eine Ebene je Bild (`:target`, display
+  none/block) schaltet hart um. Ein einziger scroll-snap-Streifen je Serie —
+  aufgebaut wie das Karussell — schiebt das nächste Foto seitlich herein und bringt
+  auf Touch das native Wischen gratis mit. Öffnen: Hash setzen, dann im nächsten
+  Frame `scrollTo` ohne Animation auf den Index.
 - **Mehrzeiliges neben einzeiligem ausrichten**: `align-items: baseline` (nicht
   `center`) — dann liegt die erste Zeile des umbrechenden Elements auf derselben
   Höhe wie die einzeiligen Nachbarn, nur die zweite Zeile hängt darunter.

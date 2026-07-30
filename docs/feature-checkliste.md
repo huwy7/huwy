@@ -64,6 +64,12 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **Vollbild blättert wie ein Filmstreifen**: eine Streifen-Ansicht je Serie
+      (statt einer Ebene je Bild) — das nächste Foto schiebt sich seitlich herein,
+      wie auf der Portfolioseite. Wischen, Klickflächen, Tastatur (←/→, Esc).
+- [x] **Pfeile ersetzt durch einen Zähler**: ein feiner Strich je Foto unter dem
+      Bild (im Vollbild unten mittig), der aktive hell, anklickbar. Zeigt Anzahl und
+      Position, ohne etwas über das Foto zu legen.
 - [x] **Sticky Header (alle Seiten)**: die Kopfzeile bleibt beim Scrollen sichtbar
       (`position: sticky`, `--z-kopf`). Darunter ein weicher Verlauf-Schleier
       (`--kopf-schleier`, je Modus), damit die Beschriftungen lesbar bleiben, wenn

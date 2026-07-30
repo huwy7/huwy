@@ -258,19 +258,17 @@ img {
    minus weissem Rand, Seitenverhältnis bleibt. Kein Passepartout (auf Weiss
    unsichtbar). Nativer Zeiger, da der invertierende Ball auf Weiss verschwindet. */
 .lightbox-bild {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
+  /* Liegt jetzt als Flex-Kind in einer Streifen-Ansicht (Serie.astro) und ist
+     dadurch von selbst zentriert. Die Deckel sind in vh/vw angegeben (eindeutige
+     Einheiten), damit max-height auch als Flex-Kind sicher greift. */
   max-width: calc(100vw - 2 * var(--abstand-48));
   max-height: calc(100vh - 2 * var(--abstand-48));
+  max-height: calc(100svh - 2 * var(--abstand-48));
   width: auto;
   height: auto;
   cursor: default;
-  /* Klicks aufs Bild fallen an die darunterliegenden Flächen durch: auf der
-     Serienseite an die Schliess-Fläche, im Karussell an die Blätter-Zonen
-     (links/rechts). Das ✕ liegt darüber (höherer z-index) und schliesst weiter. */
+  /* Klicks aufs Bild fallen an die darunterliegenden Blätter-Flächen durch; das ✕
+     liegt darüber (höherer z-index) und schliesst weiter. */
   pointer-events: none;
 }
 

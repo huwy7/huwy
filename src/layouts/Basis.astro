@@ -225,24 +225,22 @@ const name = 'TODO_NAME';
         text-decoration: none;
       }
 
-      /* Mobil: der lange spanische Button passt nicht neben die Navigation. Statt
-         eines schiefen Umbruchs (eine Zeile links, eine rechts) wird die Kopfzeile
-         zu einer sauberen Spalte — beide Zeilen bündig an einer Seite. Düster
-         linksbündig (wie der übrige Inhalt), farbig rechtsbündig (Menü bleibt
-         rechts, wie gewünscht). */
+      /* Mobil: alles bleibt in EINER Zeile — der Umschalt-Button steht neben der
+         Navigation, nicht darunter. Damit der lange spanische Text danebenpasst,
+         wird die Kopfzeile hier eine Stufe kleiner gesetzt und die Abstände enger.
+         Anordnung und Spiegelung (düster: Menü links, farbig: Button links) bleiben
+         wie am Desktop. */
       @media (max-width: 768px) {
         .kopf {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: var(--abstand-8);
+          flex-wrap: nowrap;
+          gap: var(--abstand-16);
         }
-        :root[data-modus='farbe'] .kopf {
-          align-items: flex-end;
+        .kopf-nav {
+          gap: var(--abstand-16);
         }
-        /* Der Rechtsbündig-Trick vom Desktop (space-between-Umbruch) stört in der
-           Spalte — hier richtet align-items aus. */
-        .kopf > :last-child {
-          margin-inline-start: 0;
+        .kopf-nav,
+        .kopf-switch {
+          font-size: var(--groesse-12);
         }
       }
 

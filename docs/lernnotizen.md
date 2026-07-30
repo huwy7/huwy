@@ -58,6 +58,12 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   bei `display:none` lauter Nullen — die Box darf diese Position NICHT übernehmen,
   sonst wandert der Cursor in die linke obere Ecke (passierte nach dem Entsperren,
   weil der Cursor das Tor-Eingabefeld umschloss). Bei Rechteck 0/0 die Box lösen.
+- **Feste Höhen erzeugen geräteabhängigen Leerraum**: Die Karussell-Ansicht hatte
+  `height: 72vh` und zentrierte das Bild darin. Auf schmalen Hochkant-Geräten ist ein
+  Querformat nur ein Bruchteil davon hoch → riesige Lücke zwischen Titel und Bild,
+  je Gerät anders. Besser: Höhe aus dem Bild (Deckel per `max-height` am Foto) und
+  `align-items: flex-start`, damit bei gemischten Formaten in einer Serie jedes Bild
+  an derselben Stelle beginnt. Ergebnis: überall exakt derselbe Titel-Bild-Abstand.
 - **Stacking-Context-Falle bei sticky Kopfzeile**: Eine Animation mit
   `animation-fill-mode: both` (das weiche Einblenden von `.inhalt` nach dem
   Entsperren) bleibt dauerhaft „in Kraft" und erzeugt einen eigenen

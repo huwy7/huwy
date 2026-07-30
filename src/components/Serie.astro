@@ -243,13 +243,22 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .karussell-spur::-webkit-scrollbar {
     display: none;
   }
+  /* Die Ansicht schrumpft auf das Bild (keine feste Höhe). Sonst entstand auf
+     schmalen Hochkant-Geräten viel Leerraum: ein Querformat ist dort nur ein
+     Bruchteil der früheren Festhöhe hoch, das Bild schwamm in der Mitte und der
+     Abstand zum Titel wuchs je nach Gerät. Jetzt sitzt der Titel überall im selben
+     festen Abstand über dem Bild; die Höhe deckelt --karussell-hoehe am Foto. */
   .karussell-bild {
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: flex;
-    align-items: center;
+    /* Oben ausgerichtet, nicht zentriert: enthält eine Serie Quer- UND Hochformate,
+       ist der Streifen so hoch wie das höchste Bild. Zentriert läge ein flacheres
+       Bild dann weiter unten und der Abstand zum Titel wäre je Bild anders. Oben
+       ausgerichtet beginnt jedes Bild an derselben Stelle — überall gleicher
+       Abstand zum Titel. */
+    align-items: flex-start;
     justify-content: center;
-    height: var(--karussell-hoehe);
   }
   /* Bühne = Bezugsrahmen der Pfeile. Als Flex-Kind der Ansicht schrumpft sie auf
      die tatsächliche Bildbreite/-höhe; die Pfeile sitzen so an den Bildkanten,

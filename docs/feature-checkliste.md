@@ -64,6 +64,12 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **Touch komplett effektfrei**: kein mitlaufender Kreis und kein Puls beim
+      Antippen. Zeiger-Effekte gibt es nur mit der Maus (auch am Touch-Gerät mit
+      angeschlossener Maus).
+- [x] **Kein System-Zeiger mehr neben dem eigenen Cursor** (Chrome zeigte ihn über
+      Blätterflächen, Zählerstrichen, Vollbild-Zonen und dem ✕).
+
 - [x] **Vollbild blättert wie ein Filmstreifen**: eine Streifen-Ansicht je Serie
       (statt einer Ebene je Bild) — das nächste Foto schiebt sich seitlich herein,
       wie auf der Portfolioseite. Wischen, Klickflächen, Tastatur (←/→, Esc).

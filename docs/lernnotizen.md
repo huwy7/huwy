@@ -89,6 +89,15 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   `height: 2px; padding: 8px 0` wird unsichtbar — die 2px enthalten den Innenabstand,
   die Inhaltshöhe wird 0. Für „dünne Linie mit grosser Trefferfläche" am Element
   `box-sizing: content-box` setzen (+ `background-clip: content-box`).
+- **Astro-Scoped-Styles schlagen globale Regeln**: Astro hängt an jeden Selektor
+  ein `[data-astro-cid-…]` an (+1 Klasse Spezifität). Ein `cursor: pointer` in einer
+  Komponente gewinnt dadurch gegen `html.cursor-aktiv * { cursor: none }` — Chrome
+  zeigte über diesen Flächen zusätzlich den System-Zeiger. Lösung ohne `!important`:
+  solche Regeln in `html:not(.cursor-aktiv) …` einpacken, dann greifen sie nur, wenn
+  der eigene Cursor NICHT läuft.
+- **Touch bleibt effektfrei** (Entscheidung des Betreibers): keine Cursor-, Puls-
+  oder Nachlauf-Effekte bei Fingereingabe — weder mitlaufend noch beim Antippen von
+  Bedienelementen. Alle Zeiger-Effekte gehören ausschliesslich der Maus.
 - **Element soll sich dem Untergrund anpassen** (Striche, Cursor, Puls): keine
   eigene Farbe vergeben, sondern `backdrop-filter: grayscale(1) invert(1)` — der
   Graustufen-Anteil verhindert bunte Ränder über farbigen Fotos. Unterscheidung

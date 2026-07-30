@@ -731,44 +731,5 @@ const name = 'TODO_NAME';
       }
     </script>
 
-    <script>
-      // Invert-Puls bei Fingertipp (CLAUDE.md 4a). Auf Touch-Geräten gibt es keinen
-      // mitlaufenden Cursor mehr — mit dem Finger wirkte der Nachlauf-Effekt billig.
-      // Stattdessen blitzt beim Tippen auf ein Bedienelement kurz derselbe
-      // Invert-Effekt an der Tippstelle auf. Wird stattdessen eine Maus benutzt
-      // (auch auf einem Touch-Gerät), übernimmt der normale Cursor mit Hover.
-      // Passive Listener — Scrollen bleibt frei.
-      const pulsReduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const PULS_SELEKTOR = 'a, button, [role="button"], input, label, summary';
-
-      window.addEventListener(
-        'pointerdown',
-        (e) => {
-          if (e.pointerType === 'mouse') return; // Maus hat den Cursor-Effekt
-          if (pulsReduziert.matches) return;
-          const ziel = e.target instanceof Element ? e.target.closest(PULS_SELEKTOR) : null;
-          if (!ziel) return;
-
-          const puls = document.createElement('div');
-          puls.className = 'touch-puls';
-          puls.setAttribute('aria-hidden', 'true');
-          // Düster: invert(1); Farbseite: grayscale(1) invert(1) — derselbe Effekt
-          // wie beim Cursor. Inline gesetzt, da der CSS-Minifier den Wert verändert.
-          const filter =
-            document.documentElement.dataset.modus === 'farbe'
-              ? 'grayscale(1) invert(1)'
-              : 'invert(1)';
-          puls.style.setProperty('backdrop-filter', filter);
-          puls.style.setProperty('-webkit-backdrop-filter', filter);
-          // Position über die eigenständige translate-Eigenschaft setzen — transform
-          // gehört der Animation (scale) und würde die Position sonst überschreiben.
-          puls.style.translate = `${e.clientX}px ${e.clientY}px`;
-          document.body.appendChild(puls);
-          puls.addEventListener('animationend', () => puls.remove(), { once: true });
-          setTimeout(() => puls.remove(), 800); // Sicherheitsnetz
-        },
-        { passive: true },
-      );
-    </script>
   </body>
 </html>

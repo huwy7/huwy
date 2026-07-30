@@ -322,7 +322,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     padding: 0;
     border: none;
     background: none;
-    cursor: pointer;
   }
   .blaettern-prev {
     left: 0;
@@ -354,7 +353,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     padding: var(--abstand-8) 0;
     border: none;
     background: none;
-    cursor: pointer;
     transition: flex-grow var(--zaehler-tempo) cubic-bezier(0.2, 0, 0, 1);
   }
   .zaehler-strich.ist-aktiv {
@@ -391,6 +389,17 @@ const breiten = [640, 960, 1280, 1600, 2000];
     .zaehler-linie {
       transition: none;
     }
+  }
+
+  /* Hand-Zeiger nur, solange NICHT unser eigener Cursor läuft. Sonst zeigte
+     Chrome über diesen Flächen zusätzlich den System-Zeiger: Astro hängt an
+     Scoped-Styles ein Attribut an den Selektor, dadurch schlugen sie die globale
+     Regel `html.cursor-aktiv * { cursor: none }`. */
+  html:not(.cursor-aktiv) .blaettern,
+  html:not(.cursor-aktiv) .zaehler-strich,
+  html:not(.cursor-aktiv) .lightbox-zone,
+  html:not(.cursor-aktiv) .lightbox-x {
+    cursor: pointer;
   }
 
   /* --- Vollbild-Ansicht --- weisse Fläche, Bilder als Streifen. */
@@ -435,7 +444,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     padding: 0;
     border: none;
     background: none;
-    cursor: pointer;
   }
   .lightbox-prev {
     left: 0;
@@ -468,7 +476,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     padding: 0;
     border: none;
     background: none;
-    cursor: pointer;
     font-family: var(--schrift-mono);
     font-size: var(--groesse-28);
     line-height: 1;

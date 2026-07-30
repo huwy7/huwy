@@ -33,12 +33,6 @@ body {
   line-height: var(--zeilenhoehe-1-6);
 }
 
-/* Unterste Hintergrundebene: dasselbe Bild wie das Zugangs-Tor, aber stark
-   verwischt und abgedunkelt. Der Hund ist nicht mehr erkennbar — es bleibt ein
-   ruhiger, körniger Schwarzweiss-Look, der der Seite Leben gibt, ohne die
-   eigentlichen Fotos zu überstrahlen (Fokus bleibt auf den Bildern). Nutzt die
-   bereits geladene Bilddatei (--tor-bg auf <body>), kein zusätzlicher Download.
-   inset negativ, damit der Blur keine hellen Ränder in den Viewport zieht. */
 /* Aufgeschobene Bilder (Basis.astro aktiviert sie nach dem Entsperren): bis zum
    Laden unsichtbar, danach sanft einblenden — passt zum weichen Übergang vom
    Sperrbildschirm. */
@@ -55,6 +49,12 @@ picture.bild-defer img.geladen {
   }
 }
 
+/* Unterste Hintergrundebene: dasselbe Bild wie das Zugangs-Tor, aber stark
+   verwischt und abgedunkelt. Der Hund ist nicht mehr erkennbar — es bleibt ein
+   ruhiger, körniger Schwarzweiss-Look, der der Seite Leben gibt, ohne die
+   eigentlichen Fotos zu überstrahlen (Fokus bleibt auf den Bildern). Nutzt die
+   bereits geladene Bilddatei (--tor-bg auf <body>), kein zusätzlicher Download.
+   inset negativ, damit der Blur keine hellen Ränder in den Viewport zieht. */
 body::before {
   content: '';
   position: fixed;
@@ -417,38 +417,6 @@ html.cursor-aktiv * {
   cursor: none;
 }
 
-/* --- Invert-Puls bei Fingertipp (CLAUDE.md 4a) ---
-   Auf Touch-Geräten gibt es KEINEN mitlaufenden Cursor mehr (mit dem Finger wirkte
-   der Nachlauf-Effekt billig). Stattdessen blitzt beim Tippen auf ein Bedienelement
-   kurz derselbe Invert-Effekt an der Tippstelle auf: ein transparenter Kreis mit
-   backdrop-filter: invert(1) (per JS inline gesetzt), der einmal aufgeht und
-   verschwindet. Wird eine Maus benutzt — auch auf einem Touch-Gerät — greift
-   stattdessen der normale Cursor mit seinen Hover-Effekten. */
-.touch-puls {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: var(--spur-groesse);
-  height: var(--spur-groesse);
-  margin-left: calc(var(--spur-groesse) / -2);
-  margin-top: calc(var(--spur-groesse) / -2);
-  border-radius: 50%;
-  z-index: var(--z-spur);
-  pointer-events: none;
-  /* Kein box-shadow (bricht backdrop-filter in Chromium/Edge, siehe Cursor). */
-  animation: touch-puls 420ms ease-out forwards;
-}
-
-@keyframes touch-puls {
-  from {
-    opacity: 1;
-    transform: scale(0.35);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.15);
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *,

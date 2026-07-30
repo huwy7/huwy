@@ -166,15 +166,24 @@ const name = 'TODO_NAME';
          Kopfzeile im Farbmodus automatisch gespiegelt (dort steht der Button zuerst
          im Markup, also links, das Menü rechts). */
       .kopf {
+        /* Bleibt beim Scrollen immer sichtbar. Der Schleier (Verlauf) sorgt dafür,
+           dass die Beschriftungen lesbar bleiben, wenn ein Foto darunter
+           durchscrollt — kein harter Balken, die Seite bleibt ruhig. Unter dem
+           Vollbild (--z-lightbox) und dem Cursor, damit beide darüber liegen. */
+        position: sticky;
+        top: 0;
+        z-index: var(--z-kopf);
+        background-image: var(--kopf-schleier);
         display: flex;
         flex-wrap: wrap; /* langer spanischer Button rutscht bei Bedarf in eine 2. Zeile */
         justify-content: space-between;
         align-items: center;
         gap: var(--abstand-8) var(--abstand-24);
-        max-width: var(--container);
+        /* Der Schleier läuft über die volle Breite (sonst endete er sichtbar an der
+           Container-Kante). Der Inhalt bleibt trotzdem exakt am selben Raster wie
+           .inhalt: der Innenabstand rechnet den Container-Rand mit ein. */
         width: 100%;
-        margin-inline: auto;
-        padding-inline: var(--rand);
+        padding-inline: max(var(--rand), calc((100% - var(--container)) / 2 + var(--rand)));
         padding-block: var(--abstand-24);
       }
 
@@ -420,6 +429,13 @@ const name = 'TODO_NAME';
           erledigt = true;
           wurzel.dataset.tor = 'auf';
           wurzel.classList.add('weich');
+          // Klasse nach dem Einblenden wieder entfernen. Die Animation läuft mit
+          // fill-mode „both" und bliebe sonst dauerhaft in Kraft — ein Element mit
+          // filternder/animierter Deckkraft bildet einen eigenen Stacking-Context,
+          // in dem die Vollbild-Ansicht gefangen bliebe (sie läge dann UNTER der
+          // sticky Kopfzeile). Nach dem Entfernen ist die Deckkraft wieder 1,
+          // also kein Sprung, aber auch kein Stacking-Context mehr.
+          setTimeout(() => wurzel.classList.remove('weich'), 900);
           nachOben();
         };
         tor?.addEventListener('transitionend', abschluss, { once: true });

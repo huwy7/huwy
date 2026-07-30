@@ -7,13 +7,6 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 
 ## Offen
 
-### Sticky Header (alle Seiten)
-- [ ] Die Kopfzeile (Portfolio, About me / More about me, Umschalt-Button) bleibt
-      beim Scrollen **immer sichtbar** — egal wohin man scrollt. Aktuell scrollt sie
-      mit weg. Umsetzung z. B. `position: sticky` (oder `fixed`) am Header; dabei
-      beachten: Zusammenspiel mit dem „jede Serie = volle Bildschirmhöhe"-Layout,
-      dem Zugangs-Tor und dem invertierenden Cursor.
-
 ### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
 Betreiber als Endkunde **so einfach wie möglich zu bedienen** und **so schlicht wie
@@ -71,6 +64,11 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **Sticky Header (alle Seiten)**: die Kopfzeile bleibt beim Scrollen sichtbar
+      (`position: sticky`, `--z-kopf`). Darunter ein weicher Verlauf-Schleier
+      (`--kopf-schleier`, je Modus), damit die Beschriftungen lesbar bleiben, wenn
+      ein Foto durchscrollt — kein harter Balken. Vollbild und Cursor liegen darüber,
+      am Zugangs-Tor bleibt die Kopfzeile ausgeblendet.
 - [x] **Vollbild: Swipe** links/rechts blättert (zusätzlich zum Tippen).
 - [x] **Vollbild: ✕ grösser** + grössere Trefferfläche (kompakt oben rechts,
       Blättern bleibt möglich).

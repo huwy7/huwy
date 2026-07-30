@@ -58,6 +58,14 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   bei `display:none` lauter Nullen — die Box darf diese Position NICHT übernehmen,
   sonst wandert der Cursor in die linke obere Ecke (passierte nach dem Entsperren,
   weil der Cursor das Tor-Eingabefeld umschloss). Bei Rechteck 0/0 die Box lösen.
+- **Stacking-Context-Falle bei sticky Kopfzeile**: Eine Animation mit
+  `animation-fill-mode: both` (das weiche Einblenden von `.inhalt` nach dem
+  Entsperren) bleibt dauerhaft „in Kraft" und erzeugt einen eigenen
+  Stacking-Context. Alles darin (z. B. die Vollbild-Ansicht mit `z-index: 950`)
+  bleibt gefangen und liegt dann UNTER der sticky Kopfzeile (`z-index: 100`) —
+  obwohl die Zahl grösser ist. Lösung: die Animationsklasse nach dem Einblenden
+  per `setTimeout` wieder entfernen. Merke: z-index vergleicht nur INNERHALB
+  desselben Stacking-Context.
 - **Admin-Sperrbildschirm** (`public/admin/tor.js`): sperrt beide Admin-Seiten mit
   demselben Code/derselben Sitzung wie die öffentliche Seite; das Admin-Skript wird
   erst nach dem Entsperren nachgeladen (`data-laden`), damit dahinter nichts läuft.

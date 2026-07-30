@@ -18,8 +18,9 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-/* Sticky-Footer-Layout: Fusszeile sitzt am Seitenende, auch bei leeren Seiten.
-   Kein position: sticky — der Header bleibt statisch (Spezifikation 6.1). */
+/* Spaltenlayout der Seite. Die Kopfzeile ist sticky (Basis.astro) und bleibt beim
+   Scrollen sichtbar — das löst die frühere Vorgabe „Header bleibt statisch"
+   (Spezifikation 6.1) bewusst ab. */
 body {
   min-height: 100vh;
   display: flex;
@@ -110,6 +111,13 @@ body::after {
    nur der Seitengrund wird hell gesetzt. Die düstere Seite bleibt unverändert. */
 :root[data-modus='farbe'] {
   --farbe-text: #1c1a17; /* dunkler Text auf hellem Grund */
+  /* Schleier der sticky Kopfzeile in Hell (Pendant zum dunklen Wert in tokens.css). */
+  --kopf-schleier: linear-gradient(
+    to bottom,
+    rgba(237, 237, 237, 0.94) 0%,
+    rgba(237, 237, 237, 0.8) 55%,
+    rgba(237, 237, 237, 0) 100%
+  );
 }
 :root[data-modus='farbe'] body {
   background-color: var(--farbe-rahmen); /* ruhiges Weiss */

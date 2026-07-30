@@ -90,6 +90,17 @@
   --cursor-skala-druck: 0.7; /* beim Klicken */
   --cursor-uebergang: 200ms; /* weicher Übergang der Grösse (Skala) */
   --cursor-morph: 260ms; /* Übergang beim Umschliessen eines Elements (Box-Modus) */
+  --z-kopf: 100; /* Kopfzeile bleibt beim Scrollen oben, unter Tor/Vollbild/Cursor */
+  /* Weicher Schleier unter der Kopfzeile, damit die Beschriftungen lesbar bleiben,
+     wenn ein Foto darunter durchscrollt. Bewusst ein Verlauf statt eines harten
+     Balkens — die Seite bleibt ruhig, kein zusätzliches Chrome. Farbmodus
+     überschreibt den Wert in global.css (heller Grund). */
+  --kopf-schleier: linear-gradient(
+    to bottom,
+    rgba(13, 13, 13, 0.92) 0%,
+    rgba(13, 13, 13, 0.78) 55%,
+    rgba(13, 13, 13, 0) 100%
+  );
   --z-cursor: 9999;
   --z-tor: 900; /* Zugangs-Tor, unter dem Cursor */
   --z-lightbox: 950; /* Vollbild-Ansicht der Serienbilder, über dem Tor, unter dem Cursor */

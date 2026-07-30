@@ -419,12 +419,14 @@ html.cursor-aktiv * {
   cursor: none;
 }
 
-/* --- Invertierender Touch-Kreis (CLAUDE.md 4a) ---
-   Ein einzelner transparenter Kreis (keine Füllfarbe): backdrop-filter: invert(1)
-   (per JS inline gesetzt) kehrt den Untergrund unter dem Kreis um. Er folgt der
-   Berührung mit etwas Verzögerung und verschwindet beim Loslassen — kein Schweif.
-   Zentriert per negativer Margin, Position setzt das JS per translate3d. */
-.touch-kreis {
+/* --- Invert-Puls bei Fingertipp (CLAUDE.md 4a) ---
+   Auf Touch-Geräten gibt es KEINEN mitlaufenden Cursor mehr (mit dem Finger wirkte
+   der Nachlauf-Effekt billig). Stattdessen blitzt beim Tippen auf ein Bedienelement
+   kurz derselbe Invert-Effekt an der Tippstelle auf: ein transparenter Kreis mit
+   backdrop-filter: invert(1) (per JS inline gesetzt), der einmal aufgeht und
+   verschwindet. Wird eine Maus benutzt — auch auf einem Touch-Gerät — greift
+   stattdessen der normale Cursor mit seinen Hover-Effekten. */
+.touch-puls {
   position: fixed;
   top: 0;
   left: 0;
@@ -435,14 +437,19 @@ html.cursor-aktiv * {
   border-radius: 50%;
   z-index: var(--z-spur);
   pointer-events: none;
-  opacity: 0;
   /* Kein box-shadow (bricht backdrop-filter in Chromium/Edge, siehe Cursor). */
-  transition: opacity 220ms ease;
-  will-change: transform;
+  animation: touch-puls 420ms ease-out forwards;
 }
 
-.touch-kreis--sichtbar {
-  opacity: 1;
+@keyframes touch-puls {
+  from {
+    opacity: 1;
+    transform: scale(0.35);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.15);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

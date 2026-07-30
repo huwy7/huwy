@@ -482,8 +482,12 @@ const name = 'TODO_NAME';
 
     <script>
       // Invertierter Cursor — Progressive Enhancement (CLAUDE.md 4a).
+      // Startet, sobald eine MAUS im Spiel ist: entweder ist der Zeiger von Anfang
+      // an fein (Desktop), oder es kommt später eine echte Mausbewegung (z. B. iPad
+      // mit angeschlossener Maus). Mit dem Finger bleibt der Cursor aus — dort gibt
+      // es stattdessen den kurzen Invert-Puls beim Tippen.
       const feinerZeiger = window.matchMedia('(pointer: fine)');
-      if (feinerZeiger.matches) {
+      const starteCursor = () => {
         const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
         const wurzel = document.documentElement;
 
@@ -708,110 +712,63 @@ const name = 'TODO_NAME';
           };
           requestAnimationFrame(schritt);
         }
+      };
+
+      // Sofort starten, wenn der Zeiger von Anfang an fein ist (Desktop). Sonst
+      // warten, bis wirklich eine Maus bewegt wird — dann nachträglich starten und
+      // die Bewegung gleich weitergeben, damit der Cursor sofort an der richtigen
+      // Stelle sitzt. So bekommen auch Touch-Geräte mit Maus den vollen Effekt.
+      if (feinerZeiger.matches) {
+        starteCursor();
+      } else {
+        const beiMaus = (e: PointerEvent) => {
+          if (e.pointerType !== 'mouse') return;
+          window.removeEventListener('pointermove', beiMaus, true);
+          starteCursor();
+          window.dispatchEvent(new PointerEvent('pointermove', e));
+        };
+        window.addEventListener('pointermove', beiMaus, true);
       }
     </script>
 
     <script>
-      // Invertierender Touch-Kreis — für Touch-Geräte (kein Cursor dort). Ein
-      // einzelner transparenter Kreis mit backdrop-filter: invert(1) folgt der
-      // Berührung mit etwas Verzögerung (Nachlauf) und verschwindet beim Loslassen.
-      // Kein Schweif, keine Maske. Passive Listener — Scrollen bleibt frei.
-      const touchGeraet =
-        window.matchMedia('(pointer: coarse)').matches ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0;
-      const spurReduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
+      // Invert-Puls bei Fingertipp (CLAUDE.md 4a). Auf Touch-Geräten gibt es keinen
+      // mitlaufenden Cursor mehr — mit dem Finger wirkte der Nachlauf-Effekt billig.
+      // Stattdessen blitzt beim Tippen auf ein Bedienelement kurz derselbe
+      // Invert-Effekt an der Tippstelle auf. Wird stattdessen eine Maus benutzt
+      // (auch auf einem Touch-Gerät), übernimmt der normale Cursor mit Hover.
+      // Passive Listener — Scrollen bleibt frei.
+      const pulsReduziert = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const PULS_SELEKTOR = 'a, button, [role="button"], input, label, summary';
 
-      if (touchGeraet) {
-        const kreis = document.createElement('div');
-        kreis.className = 'touch-kreis';
-        kreis.setAttribute('aria-hidden', 'true');
-        // Düster: invert(1); Farbseite: grayscale(1) invert(1) (Schwarz-Weiss-Invert,
-        // auch über Weiss/Schwarz sichtbar). Explizit gesetzt (beide Präfixe) —
-        // nicht vom CSS-Minifier verändert.
-        const kreisFilter =
-          document.documentElement.dataset.modus === 'farbe'
-            ? 'grayscale(1) invert(1)'
-            : 'invert(1)';
-        kreis.style.setProperty('backdrop-filter', kreisFilter);
-        kreis.style.setProperty('-webkit-backdrop-filter', kreisFilter);
-        document.body.appendChild(kreis);
+      window.addEventListener(
+        'pointerdown',
+        (e) => {
+          if (e.pointerType === 'mouse') return; // Maus hat den Cursor-Effekt
+          if (pulsReduziert.matches) return;
+          const ziel = e.target instanceof Element ? e.target.closest(PULS_SELEKTOR) : null;
+          if (!ziel) return;
 
-        let zielX = 0;
-        let zielY = 0;
-        let istX = 0;
-        let istY = 0;
-        let sichtbar = false;
-
-        const setze = () => {
-          kreis.style.transform = `translate3d(${istX}px, ${istY}px, 0)`;
-        };
-
-        const beruehrung = (e: TouchEvent) => {
-          const t = e.touches[0];
-          if (!t) return;
-          zielX = t.clientX;
-          zielY = t.clientY;
-          if (!sichtbar) {
-            // Am Berührungspunkt erscheinen (kein Hereinfliegen von 0,0).
-            sichtbar = true;
-            istX = zielX;
-            istY = zielY;
-            setze();
-            kreis.classList.add('touch-kreis--sichtbar');
-          }
-          if (spurReduziert.matches) {
-            istX = zielX;
-            istY = zielY;
-            setze();
-          }
-        };
-
-        const ende = () => {
-          sichtbar = false;
-          kreis.classList.remove('touch-kreis--sichtbar');
-        };
-
-        window.addEventListener('touchstart', beruehrung, { passive: true });
-        window.addEventListener('touchmove', beruehrung, { passive: true });
-        window.addEventListener('touchend', ende, { passive: true });
-        window.addEventListener('touchcancel', ende, { passive: true });
-
-        // Nachlauf + elastische Verformung wie beim Desktop-Cursor: der Kreis zieht
-        // sich bei Bewegung in die Richtung lang wie ein Wasserballon (ein Objekt,
-        // kein Schweif) und relaxt im Stillstand zum Kreis. Grundlage ist der
-        // Rückstand zur Berührung (zielX/Y − istX/Y).
-        if (!spurReduziert.matches) {
-          const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
-          const nachlauf = 0.18;
-          const DEHN_REF = 90; // Rückstand (px) für nahezu maximale Dehnung
-          const DEHN_MAX = 1.1; // maximale Zusatz-Längung
-          const QUETSCH = 0.4; // seitliche Stauchung (Volumen-Anmutung)
-          const VORNE = 0.32; // Versatz der Spitze Richtung Berührung
-          const schritt = () => {
-            istX = lerp(istX, zielX, nachlauf);
-            istY = lerp(istY, zielY, nachlauf);
-            const dx = zielX - istX;
-            const dy = zielY - istY;
-            const dist = Math.hypot(dx, dy);
-            if (dist > 0.6) {
-              const s = Math.min(dist / DEHN_REF, 1) * DEHN_MAX;
-              const winkel = (Math.atan2(dy, dx) * 180) / Math.PI;
-              const sx = 1 + s;
-              const sy = 1 - Math.min(s, 1) * QUETSCH;
-              const vx = dx * VORNE;
-              const vy = dy * VORNE;
-              kreis.style.transform =
-                `translate3d(${istX + vx}px, ${istY + vy}px, 0) ` +
-                `rotate(${winkel}deg) scale(${sx}, ${sy})`;
-            } else {
-              setze();
-            }
-            requestAnimationFrame(schritt);
-          };
-          requestAnimationFrame(schritt);
-        }
-      }
+          const puls = document.createElement('div');
+          puls.className = 'touch-puls';
+          puls.setAttribute('aria-hidden', 'true');
+          // Düster: invert(1); Farbseite: grayscale(1) invert(1) — derselbe Effekt
+          // wie beim Cursor. Inline gesetzt, da der CSS-Minifier den Wert verändert.
+          const filter =
+            document.documentElement.dataset.modus === 'farbe'
+              ? 'grayscale(1) invert(1)'
+              : 'invert(1)';
+          puls.style.setProperty('backdrop-filter', filter);
+          puls.style.setProperty('-webkit-backdrop-filter', filter);
+          // Position über die eigenständige translate-Eigenschaft setzen — transform
+          // gehört der Animation (scale) und würde die Position sonst überschreiben.
+          puls.style.translate = `${e.clientX}px ${e.clientY}px`;
+          document.body.appendChild(puls);
+          puls.addEventListener('animationend', () => puls.remove(), { once: true });
+          setTimeout(() => puls.remove(), 800); // Sicherheitsnetz
+        },
+        { passive: true },
+      );
     </script>
   </body>
 </html>

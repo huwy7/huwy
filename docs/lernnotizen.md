@@ -99,6 +99,16 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   obwohl die Zahl grösser ist. Lösung: die Animationsklasse nach dem Einblenden
   per `setTimeout` wieder entfernen. Merke: z-index vergleicht nur INNERHALB
   desselben Stacking-Context.
+- **Cursor nur bei Maus, nicht bei Finger** (Entscheidung des Betreibers): Der
+  mitlaufende Kreis wirkt mit dem Finger billig. Darum kein Touch-Cursor mehr —
+  stattdessen ein kurzer Invert-Puls an der Tippstelle, aber NUR auf Bedienelementen.
+  Der Desktop-Cursor inkl. Hover-/Box-Effekten bleibt unverändert und startet auch
+  nachträglich, sobald eine echte Mausbewegung kommt (`pointerType === 'mouse'`) —
+  so bekommt auch ein iPad mit Maus den vollen Effekt. `(pointer: fine)` allein
+  genügt dafür nicht.
+- **Animierte Elemente positionieren**: Wenn eine CSS-Animation `transform` nutzt
+  (z. B. `scale`), die Position NICHT über `transform` setzen — sonst überschreibt
+  die Animation sie. Stattdessen die eigenständige `translate`-Eigenschaft nehmen.
 - **Admin-Sperrbildschirm** (`public/admin/tor.js`): sperrt beide Admin-Seiten mit
   demselben Code/derselben Sitzung wie die öffentliche Seite; das Admin-Skript wird
   erst nach dem Entsperren nachgeladen (`data-laden`), damit dahinter nichts läuft.

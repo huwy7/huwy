@@ -64,6 +64,17 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   je Gerät anders. Besser: Höhe aus dem Bild (Deckel per `max-height` am Foto) und
   `align-items: flex-start`, damit bei gemischten Formaten in einer Serie jedes Bild
   an derselben Stelle beginnt. Ergebnis: überall exakt derselbe Titel-Bild-Abstand.
+- **Gleichmässige Abstände statt Zentrierung**: `justify-content: center` in einer
+  100svh-Sektion lässt die Lücke zur Kopfzeile wachsen, je schmaler das Gerät ist
+  (das Bild wird niedriger, die freie Fläche verteilt sich). Stattdessen oben
+  ausrichten mit festem `padding-block-start`. Für alle Sektionen ausser der ersten
+  die Höhe der sticky Kopfzeile addieren (`calc(var(--header-hoehe) + …)`) — sonst
+  liegt ihr Titel beim Scrollen hinter der Kopfzeile. Die Kopfzeile dafür auf feste
+  `min-height: var(--header-hoehe)` setzen, damit sie auch bei zweizeiligem
+  Umschalt-Button gleich hoch bleibt.
+- **Schriftgrössen nicht per Breakpoint verkleinern** (Wunsch des Betreibers:
+  überall identisch). Passt ein langer Text nicht daneben, lieber NUR dieses Element
+  umbrechen lassen (`white-space: normal` + `text-align` an seiner Seite).
 - **Stacking-Context-Falle bei sticky Kopfzeile**: Eine Animation mit
   `animation-fill-mode: both` (das weiche Einblenden von `.inhalt` nach dem
   Entsperren) bleibt dauerhaft „in Kraft" und erzeugt einen eigenen

@@ -206,12 +206,24 @@ const breiten = [640, 960, 1280, 1600, 2000];
      ausserhalb des Sichtfensters. Gleichmässiger Abstand für maximale Übersicht;
      auch die letzte Serie bekommt genug Raum. 100svh statt 100vh, damit die
      Adressleiste auf Mobil nichts abschneidet. */
+  /* Jede Serie füllt eine Bildschirmhöhe, damit beim Scrollen immer nur EINE
+     Serie zu sehen ist. Der Inhalt sitzt oben mit minimalem, festem Abstand
+     (nicht zentriert) — sonst wächst die Lücke zur Kopfzeile, je schmaler das
+     Gerät ist (das Bild wird dort niedriger, die freie Fläche verteilt sich).
+     Für alle Serien ausser der ersten kommt die Höhe der sticky Kopfzeile dazu:
+     scrollt man zu ihnen, liegt die Kopfzeile über dem Seitenanfang — so bleibt
+     der sichtbare Abstand unter der Kopfzeile überall gleich klein. */
   .serie {
     min-height: 100vh;
     min-height: 100svh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-block-start: calc(var(--header-hoehe) + var(--abstand-16));
+  }
+  .serie:first-of-type {
+    /* Hier steht die Kopfzeile bereits im Fluss darüber. */
+    padding-block-start: var(--abstand-16);
   }
   .serie-kopf {
     display: flex;

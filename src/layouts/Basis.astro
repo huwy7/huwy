@@ -184,7 +184,11 @@ const name = 'TODO_NAME';
            .inhalt: der Innenabstand rechnet den Container-Rand mit ein. */
         width: 100%;
         padding-inline: max(var(--rand), calc((100% - var(--container)) / 2 + var(--rand)));
-        padding-block: var(--abstand-24);
+        /* Feste Höhe auf jedem Gerät (auch wenn der Umschalt-Button zweizeilig
+           umbricht). Nur so ist der Abstand von der Kopfzeile zum Serientitel
+           überall identisch — die Serien rechnen mit --header-hoehe. */
+        min-height: var(--header-hoehe);
+        padding-block: var(--abstand-16);
       }
 
       /* Beim Umbruch (schmale Screens) rutscht das zweite Element in eine zweite
@@ -238,9 +242,15 @@ const name = 'TODO_NAME';
         .kopf-nav {
           gap: var(--abstand-16);
         }
-        .kopf-nav,
+        /* Schriftgrösse bleibt überall gleich (keine kleinere Stufe auf Mobil).
+           Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
+           bündig an seiner Seite: düster oben rechts, farbig oben links. */
         .kopf-switch {
-          font-size: var(--groesse-12);
+          white-space: normal;
+          text-align: right;
+        }
+        :root[data-modus='farbe'] .kopf-switch {
+          text-align: left;
         }
       }
 

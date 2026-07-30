@@ -243,6 +243,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
     line-height: var(--zeilenhoehe-1-4);
     font-variant-ligatures: none;
     margin-block-end: var(--abstand-24);
+    /* Der Titel wird aus der Zentrierung herausgerechnet: sein eigener Platz
+       (eine Zeile + Abstand zum Bild) wird als negativer Aussenabstand wieder
+       abgezogen. Dadurch zentriert die Sektion faktisch nur das BILD — die
+       Bildmitte liegt exakt in der Mitte des sichtbaren Bereichs, der Titel sitzt
+       im festen Abstand darüber. Die Formel arbeitet mit den Tokens, passt sich
+       also automatisch an, wenn Schriftgrösse oder Abstand geändert werden. */
+    margin-block-start: calc(
+      -1 * (var(--groesse-14) * var(--zeilenhoehe-1-4) + var(--abstand-24))
+    );
   }
   /* Jahr in derselben Farbe wie der Titel (weiss) — keine gedämpfte Zweitfarbe;
      erbt die Textfarbe. */
@@ -273,12 +282,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: flex;
-    /* Oben ausgerichtet, nicht zentriert: enthält eine Serie Quer- UND Hochformate,
-       ist der Streifen so hoch wie das höchste Bild. Zentriert läge ein flacheres
-       Bild dann weiter unten und der Abstand zum Titel wäre je Bild anders. Oben
-       ausgerichtet beginnt jedes Bild an derselben Stelle — überall gleicher
-       Abstand zum Titel. */
-    align-items: flex-start;
+    /* Zentriert: enthält eine Serie Quer- UND Hochformate, ist der Streifen so hoch
+       wie das höchste Bild. Zentriert liegt damit JEDES Bild — auch ein flacheres —
+       mittig im Streifen und dadurch mittig im sichtbaren Bereich. Der Abstand zum
+       Titel fällt je nach Bildformat unterschiedlich aus; das ist so gewollt. */
+    align-items: center;
     justify-content: center;
   }
   /* Bühne = Bezugsrahmen der Pfeile. Als Flex-Kind der Ansicht schrumpft sie auf

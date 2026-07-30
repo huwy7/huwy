@@ -72,6 +72,14 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   unter der Serie exakt gleich, auf jedem Gerät. Die Kopfzeile braucht dafür eine
   feste Höhe (`min-height: var(--header-hoehe)`), sonst stimmt die Rechnung nicht —
   Innenabstände so wählen, dass auch ein zweizeiliger Button darunter passt.
+- **Nicht den Block zentrieren, sondern das BILD**: Wird Titel + Bild gemeinsam
+  zentriert, sitzt das Bild um die halbe Titelhöhe zu tief — von Auge deutlich
+  sichtbar. Lösung ohne JS: der Titel bekommt seinen eigenen Platz als NEGATIVEN
+  oberen Aussenabstand zurück
+  (`calc(-1 * (var(--groesse-14) * var(--zeilenhoehe-1-4) + var(--abstand-24)))`),
+  dann zentriert die Sektion faktisch nur das Bild. Formel aus Tokens gebaut, passt
+  sich also automatisch an. Zusätzlich `align-items: center` im Karussell, damit
+  auch in Serien mit gemischten Formaten jedes einzelne Bild mittig liegt.
 - **Mehrzeiliges neben einzeiligem ausrichten**: `align-items: baseline` (nicht
   `center`) — dann liegt die erste Zeile des umbrechenden Elements auf derselben
   Höhe wie die einzeiligen Nachbarn, nur die zweite Zeile hängt darunter.

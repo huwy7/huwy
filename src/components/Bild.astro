@@ -57,18 +57,26 @@ const w = cropModus ? breite! : maxW;
 const h = cropModus ? hoehe! : Math.round((src.height * maxW) / src.width);
 ---
 
-<picture>
-  <source type="image/avif" srcset={avif.srcSet.attribute} sizes={sizes} />
-  <source type="image/webp" srcset={webp.srcSet.attribute} sizes={sizes} />
+{/*
+  Aufgeschobenes Laden: die echten Quellen stehen in data-srcset/data-src und
+  werden erst NACH dem Entsperren per JS aktiviert (Basis.astro). So lädt am
+  Sperrbildschirm noch kein einziges Foto — es liegt kein Bild im Netzwerk-Tab.
+  Bis dahin ein transparenter 1×1-Platzhalter (kein Broken-Icon, kein Layout-Shift,
+  width/height bleiben gesetzt). Die öffentliche Seite braucht ohnehin JS (das Tor),
+  darum ist das aufgeschobene Laden hier konsistent.
+*/}
+<picture class="bild-defer">
+  <source type="image/avif" data-srcset={avif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" data-srcset={webp.srcSet.attribute} sizes={sizes} />
   <img
-    src={jpeg.src}
-    srcset={jpeg.srcSet.attribute}
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+    data-src={jpeg.src}
+    data-srcset={jpeg.srcSet.attribute}
     sizes={sizes}
     width={w}
     height={h}
     alt={alt}
     class={klasse}
-    loading={loading}
     decoding="async"
     fetchpriority={fetchpriority}
   />

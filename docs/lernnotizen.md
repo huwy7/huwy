@@ -45,6 +45,15 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 - **Über-mich-Modell:** `bilder` ist eine Liste aus `{ bild, text? }` (Text
   optional, pro Bild). Website rendert die Reihen abwechselnd (Bild rechts/links).
   Serien dagegen bleiben eine reine Bilderreihe.
+- **Bilder erst nach dem Entsperren laden** (kein Vorladen am Sperrbildschirm):
+  `Bild.astro` gibt die echten Quellen in `data-srcset`/`data-src` aus (Platzhalter
+  = transparentes 1×1-GIF, `width`/`height` bleiben → kein Layout-Shift). Ein Skript
+  in `Basis.astro` (`aktiviereBilder`) setzt sie nach dem Passwort in DOM-Reihenfolge
+  aktiv (Serie eins zuerst). `visibility:hidden` allein verhindert das Laden NICHT —
+  nur ein fehlendes `src`/`srcset` tut das. Übergang: `#tor` (scharf) blendet per
+  `opacity` auf `body::before` (dasselbe Bild, blur+grain) über, dann Inhalt weich
+  ein. Rest-Risiko: die URLs stehen in `data-*` im DOM (statische Seite, kein echter
+  Schutz — siehe zugang.md); es lädt aber nichts mehr automatisch.
 - **Admin-Vorschauen NICHT als Vollbild laden** (Performance): `public/` läuft
   nicht durch Astro, also gibt es dort keine fertigen Grössen. Lösung: kleine
   Vorschau über einen On-the-fly-Resizer (wsrv.nl: `?url=ssl:raw.githubusercontent…

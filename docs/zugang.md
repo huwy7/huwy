@@ -14,6 +14,16 @@ hinterlegt (`Basis.astro`).
 in `src/layouts/Basis.astro` ersetzen (oder mir den gewünschten Code sagen, ich
 tausche den Hash).
 
+## Bilder laden erst nach dem Entsperren
+
+Die Portfolio-Fotos werden **nicht mehr am Sperrbildschirm vorgeladen** — erst
+nach korrekter Code-Eingabe (aufgeschobenes Laden, siehe `docs/lernnotizen.md`).
+Am Tor liegt damit kein einziges Foto im Netzwerk-Tab, und der Übergang blendet
+weich vom scharfen Tor-Bild auf den blur+grain-Hintergrund. Das hebt die Hürde
+gegen „mal kurz per F12 die Bilder ansehen" — **ändert aber nichts** am Folgenden:
+die Bild-URLs stehen weiterhin im Quelltext/DOM und sind nach dem Laden öffentlich
+abrufbar.
+
 ## ⚠️ Wichtig: Das ist KEIN echter Schutz
 
 Auf einer **statischen Seite bei GitHub Pages** kann ein Passwortfeld die Bilder

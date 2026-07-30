@@ -38,6 +38,22 @@ body {
    eigentlichen Fotos zu überstrahlen (Fokus bleibt auf den Bildern). Nutzt die
    bereits geladene Bilddatei (--tor-bg auf <body>), kein zusätzlicher Download.
    inset negativ, damit der Blur keine hellen Ränder in den Viewport zieht. */
+/* Aufgeschobene Bilder (Basis.astro aktiviert sie nach dem Entsperren): bis zum
+   Laden unsichtbar, danach sanft einblenden — passt zum weichen Übergang vom
+   Sperrbildschirm. */
+picture.bild-defer img {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+picture.bild-defer img.geladen {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  picture.bild-defer img {
+    transition: none;
+  }
+}
+
 body::before {
   content: '';
   position: fixed;

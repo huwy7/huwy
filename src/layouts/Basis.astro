@@ -286,8 +286,41 @@ const name = 'TODO_NAME';
           background-position: center, 72% center;
         }
       }
+      /* Weicher Übergang: der scharfe Sperrbildschirm blendet auf den Portfolio-
+         Hintergrund (dasselbe Bild, blur+grain aus body::before) über. Erst danach
+         wird der Inhalt gezeigt — Zeit, in der die Bilder laden. */
+      #tor {
+        transition: opacity 0.9s ease;
+      }
+      #tor.tor--zu {
+        opacity: 0;
+        pointer-events: none;
+      }
       html[data-tor='auf'] #tor {
         display: none;
+      }
+      /* Inhalt nach der Blende sanft einblenden (nur beim Live-Entsperren, Klasse
+         .weich); bei bereits freigeschalteter Sitzung erscheint er ohne Animation. */
+      html.weich .kopf,
+      html.weich .inhalt {
+        animation: inhalt-ein 0.7s ease both;
+      }
+      @keyframes inhalt-ein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #tor {
+          transition: none;
+        }
+        html.weich .kopf,
+        html.weich .inhalt {
+          animation: none;
+        }
       }
       /* Solange gesperrt (Tor sichtbar): den eigentlichen Inhalt ausblenden und
          den Body nicht scrollen. Sonst blitzt beim Drehen des Geräts (iOS legt
@@ -333,38 +366,82 @@ const name = 'TODO_NAME';
       const torForm = document.getElementById('tor-form');
       const torCode = document.getElementById('tor-code') as HTMLInputElement | null;
 
+      const wurzel = document.documentElement;
+
       const sha256 = async (text: string) => {
         const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
         return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
       };
 
-      // Nur bei feinem Zeiger (Desktop) automatisch fokussieren. Auf Touch würde
-      // das Fokussieren die Tastatur öffnen und den Viewport verschieben (iOS
-      // scrollt dann weg von zuoberst) — dort tippt man das Feld selbst an.
-      if (
-        document.documentElement.dataset.tor !== 'auf' &&
-        window.matchMedia('(pointer: fine)').matches
-      )
-        torCode?.focus();
+      // Aufgeschobene Bilder aktivieren: die echten Quellen (data-srcset/data-src)
+      // ins Markup setzen, sodass sie erst JETZT laden. Reihenfolge = DOM-Reihenfolge,
+      // also Serie eins zuerst, danach die folgenden Serien (logische Reihenfolge).
+      // Am Sperrbildschirm passiert das nicht — dort lädt kein Foto.
+      let bilderAktiv = false;
+      const aktiviereBilder = () => {
+        if (bilderAktiv) return;
+        bilderAktiv = true;
+        for (const pic of document.querySelectorAll('picture.bild-defer')) {
+          for (const q of pic.querySelectorAll('source[data-srcset]')) {
+            const ds = q.getAttribute('data-srcset');
+            if (ds) q.setAttribute('srcset', ds);
+            q.removeAttribute('data-srcset');
+          }
+          const img = pic.querySelector('img');
+          if (!img) continue;
+          const fertig = () => img.classList.add('geladen');
+          img.addEventListener('load', fertig, { once: true });
+          img.addEventListener('error', fertig, { once: true });
+          if (img.dataset.srcset) {
+            img.srcset = img.dataset.srcset;
+            delete img.dataset.srcset;
+          }
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            delete img.dataset.src;
+          }
+        }
+      };
+
+      const nachOben = () => {
+        window.scrollTo(0, 0);
+        requestAnimationFrame(() => window.scrollTo(0, 0));
+      };
+
+      // Weicher Übergang vom scharfen Sperrbildschirm auf den blur+grain-Hintergrund
+      // (dasselbe Bild). Während der Blende laden die Bilder; danach erscheint der
+      // Inhalt — die Fotos sind dann fertig und blenden sofort ein.
+      const entsperren = () => {
+        aktiviereBilder();
+        tor?.classList.add('tor--zu');
+        let erledigt = false;
+        const abschluss = () => {
+          if (erledigt) return;
+          erledigt = true;
+          wurzel.dataset.tor = 'auf';
+          wurzel.classList.add('weich');
+          nachOben();
+        };
+        tor?.addEventListener('transitionend', abschluss, { once: true });
+        setTimeout(abschluss, 1000);
+      };
+
+      // Schon in dieser Sitzung freigeschaltet? Dann sofort laden (keine Blende).
+      // Sonst: nur bei feinem Zeiger (Desktop) fokussieren — auf Touch würde das
+      // die Tastatur öffnen und den Viewport verschieben.
+      if (wurzel.dataset.tor === 'auf') aktiviereBilder();
+      else if (window.matchMedia('(pointer: fine)').matches) torCode?.focus();
 
       torForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!torCode) return;
         if ((await sha256(torCode.value)) === TOR_HASH) {
           try {
-            // Nur für den aktuellen Besuch merken (sessionStorage) — beim nächsten
-            // Aufruf der Seite ist der Code erneut nötig. Erlaubt aber das Navigieren
-            // zwischen Start- und Serienseiten innerhalb desselben Besuchs.
+            // Nur für den aktuellen Besuch merken (sessionStorage).
             sessionStorage.setItem('tor', 'auf');
           } catch (err) {}
-          document.documentElement.dataset.tor = 'auf';
-          // Nach dem Entsperren zuoberst starten: das Eingabefeld loslassen (schliesst
-          // auf Touch die Tastatur) und nach oben scrollen — sonst zeigt die Seite
-          // nach der Passworteingabe irgendwo in der Mitte, nicht am Anfang. Zusätzlich
-          // im nächsten Frame, falls das Einblenden des Inhalts noch nachverschiebt.
           torCode.blur();
-          window.scrollTo(0, 0);
-          requestAnimationFrame(() => window.scrollTo(0, 0));
+          entsperren();
         } else {
           torCode.value = '';
           tor?.classList.add('tor--falsch');

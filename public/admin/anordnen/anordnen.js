@@ -417,51 +417,83 @@ const markiereGeaendert = () => {
 // ---------------------------------------------------------------------------
 // Drag & Drop (Pointer-basiert → Maus UND Touch)
 // ---------------------------------------------------------------------------
-const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk }) => {
+const HALTE_MS = 280; // Touch: so lange halten, bis Ziehen startet (sonst = Scrollen)
+const SCROLL_SCHWELLE = 12; // Bewegung während des Haltens = Scrollen → Drag verwerfen
+const ZIEH_SCHWELLE = 6;
+
+const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk, langHalten }) => {
   let ctx = null;
+
+  const timerAus = () => { if (ctx && ctx.timer) { clearTimeout(ctx.timer); ctx.timer = null; } };
+
+  // Ziehen sichtbar starten (Klon „hebt ab", Platzhalter erscheint).
+  const aktiviere = (x, y) => {
+    ctx.aktiv = true;
+    const r = ctx.item.getBoundingClientRect();
+    ctx.versatzX = x - r.left;
+    ctx.versatzY = y - r.top;
+    ctx.klon = ctx.item.cloneNode(true);
+    ctx.klon.classList.add('klon');
+    ctx.klon.classList.remove('versteckt');
+    ctx.klon.style.width = r.width + 'px';
+    ctx.klon.style.height = r.height + 'px';
+    document.body.append(ctx.klon);
+    ctx.platz = el('div', { class: 'platz' });
+    ctx.platz.style.width = r.width + 'px';
+    ctx.platz.style.height = r.height + 'px';
+    ctx.item.after(ctx.platz);
+    ctx.item.classList.add('versteckt');
+    document.body.classList.add('zieht');
+    ctx.klon.style.left = x - ctx.versatzX + 'px';
+    ctx.klon.style.top = y - ctx.versatzY + 'px';
+  };
 
   const start = (e) => {
     if (griffSel && !e.target.closest(griffSel)) return;
-    if (!griffSel && e.target.closest('input, button, .griff')) return;
+    if (!griffSel && e.target.closest('input, button, textarea, .griff')) return;
     const item = e.target.closest(itemSel);
     if (!item) return;
-    const istPool = !!item.closest('.pool-liste');
     const startZone = item.closest(zoneSel) || item.closest('.pool-liste');
     ctx = {
       item,
-      istPool,
+      istPool: !!item.closest('.pool-liste'),
       gruppe: startZone?.dataset.gruppe,
       bereich: item.closest('.bereich-serien')?.dataset.bereich,
       startX: e.clientX,
       startY: e.clientY,
       aktiv: false,
+      bereit: false,
+      timer: null,
       klon: null,
       platz: null,
       pointerId: e.pointerId,
     };
-    item.setPointerCapture(e.pointerId);
+    // Touch (Bilder): erst nach kurzem Halten ziehbar → dazwischen normales Scrollen.
+    // Maus und Griff: sofort ziehbar.
+    if (langHalten && e.pointerType !== 'mouse') {
+      ctx.timer = setTimeout(() => {
+        if (!ctx) return;
+        ctx.bereit = true;
+        ctx.item.setPointerCapture(ctx.pointerId);
+        aktiviere(ctx.startX, ctx.startY);
+      }, HALTE_MS);
+    } else {
+      ctx.bereit = true;
+      item.setPointerCapture(e.pointerId);
+    }
   };
 
   const bewegen = (e) => {
     if (!ctx || ctx.pointerId !== e.pointerId) return;
+    const dist = Math.hypot(e.clientX - ctx.startX, e.clientY - ctx.startY);
+    if (!ctx.bereit) {
+      // Halte-Phase: Bewegung = Scroll-Absicht → Ziehen verwerfen, Browser scrollt.
+      if (dist > SCROLL_SCHWELLE) { timerAus(); ctx = null; }
+      return;
+    }
     if (!ctx.aktiv) {
-      if (Math.hypot(e.clientX - ctx.startX, e.clientY - ctx.startY) < 6) return;
-      ctx.aktiv = true;
-      const r = ctx.item.getBoundingClientRect();
-      ctx.versatzX = ctx.startX - r.left;
-      ctx.versatzY = ctx.startY - r.top;
-      ctx.klon = ctx.item.cloneNode(true);
-      ctx.klon.classList.add('klon');
-      ctx.klon.classList.remove('versteckt');
-      ctx.klon.style.width = r.width + 'px';
-      ctx.klon.style.height = r.height + 'px';
-      document.body.append(ctx.klon);
-      ctx.platz = el('div', { class: 'platz' });
-      ctx.platz.style.width = r.width + 'px';
-      ctx.platz.style.height = r.height + 'px';
-      ctx.item.after(ctx.platz);
-      ctx.item.classList.add('versteckt');
-      document.body.classList.add('zieht');
+      if (dist < ZIEH_SCHWELLE) return;
+      aktiviere(ctx.startX, ctx.startY);
     }
     ctx.klon.style.left = e.clientX - ctx.versatzX + 'px';
     ctx.klon.style.top = e.clientY - ctx.versatzY + 'px';
@@ -485,10 +517,12 @@ const ziehbar = ({ zoneSel, itemSel, griffSel, achse, onTap, zoneOk }) => {
 
   const ende = (e) => {
     if (!ctx || ctx.pointerId !== e.pointerId) return;
+    timerAus();
     const c = ctx;
     ctx = null;
     if (!c.aktiv) {
-      if (onTap) onTap(c.item);
+      // Kein Ziehen: kurzes Tippen (kaum bewegt) → Menü.
+      if (onTap && Math.hypot(e.clientX - c.startX, e.clientY - c.startY) < ZIEH_SCHWELLE) onTap(c.item);
       return;
     }
     const zielZone = c.platz.closest(zoneSel);
@@ -552,7 +586,11 @@ const zeigeMenu = (kachel) => {
         if (liste) { liste.append(macheKachel(kachel.dataset.bild)); markiereGeaendert(); }
       }));
     }
-    karte.append(el('div', { class: 'menu-trenner' }), knopf('Abbrechen', () => {}, 'abbrechen'));
+    karte.append(
+      el('div', { class: 'menu-trenner' }),
+      knopf('Aus Pool löschen', () => poolLoeschen(kachel), 'loeschen'),
+      knopf('Abbrechen', () => {}, 'abbrechen'),
+    );
   } else {
     // Verschieben in ein Ziel derselben Gruppe + Löschen.
     const gruppe = zone?.dataset.gruppe;
@@ -630,9 +668,10 @@ const gh = async (pfad, opt = {}) => {
   return res.json();
 };
 
-const speichern = async () => {
+const speichern = async (opt = {}) => {
   if (!state.token) return;
-  if (!confirm(`Änderungen als Commit auf Branch „${state.branch}" speichern?`)) return;
+  if (!opt.stumm && !confirm(`Änderungen als Commit auf Branch „${state.branch}" speichern?`)) return;
+  const assetsLoeschen = opt.assetsLoeschen || [];
   $('#speichern').disabled = true;
   const board = $('#board');
   try {
@@ -684,13 +723,14 @@ const speichern = async () => {
         tree: [
           ...Object.entries(final).map(([path, content]) => ({ path, mode: '100644', type: 'blob', content })),
           ...geloescht.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
+          ...assetsLoeschen.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
         ],
       }),
     });
     const neu = await gh('/git/commits', {
       method: 'POST',
       body: JSON.stringify({
-        message: 'Bilder anordnen/befüllen (via Admin)',
+        message: opt.nachricht || 'Bilder anordnen/befüllen (via Admin)',
         tree: baum.sha,
         parents: [commitSha],
       }),
@@ -730,6 +770,47 @@ const speichern = async () => {
     setzeStatus('Fehler beim Speichern: ' + err.message, 'fehler');
     markiereGeaendert();
   }
+};
+
+// Wo wird ein Foto (assetPfad) aktuell auf der Seite verwendet? (aus dem DOM)
+const verwendungen = (assetPfad) => {
+  const treffer = [];
+  $('#board').querySelectorAll('.kachel').forEach((k) => {
+    if (k.dataset.bild !== assetPfad) return;
+    const serieListe = k.closest('.kachel-liste');
+    const galerieListe = k.closest('.galerie-liste');
+    if (serieListe) {
+      const spalte = k.closest('.serie-spalte');
+      const titel = $('.titel-feld', spalte)?.value || spalte.dataset.serie;
+      const bereich = BEREICHE.find((b) => b.id === serieListe.dataset.bereich)?.label || '';
+      treffer.push(`${bereich}: ${titel}`);
+    } else if (galerieListe) {
+      const seite = SEITEN.find((s) => s.key === galerieListe.dataset.seite);
+      treffer.push(`Über mich: ${seite?.label || galerieListe.dataset.seite}`);
+    }
+  });
+  return treffer;
+};
+
+// Foto aus dem Pool (und überall, wo es verwendet wird) löschen. Zeigt vorher, wo
+// es sichtbar ist — hilft, Doppel zu erkennen. Löscht das Asset und speichert.
+const poolLoeschen = (kachel) => {
+  if (!state.token) {
+    setzeStatus('Zum Löschen zuerst einen Token einfügen (Einstellungen).', 'fehler');
+    return;
+  }
+  const assetPfad = kachel.dataset.bild;
+  const orte = verwendungen(assetPfad);
+  const frage = orte.length
+    ? `Dieses Foto wird verwendet in:\n\n- ${orte.join('\n- ')}\n\nBeim Löschen wird es dort entfernt und die aktuellen Änderungen werden mitgespeichert. Fortfahren?`
+    : `Dieses Foto wird nirgends auf der Seite verwendet.\n\nEndgültig aus dem Repo löschen? (Aktuelle Änderungen werden mitgespeichert.)`;
+  if (!confirm(frage)) return;
+  const pool = $('#pool');
+  [...$('#board').querySelectorAll('.kachel'), ...pool.querySelectorAll('.kachel')].forEach((k) => {
+    if (k.dataset.bild === assetPfad) k.remove();
+  });
+  $('#pool-anzahl').textContent = `(${pool.querySelectorAll('.kachel').length})`;
+  speichern({ assetsLoeschen: [assetPfad], stumm: true, nachricht: 'Foto aus dem Pool löschen (via Admin)' });
 };
 
 // ---------------------------------------------------------------------------
@@ -867,6 +948,7 @@ ziehbar({
   griffSel: null,
   achse: 'x',
   onTap: zeigeMenu,
+  langHalten: true,
   zoneOk: (zone, ctx) => ctx.istPool || zone.dataset.gruppe === ctx.gruppe,
 });
 // Serien als Ganzes verschieben (nur innerhalb ihres Bereichs).

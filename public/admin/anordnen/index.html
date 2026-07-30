@@ -177,7 +177,9 @@
         overflow: hidden;
         background: var(--flaeche-2);
         cursor: grab;
-        touch-action: none;
+        /* pan-y: über Bildern normal scrollen; Ziehen startet erst nach kurzem
+           Halten (siehe anordnen.js). Sonst blockiert jedes Antippen das Scrollen. */
+        touch-action: pan-y;
         flex: 0 0 auto;
       }
       .pool-kachel { width: 92px; height: 64px; }

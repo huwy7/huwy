@@ -41,15 +41,16 @@ Erledigt:
 - [x] **Über-mich-Seiten** als Ziele — ganze Seite mit Fotos befüllbar.
 - [x] **Foto-Upload direkt im Werkzeug** (Datei-/Foto-Picker → base64 → ein Commit
       nach `src/assets/pool/`, sofort im Pool). Sveltia für Uploads nicht mehr nötig.
-- [x] **Über-mich-Text bearbeiten** (Textfeld je Seite, wird beim Speichern
-      geschrieben). Damit deckt das Werkzeug alles ab — Sveltia nur noch optional.
+- [x] **Über-mich-Text bearbeiten** (Textfeld je Seite bzw. je Foto, siehe unten).
+- [x] **Foto aus dem Pool/Repo löschen** — mit Hinweis, wo es verwendet wird
+      (hilft Doppel erkennen); löscht Asset + Verwendungen in einem Commit.
+- [x] **Halten zum Ziehen** (Touch): erst nach kurzem Halten ziehbar, sonst scrollt
+      man normal über die Fotos. Maus zieht sofort.
 
 Noch offen:
 - [ ] **Umzug auf `/admin`** + Sveltia/OAuth-Worker abschalten (kurze URL, ein
       Werkzeug). Erst wenn der Betreiber grünes Licht gibt.
 - [ ] **Serien löschen** im Werkzeug (anlegen geht; löschen noch über Git/Sveltia).
-- [ ] **Foto aus dem Pool/Repo löschen** (aktuell bleibt ein Asset liegen, wenn es
-      aus allen Zielen entfernt wird).
 - [ ] Komfort-Login via **GitHub-OAuth** statt Token.
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.

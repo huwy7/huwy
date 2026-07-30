@@ -58,10 +58,13 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   bei `display:none` lauter Nullen — die Box darf diese Position NICHT übernehmen,
   sonst wandert der Cursor in die linke obere Ecke (passierte nach dem Entsperren,
   weil der Cursor das Tor-Eingabefeld umschloss). Bei Rechteck 0/0 die Box lösen.
-- **Admin-Tor**: `public/admin/tor.js` sperrt beide Admin-Seiten mit demselben Code
-  und derselben Sitzung wie die öffentliche Seite; das eigentliche Admin-Skript wird
+- **Admin-Sperrbildschirm** (`public/admin/tor.js`): sperrt beide Admin-Seiten mit
+  demselben Code/derselben Sitzung wie die öffentliche Seite; das Admin-Skript wird
   erst nach dem Entsperren nachgeladen (`data-laden`), damit dahinter nichts läuft.
-  Auch das ist kein echter Schutz — Schreiben braucht weiterhin Token bzw. Login.
+  **Zweck ist rein ästhetisch** — niemand soll hinter die Bühne sehen. Er ist
+  ausdrücklich KEIN Schutzmechanismus und ersetzt nichts: Speichern läuft weiterhin
+  über den **GitHub-Token**, und der bleibt so (Entscheidung des Betreibers —
+  **kein OAuth-Ersatz** vorschlagen).
 - **Admin-Vorschauen NICHT als Vollbild laden** (Performance): `public/` läuft
   nicht durch Astro, also gibt es dort keine fertigen Grössen. Lösung: kleine
   Vorschau über einen On-the-fly-Resizer (wsrv.nl: `?url=ssl:raw.githubusercontent…
@@ -101,4 +104,5 @@ Zweifel weglassen oder hinter einer klaren Aktion verstecken.
 
 - Aus dem Pool/Repo Fotos wirklich löschen inkl. Hinweis, wo sie verwendet werden.
 - Serien löschen im Werkzeug (anlegen geht schon).
-- OAuth-Login statt Token; Sveltia (`/admin/cms`) ganz abschalten.
+- Sveltia (`/admin/cms`) ganz abschalten, sobald das Werkzeug im Alltag trägt.
+  (Kein OAuth-Login — der Token bleibt, siehe oben.)

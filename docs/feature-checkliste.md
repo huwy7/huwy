@@ -48,8 +48,10 @@ Erledigt:
       (hilft Doppel erkennen); löscht Asset + Verwendungen in einem Commit.
 - [x] **Umzug auf `/admin`**: das Werkzeug ist die Hauptoberfläche, Sveltia liegt
       unter `/admin/cms`. Alte URL `/admin/anordnen` leitet weiter.
-- [x] **Zugangs-Tor auch im Admin** (gleicher Code/Sitzung wie die Seite); das
-      Admin-Skript lädt erst nach dem Entsperren.
+- [x] **Sperrbildschirm auch im Admin** — **rein ästhetisch**, damit niemand hinter
+      die Bühne sieht. Gleicher Code/dieselbe Sitzung wie die Seite; das Admin-Skript
+      lädt erst nach dem Entsperren. **Der GitHub-Token bleibt** der eigentliche
+      Mechanismus zum Speichern — das Tor ersetzt ihn nicht und schützt nichts.
 - [x] **Halten zum Ziehen** (Touch): erst nach kurzem Halten ziehbar, sonst scrollt
       man normal über die Fotos. Maus zieht sofort.
 
@@ -59,9 +61,13 @@ Erledigt:
 Noch offen:
 - [ ] Sveltia (`/admin/cms`) samt OAuth-Worker ganz abschalten, sobald das
       Werkzeug im Alltag trägt.
-- [ ] Komfort-Login via **GitHub-OAuth** statt Token.
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.
+
+**Entscheidung Zugang zum Admin (verbindlich):** Der **GitHub-Token bleibt** — er
+ist der Mechanismus zum Speichern und wird **nicht** durch OAuth ersetzt. Der
+**Sperrbildschirm ist rein ästhetisch** (nichts von der Bühne sichtbar), kein
+Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 

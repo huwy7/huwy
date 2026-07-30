@@ -235,6 +235,7 @@ const laden = async () => {
   state.serienBilder = {};
   state.seiten = {};
   state.origBildPfade = new Set();
+  state.origSeriePfade = new Set();
 
   for (const b of BEREICHE) {
     const [serienDateien, bildDateien] = await Promise.all([
@@ -251,6 +252,7 @@ const laden = async () => {
         pfad: d.pfad,
       }))
       .sort((a, z) => a.reihenfolge - z.reihenfolge);
+    for (const s of state.serien[b.id]) if (s.pfad) state.origSeriePfade.add(s.pfad);
 
     const proSerie = {};
     for (const d of bildDateien) {
@@ -293,6 +295,13 @@ const macheKachel = (assetPfad, opt = {}) => {
 };
 
 const serieSpalte = (bereich, serie) => {
+  const loeschen = el('button', {
+    class: 'serie-loeschen',
+    type: 'button',
+    title: 'Serie löschen',
+    'aria-label': 'Serie löschen',
+    text: '✕',
+  });
   const kopf = el('div', { class: 'serie-kopf' }, [
     el('div', { class: 'griff', title: 'Serie verschieben', 'aria-label': 'Serie verschieben' }, [
       el('span', { text: '⠿' }),
@@ -312,6 +321,7 @@ const serieSpalte = (bereich, serie) => {
       'aria-label': 'Jahr',
       oninput: markiereGeaendert,
     }),
+    loeschen,
   ]);
   const liste = el('div', {
     class: 'kachel-liste',
@@ -322,7 +332,21 @@ const serieSpalte = (bereich, serie) => {
   for (const bild of state.serienBilder[bereich.id]?.[serie.slug] || []) {
     liste.append(macheKachel(bild.assetPfad, { origPfad: bild.origPfad }));
   }
-  return el('div', { class: 'serie-spalte', 'data-serie': serie.slug }, [kopf, liste]);
+  const spalte = el('div', { class: 'serie-spalte', 'data-serie': serie.slug }, [kopf, liste]);
+  loeschen.addEventListener('click', () => serieLoeschen(bereich, serie.slug, spalte));
+  return spalte;
+};
+
+// Ganze Serie entfernen: aus der Anzeige raus; beim Speichern werden ihre
+// Metadaten-Datei und die Bild-Einträge gelöscht. Die Fotos bleiben im Pool.
+const serieLoeschen = (bereich, slug, spalte) => {
+  const titel = $('.titel-feld', spalte)?.value.trim() || slug;
+  const anzahl = spalte.querySelectorAll('.kachel').length;
+  const zusatz = anzahl ? ` Die Zuordnung von ${anzahl} Foto(s) wird gelöst (die Fotos bleiben im Pool).` : '';
+  if (!confirm(`Serie „${titel}" löschen?${zusatz}`)) return;
+  spalte.remove();
+  state.serien[bereich.id] = (state.serien[bereich.id] || []).filter((s) => s.slug !== slug);
+  markiereGeaendert();
 };
 
 // Eine Über-mich-Reihe: Foto (zum Ziehen/Antippen) + Textfeld daneben. So sieht
@@ -747,6 +771,7 @@ const speichern = async (opt = {}) => {
     setzeStatus('Speichert …');
     const final = {};
     const finalBildPfade = new Set();
+    const finalSeriePfade = new Set();
 
     for (const b of BEREICHE) {
       const spalten = [...board.querySelectorAll(`.bereich-serien[data-bereich="${b.id}"] .serie-spalte`)];
@@ -755,10 +780,9 @@ const speichern = async (opt = {}) => {
         const titel = $('.titel-feld', spalte).value.trim();
         const jahr = Number($('.jahr-feld', spalte).value) || new Date().getFullYear();
         const body = (state.serien[b.id] || []).find((s) => s.slug === slug)?.body || '';
-        final[`src/content/${b.serieColl}/${slug}.md`] = frontmatter(
-          { titel, jahr, reihenfolge: si + 1 },
-          body,
-        );
+        const seriePfad = `src/content/${b.serieColl}/${slug}.md`;
+        final[seriePfad] = frontmatter({ titel, jahr, reihenfolge: si + 1 }, body);
+        finalSeriePfade.add(seriePfad);
         [...spalte.querySelectorAll('.kachel')].forEach((k, ki) => {
           const pfad = `src/content/${b.bildColl}/${slug}-${ki + 1}.md`;
           final[pfad] = frontmatter({
@@ -782,6 +806,8 @@ const speichern = async (opt = {}) => {
     }
 
     const geloescht = [...state.origBildPfade].filter((p) => !(p in final));
+    // Metadaten-Dateien gelöschter Serien mitnehmen.
+    const geloeschtSerien = [...(state.origSeriePfade || [])].filter((p) => !finalSeriePfade.has(p));
 
     // Git-Data-API: Baum auf Basis des aktuellen Commits, dann Commit + Ref.
     const ref = await gh(`/git/ref/heads/${state.branch}`);
@@ -794,6 +820,7 @@ const speichern = async (opt = {}) => {
         tree: [
           ...Object.entries(final).map(([path, content]) => ({ path, mode: '100644', type: 'blob', content })),
           ...geloescht.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
+          ...geloeschtSerien.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
           ...assetsLoeschen.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
         ],
       }),
@@ -810,6 +837,7 @@ const speichern = async (opt = {}) => {
 
     // In-Memory-Zustand angleichen statt neu vom Netz zu laden (CDN hinkt kurz hinterher).
     state.origBildPfade = finalBildPfade;
+    state.origSeriePfade = finalSeriePfade;
     for (const b of BEREICHE) {
       const spalten = board.querySelectorAll(`.bereich-serien[data-bereich="${b.id}"] .serie-spalte`);
       const neueListe = [];

@@ -49,10 +49,12 @@ Erledigt:
 - [x] **Halten zum Ziehen** (Touch): erst nach kurzem Halten ziehbar, sonst scrollt
       man normal über die Fotos. Maus zieht sofort.
 
+- [x] **Serien löschen** im Werkzeug (✕ im Serien-Kopf; löscht beim Speichern die
+      Metadaten-Datei + Bild-Einträge, Fotos bleiben im Pool).
+
 Noch offen:
 - [ ] **Umzug auf `/admin`** + Sveltia/OAuth-Worker abschalten (kurze URL, ein
       Werkzeug). Erst wenn der Betreiber grünes Licht gibt.
-- [ ] **Serien löschen** im Werkzeug (anlegen geht; löschen noch über Git/Sveltia).
 - [ ] Komfort-Login via **GitHub-OAuth** statt Token.
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.

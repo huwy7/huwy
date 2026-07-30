@@ -333,22 +333,32 @@ const breiten = [640, 960, 1280, 1600, 2000];
 
   /* Zähler: ein feiner Strich je Bild, der aktive hell. Zeigt Anzahl und Position
      und lädt zum Blättern ein — ohne etwas über das Foto zu legen. */
+  /* Feste Gesamtbreite: die Striche teilen sie unter sich auf. Der aktive bekommt
+     einen grösseren Anteil und verdrängt die anderen — die bleiben dabei alle
+     exakt gleich breit (gleicher Flex-Anteil), egal ob direkter Nachbar oder
+     weiter weg. Aussen bleibt die Breite dadurch immer gleich. */
   .zaehler {
     display: flex;
-    justify-content: center;
     gap: var(--abstand-8);
+    width: var(--zaehler-breite);
+    margin-inline: auto;
     margin-block-start: var(--abstand-24);
   }
-  /* Knopf = grosse Trefferfläche (unsichtbar), Linie = der sichtbare Strich. */
+  /* Knopf = Trefferfläche (unsichtbar) und zugleich der Platzhalter im Raster.
+     flex: 1 1 0 → alle inaktiven exakt gleich breit; der aktive wächst. */
   .zaehler-strich {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: var(--strich-breite-aktiv);
+    flex: 1 1 0;
+    min-width: 0;
     padding: var(--abstand-8) 0;
     border: none;
     background: none;
     cursor: pointer;
+    transition: flex-grow var(--zaehler-tempo) cubic-bezier(0.2, 0, 0, 1);
+  }
+  .zaehler-strich.ist-aktiv {
+    flex-grow: var(--zaehler-wachstum);
   }
   /* Die Linie hat KEINE eigene Farbe: sie invertiert ihren Untergrund in
      Graustufen (backdrop-filter, per JS inline gesetzt — der CSS-Minifier würde
@@ -358,14 +368,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
      ist — beim Blättern wächst der neue und der alte schrumpft. */
   .zaehler-linie {
     display: block;
-    width: var(--strich-breite);
+    width: 100%;
     height: var(--strich-staerke);
-    transition:
-      width 220ms ease,
-      height 220ms ease;
+    transition: height var(--zaehler-tempo) cubic-bezier(0.2, 0, 0, 1);
   }
   .ist-aktiv .zaehler-linie {
-    width: var(--strich-breite-aktiv);
     height: var(--strich-staerke-aktiv);
   }
   /* Ohne backdrop-filter (alte Browser) bleibt der Strich sichtbar: dann als
@@ -380,6 +387,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    .zaehler-strich,
     .zaehler-linie {
       transition: none;
     }

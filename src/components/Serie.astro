@@ -59,14 +59,14 @@ const breiten = [640, 960, 1280, 1600, 2000];
                     href={`#k-${slug}-${nachbar(i, -1)}`}
                     aria-label="Vorheriges Bild"
                   >
-                    ‹
+                    <span class="karussell-zeichen">‹</span>
                   </a>
                   <a
                     class="karussell-pfeil karussell-next"
                     href={`#k-${slug}-${nachbar(i, 1)}`}
                     aria-label="Nächstes Bild"
                   >
-                    ›
+                    <span class="karussell-zeichen">›</span>
                   </a>
                 </>
               )}
@@ -234,6 +234,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
     min-height: calc(100svh - var(--header-hoehe));
     padding-block-start: 0;
   }
+  /* Letzte Serie: etwas Scroll-Reserve nach unten. Die Sektionen sind 100svh hoch
+     (kleines Sichtfenster, Browserleiste eingeblendet). Blendet die Leiste beim
+     Scrollen aus, wird das Sichtfenster höher (100lvh) — dann reicht die Seite
+     nicht mehr weit genug, um die letzte Serie ganz nach oben und damit mittig zu
+     bringen. Die Differenz beider Höhen ist genau die Höhe der Leiste. Ohne
+     Browserleiste (App vom Home-Bildschirm, Desktop) ist sie 0. */
+  .serie:last-of-type {
+    padding-block-end: calc(100lvh - 100svh);
+  }
   .serie-kopf {
     display: flex;
     gap: var(--abstand-16);
@@ -307,6 +316,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
      sie zeigen auf das Nachbar-Bild im Streifen (Anker), der Streifen scrollt hin.
      Der Pfeil selbst ist deutlich sichtbar (heller Chevron mit dunklem Halo, damit
      er auf hellen wie dunklen Bildpartien lesbar bleibt). */
+  /* Die Trefferfläche bleibt gross (22% der Bildbreite, volle Höhe), das sichtbare
+     Zeichen sitzt aber ganz aussen im weissen Passepartout — nicht mehr auf dem
+     Foto. Es ist grau und zurückhaltend, damit es das Bild nicht stört. Auf der
+     Farbseite gibt es keinen Rahmen; dort liegt das Zeichen an derselben Stelle,
+     also so weit aussen wie möglich. */
   .karussell-pfeil {
     position: absolute;
     top: 0;
@@ -315,16 +329,20 @@ const breiten = [640, 960, 1280, 1600, 2000];
     display: flex;
     align-items: center;
     z-index: 2;
-    font-family: var(--schrift-mono);
-    font-size: var(--groesse-22);
-    font-weight: var(--gewicht-500);
-    color: #fff;
     text-decoration: none;
-    opacity: 0.92;
-    text-shadow:
-      0 1px 10px rgba(0, 0, 0, 0.7),
-      0 0 2px rgba(0, 0, 0, 0.55);
-    padding-inline: var(--abstand-16);
+    padding-inline: 0;
+  }
+  .karussell-zeichen {
+    width: var(--rahmen-breite);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--schrift-mono);
+    font-size: var(--groesse-16);
+    line-height: 1;
+    color: var(--farbe-text-leise);
+    opacity: 0.85;
+    transition: opacity 200ms ease;
   }
   .karussell-prev {
     left: 0;
@@ -335,8 +353,13 @@ const breiten = [640, 960, 1280, 1600, 2000];
     justify-content: flex-end;
   }
   @media (hover: hover) and (pointer: fine) {
-    .karussell-pfeil:hover {
+    .karussell-pfeil:hover .karussell-zeichen {
       opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .karussell-zeichen {
+      transition: none;
     }
   }
 

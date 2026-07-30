@@ -72,6 +72,11 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   unter der Serie exakt gleich, auf jedem Gerät. Die Kopfzeile braucht dafür eine
   feste Höhe (`min-height: var(--header-hoehe)`), sonst stimmt die Rechnung nicht —
   Innenabstände so wählen, dass auch ein zweizeiliger Button darunter passt.
+- **Letzte Sektion braucht Scroll-Reserve**: Sektionen sind `100svh` hoch (kleines
+  Sichtfenster, Browserleiste sichtbar). Blendet iOS Safari die Leiste beim Scrollen
+  aus, wächst das Sichtfenster auf `100lvh` — die Seite endet dann zu früh, um die
+  LETZTE Sektion ganz nach oben zu bringen. Fix: `.serie:last-of-type
+  { padding-block-end: calc(100lvh - 100svh) }` (ohne Leiste = 0).
 - **Nicht den Block zentrieren, sondern das BILD**: Wird Titel + Bild gemeinsam
   zentriert, sitzt das Bild um die halbe Titelhöhe zu tief — von Auge deutlich
   sichtbar. Lösung ohne JS: der Titel bekommt seinen eigenen Platz als NEGATIVEN

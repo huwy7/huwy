@@ -167,10 +167,34 @@ const breiten = [640, 960, 1280, 1600, 2000];
   // Gemessen wird die Bühne, also Bild INKLUSIVE weissem Rahmen: auf der düsteren
   // Seite ist der Rahmen die sichtbare Kante. Ohne JavaScript passiert nichts und
   // die Seite bleibt vollständig bedienbar (nur eben mit der alten Vorgabe-Höhe).
+  // Mitten im Blättern sind ZWEI Bilder gleichzeitig zu sehen. Dann gilt die grössere
+  // der beiden Höhen, sonst würde das höhere angeschnitten (der Streifen ist vertikal
+  // auf `hidden` gestellt, damit man ihn nicht wegschieben kann). Steht der Streifen
+  // still, gilt genau die Höhe des sichtbaren Bildes — nur so stimmen die Abstände.
   const passeHoeheAn = (spur: HTMLElement) => {
-    const kind = spur.children[index(spur)] as HTMLElement | undefined;
-    const buehne = kind?.querySelector<HTMLElement>('.karussell-buehne');
-    if (buehne?.offsetHeight) spur.style.height = `${buehne.offsetHeight}px`;
+    const breite = spur.clientWidth;
+    if (!breite) return;
+    const letzte = spur.children.length - 1;
+    const hoeheVon = (i: number) =>
+      (spur.children[i] as HTMLElement | undefined)?.querySelector<HTMLElement>('.karussell-buehne')
+        ?.offsetHeight || 0;
+
+    const stelle = spur.scrollLeft / breite;
+    const nächste = Math.round(stelle);
+    const ruhig = Math.abs(stelle - nächste) < 0.01;
+    const hoehe = ruhig
+      ? hoeheVon(Math.min(Math.max(nächste, 0), letzte))
+      : Math.max(
+          hoeheVon(Math.max(Math.floor(stelle), 0)),
+          hoeheVon(Math.min(Math.ceil(stelle), letzte)),
+        );
+    if (!hoehe) return;
+    // Wachsen SOFORT, Schrumpfen weich. Läuft das Wachsen über den Übergang, hinkt
+    // der Streifen dem Wisch hinterher und schneidet das hereinkommende höhere Bild
+    // für einen Moment an (gemessen: 5 von 20 Punkten während eines Wischs).
+    // Der Streifen macht also sofort Platz und zieht sich danach ruhig zusammen.
+    spur.style.transitionDuration = hoehe > spur.getBoundingClientRect().height ? '0s' : '';
+    spur.style.height = `${hoehe}px`;
   };
 
   for (const serie of document.querySelectorAll<HTMLElement>('.serie')) {
@@ -347,6 +371,10 @@ const breiten = [640, 960, 1280, 1600, 2000];
     gap: 0;
     transition: height var(--streifen-tempo) cubic-bezier(0.2, 0, 0, 1);
     overflow-x: auto;
+    /* Kein overflow-y hier — probiert und verworfen: `overflow-y: hidden` auf dem
+       Scroll-Container schluckt den ersten Wisch (getestet, im Karussell wie im
+       Vollbild). Der senkrechte Überlauf wird stattdessen an der Quelle vermieden:
+       jede Ansicht schneidet ihren eigenen Inhalt ab (.karussell-bild). */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none; /* Firefox */
@@ -369,6 +397,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
        unter dem Bild. Entscheidung des Betreibers, nicht ohne Rückfrage ändern. */
     align-items: flex-start;
     justify-content: center;
+    /* Die Streifenhöhe folgt dem sichtbaren Bild, höhere Nachbarbilder ragen also
+       darüber hinaus. Ohne diese Zeile wäre der Streifen dadurch senkrecht
+       scrollbar (`overflow-x: auto` zwingt die andere Achse von `visible` auf
+       `auto`) und man konnte das Bild im Karussell nach oben wegschieben. Jede
+       Ansicht schneidet darum ihren eigenen Inhalt ab — der Scroll-Container selbst
+       bleibt unangetastet, sonst leidet das Wischen. Sichtbar abgeschnitten wird
+       nichts: das Skript hält den Streifen beim Blättern auf der Höhe des grösseren
+       der beiden gerade sichtbaren Bilder. */
+    overflow: hidden;
   }
   .karussell-buehne {
     position: relative;
@@ -491,6 +528,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
     display: flex;
     height: 100%;
     overflow-x: auto;
+    /* KEIN overflow-y: hidden hier — probiert und wieder entfernt: es nimmt dem
+       Vollbild das Wischen (getestet, Wisch blätterte nicht mehr). Nötig ist es
+       hier ohnehin nicht: die Bilder passen immer in die Höhe (gemessen: Inhalt =
+       Streifenhöhe), es gibt also nichts wegzuschieben. Im Karussell ist der Fall
+       anders — dort folgt die Höhe dem Bild und `hidden` ist Pflicht. */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;

@@ -203,6 +203,18 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
     sich herunter und der Streifen fällt auf ein paar Pixel zusammen.
   - Ohne JavaScript bleibt es bei der Vorgabe (so hoch wie das höchste Bild); die
     Seite funktioniert vollständig, nur die Abstände wandern.
+  - **`overflow-x: auto` zwingt die andere Achse von `visible` auf `auto`.** Der
+    Streifen war dadurch senkrecht scrollbar, sobald ein Nachbarbild höher war als
+    das sichtbare — man konnte das Bild wegschieben. Gelöst wird das **an der
+    Quelle**: `.karussell-bild { overflow: hidden }`, also jede Ansicht schneidet
+    ihren eigenen Inhalt ab. **Nicht `overflow-y: hidden` auf den Scroll-Container
+    setzen** — probiert, es schluckt den ersten Wisch (im Karussell wie im
+    Vollbild, beides gemessen).
+  - **Wachsen sofort, Schrumpfen weich.** Läuft auch das Wachsen über den
+    Höhen-Übergang, hinkt der Streifen dem Wisch hinterher und schneidet das
+    hereinkommende höhere Bild an (gemessen: 5 von 20 Punkten). Darum setzt das
+    Skript beim Wachsen `transition-duration: 0s`. Während des Blätterns gilt
+    ausserdem die grössere der beiden sichtbaren Höhen.
   Weder eine feste Streifenhöhe noch `align-items: center` wieder einführen —
   beides wurde probiert und macht genau dieses Problem.
 - **Weisser Rahmen auf der Farbseite: er liegt AUSSEN (`box-sizing: content-box`).**

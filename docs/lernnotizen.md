@@ -178,6 +178,16 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
+- **Der Karussell-Streifen hat eine FESTE Höhe (`height: var(--karussell-hoehe)`),
+  nicht „so hoch wie das höchste Bild der Serie".** Vorher richtete er sich nach dem
+  grössten Bild — dadurch stand der Zähler bei jeder Serie woanders (iPhone gemessen
+  40 bis 501px unter dem Bild) und der ganze Block sass unterschiedlich hoch im
+  Bild­schirm; düstere und farbige Seite sahen dadurch verschieden aus, obwohl die
+  Regel dieselbe war. Mit fester Höhe liegen Titel, Bildoberkante und Zähler auf
+  JEDER Serie und BEIDEN Seiten auf derselben y-Position (gemessen: Titel 105,
+  Bild 164, Zähler 844 auf dem iPhone; erste Serie 80px höher, weil die Kopfzeile
+  dort im Fluss darüber steht). Nur die Bildhöhe selbst unterscheidet sich — die
+  kommt aus dem Foto. **Nicht auf `height: auto` zurückstellen.**
 - **Karussellbilder hängen OBEN am Streifen (`align-items: flex-start`), nicht
   mittig.** Der Streifen ist so hoch wie das höchste Bild der Serie; zentriert
   rutschten kürzere Bilder nach unten und ihr Abstand zum Serientitel wuchs mit

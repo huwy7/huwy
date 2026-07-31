@@ -300,6 +300,16 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .karussell-spur {
     list-style: none;
     display: flex;
+    /* FESTE Höhe, nicht „so hoch wie das höchste Bild der Serie". Vorher richtete
+       sich der Streifen nach dem grössten Bild — dadurch stand der Zähler bei jeder
+       Serie woanders (auf dem iPhone gemessen 40 bis 501px unter dem Bild) und der
+       ganze Block sass unterschiedlich hoch im Bildschirm. Beides sah auf der
+       düsteren und der farbigen Seite verschieden aus, obwohl die Regel dieselbe
+       war. Mit fester Höhe stehen Titel, Bild und Zähler auf JEDER Serie und auf
+       BEIDEN Seiten an derselben Stelle. Der Wert ist derselbe Deckel, den die
+       Bilder schon haben (--karussell-hoehe) — der Streifen wird also nie höher,
+       als er vorher im Extremfall ohnehin schon war. */
+    height: var(--karussell-hoehe);
     gap: 0;
     overflow-x: auto;
     scroll-snap-type: x mandatory;

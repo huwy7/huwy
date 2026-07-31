@@ -84,6 +84,12 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
       um das Bild: das Bild behält exakt seine Grösse (so gross wie auf der düsteren
       Seite Bild + Rahmen zusammen), die Bildkante fluchtet weiterhin mit dem
       Serientitel, kein horizontaler Überlauf.
+- [x] **Serien sitzen überall identisch.** Der Bildstreifen hat eine feste Höhe
+      statt „so hoch wie das höchste Bild der Serie". Dadurch stehen Titel,
+      Bildoberkante und Zähler auf jeder Serie und auf beiden Seiten an derselben
+      Stelle (iPhone: Titel 105, Bild 164, Zähler 844; Desktop entsprechend).
+      Vorher wanderte der Zähler zwischen 40 und 501 px unter dem Bild, was die
+      düstere und die farbige Seite unterschiedlich aussehen liess.
 - [x] **Abstand Titel→Bild überall gleich: 40 px.** Beide Seiten, Mobil und Desktop,
       jedes Bild — auch in Serien, die Quer- und Hochformate mischen (vorher bis
       176 px). Die Bilder hängen dafür oben am Streifen statt mittig

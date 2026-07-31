@@ -54,6 +54,34 @@ const SERIEN_MARKE = 'ist-mobil';
 
 const zahl = (wert: string) => Number.parseFloat(wert) || 0;
 
+/**
+ * Die beiden festen Viewport-Höhen des Geräts, gemessen über ein unsichtbares
+ * Hilfselement:
+ *
+ *   `gross` (`100lvh`) — Höhe mit eingefahrener Adressleiste
+ *   `klein` (`100svh`) — Höhe mit ausgefahrener Adressleiste
+ *
+ * Beide sind je Gerät und Ausrichtung fest. `window.innerHeight` ist das NICHT: es
+ * springt beim Scrollen zwischen den beiden Werten hin und her, sobald die
+ * Adressleiste ein- oder ausfährt. Wer damit rechnet, bekommt Bilder, die mitten im
+ * Scrollen ihre Grösse ändern. Kennt der Browser die Einheiten nicht, fällt beides
+ * auf `window.innerHeight` zurück — dann verhält sich alles wie zuvor.
+ */
+const messeViewport = () => {
+  const probe = document.createElement('div');
+  probe.style.cssText =
+    'position:fixed;top:0;left:0;width:0;pointer-events:none;visibility:hidden';
+  document.body.append(probe);
+  const messe = (einheit: string) => {
+    probe.style.height = `100${einheit}`;
+    return probe.getBoundingClientRect().height;
+  };
+  const gross = messe('lvh') || window.innerHeight;
+  const klein = messe('svh') || window.innerHeight;
+  probe.remove();
+  return { gross, klein: Math.min(klein, gross) };
+};
+
 interface Serie {
   el: HTMLElement;
   kopf: HTMLElement;
@@ -123,15 +151,32 @@ export function starteMobileGalerie(): void {
     const luft = zahl(stil.getPropertyValue('--abstand-24'));
     const extra = zahl(stil.getPropertyValue('--serien-luft-extra'));
     const farbe = wurzel.dataset.modus === 'farbe';
-    const sicht = window.innerHeight;
+    const { gross: sicht, klein } = messeViewport();
     if (!sicht || !rahmen) return;
 
-    // 1. Höhendeckel. Die aktive Serie steht exakt mittig im Bildschirm; über dem
-    //    Titel müssen Kopfzeile + 3 Rahmenbreiten frei bleiben. Durch die Zentrierung
-    //    gilt derselbe Abstand unten — die geforderten 3 Rahmenbreiten zum unteren
-    //    Rand sind damit immer eingehalten (sie sind das kleinere der beiden Masse).
+    // 1. Höhendeckel.
+    //
+    //    Gerechnet wird mit der GROSSEN Viewporthöhe (`lvh`), nicht mit der
+    //    aktuellen. Auf dem Telefon fährt die Adressleiste beim Scrollen ein und
+    //    aus; `window.innerHeight` springt dabei um rund 80px, und die Bilder
+    //    änderten mitten im Scrollen ihre Grösse (gemessen: Deckel 588 ↔ 508,
+    //    Bild 398×520 ↔ 389×508). `lvh` ist je Gerät und Ausrichtung fest und
+    //    ändert sich beim Scrollen nie — und es ist die GRÖSSERE der beiden Höhen,
+    //    die Bilder behalten also ihre volle Grösse. (Mit `svh` wären sie stabil,
+    //    aber dauerhaft kleiner — darum ausdrücklich nicht.)
+    //
+    //    Zwei Grenzen müssen halten, es gilt die kleinere:
+    //      a) Über dem Titel: Kopfzeile + 3 Rahmenbreiten. Die Serie steht mittig
+    //         im grossen Viewport, also gilt derselbe Abstand auch darunter.
+    //      b) Unter dem Zähler bei SICHTBARER Adressleiste: dann endet der
+    //         sichtbare Bereich schon bei `svh`. Die Serienmitte liegt weiterhin
+    //         bei `lvh/2`, der Zähler also bei `(lvh + hoehe)/2` — davon müssen
+    //         noch 3 Rahmenbreiten bis `svh` übrig bleiben.
     const mindestLuft = kopfHoehe + 3 * rahmen;
-    const serienDeckel = Math.max(0, sicht - 2 * mindestLuft);
+    const serienDeckel = Math.max(
+      0,
+      Math.min(sicht - 2 * mindestLuft, 2 * klein - sicht - 6 * rahmen),
+    );
 
     // 2. Je Serie den Deckel für die Bildhöhe setzen. Titel- und Zählerhöhe werden
     //    gemessen (Titel kann umbrechen), die beiden festen Abstände kommen aus dem

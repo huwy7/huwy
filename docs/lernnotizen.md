@@ -197,6 +197,16 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   Bildkante; **3 Rahmenbreiten** Mindestabstand vom Titel zur Kopfzeile und vom
   Zähler zum unteren Rand; Titel↔Bild und Bild↔Zähler bleiben bei 24px; erste Serie
   steht sofort mittig.
+- **NIE mit `window.innerHeight` rechnen — auf dem Telefon springt der Wert.** Die
+  Adressleiste fährt beim Scrollen ein und aus und ändert die Fensterhöhe um rund
+  80px; die Bilder änderten dadurch mitten im Scrollen ihre Grösse (gemessen: Deckel
+  588 ↔ 508, Bild 398×520 ↔ 389×508). Stattdessen die festen Viewport-Höhen des
+  Geräts über ein unsichtbares Hilfselement messen: `100lvh` (Leiste eingefahren)
+  und `100svh` (Leiste ausgefahren) — beide ändern sich beim Scrollen nie.
+  Bezug ist die **grosse** Höhe, damit die Bilder ihre volle Grösse behalten; eine
+  zweite Grenze aus `svh` sorgt dafür, dass der Zähler nicht unter die Leiste
+  rutscht, und es gilt die kleinere von beiden. Bei den üblichen iPhone-Massen
+  fallen beide zusammen, es geht also keine Bildgrösse verloren.
 - **KEIN senkrechtes Einrasten.** Es war einmal gebaut (Reels-/TikTok-Mechanik) und
   auf Wunsch des Betreibers wieder entfernt: gescrollt wird frei. Der gerechnete
   Abstand zwischen zwei Serien bleibt — er sorgt dafür, dass immer nur eine Serie im

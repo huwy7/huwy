@@ -61,9 +61,11 @@ Erledigt:
 - [x] **Serien löschen** im Werkzeug (✕ im Serien-Kopf; löscht beim Speichern die
       Metadaten-Datei + Bild-Einträge, Fotos bleiben im Pool).
 
-Noch offen:
-- [ ] Sveltia (`/admin/cms`) samt OAuth-Worker ganz abschalten, sobald das
-      Werkzeug im Alltag trägt.
+**Entscheidung Sveltia (verbindlich):** Sveltia unter `/admin/cms` **bleibt als
+Rückfall/Backup bestehen** und wird bis auf Weiteres **nicht** abgeschaltet. Das
+Abschalten ist damit **keine Aufgabe mehr** — nicht wieder als offener Punkt
+aufnehmen und nicht ungefragt entfernen. Ändert sich das, sagt es der Betreiber.
+
 - Hinweis: Aus dem Pool ziehen ändert nur die kleinen Markdown-Einträge
   (`serie`/`reihenfolge` bzw. Über-mich-Liste); die Bild-Assets bleiben unangetastet.
 

@@ -216,7 +216,9 @@ Zweifel weglassen oder hinter einer klaren Aktion verstecken.
 
 ## Ideen / Backlog (später)
 
-- Aus dem Pool/Repo Fotos wirklich löschen inkl. Hinweis, wo sie verwendet werden.
-- Serien löschen im Werkzeug (anlegen geht schon).
-- Sveltia (`/admin/cms`) ganz abschalten, sobald das Werkzeug im Alltag trägt.
-  (Kein OAuth-Login — der Token bleibt, siehe oben.)
+(Beide früheren Punkte — Fotos aus dem Pool löschen und Serien löschen — sind
+gebaut. Aktuell steht hier nichts Offenes.)
+
+**Sveltia bleibt.** `/admin/cms` ist der Rückfall/das Backup und wird bis auf
+Weiteres **nicht** abgeschaltet — das ist keine Aufgabe und gehört nicht wieder
+auf die Checkliste. (Kein OAuth-Login — der Token bleibt, siehe oben.)

@@ -277,6 +277,32 @@ picture > source {
   max-width: calc(100% - 2 * var(--rahmen-breite));
 }
 
+/* NUR MOBIL: Der Höhendeckel kommt nicht mehr aus einem festen vh-Wert, sondern aus
+   der Rechnung in `galerie-mobil.ts` (Viewporthöhe minus Kopfzeile, Mindestabstände,
+   Titel- und Zählerhöhe). Er steht als `--bild-deckel` auf der Serie und wirkt hier.
+   Fehlt er (kein JavaScript), bleibt der bisherige Deckel — die Seite sieht dann aus
+   wie bisher. Die Bedingung steht wörtlich genauso in `galerie-mobil.ts`. */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .ist-mobil .karussell-foto {
+    max-height: var(--bild-deckel, var(--karussell-hoehe));
+  }
+  /* Waagerecht: bis zur sichtbaren Kante genau eine Rahmenbreite Abstand zum
+     Displayrand. Den Platz dafür schafft der Streifen (Serie.astro); hier gilt nur
+     noch, dass das Bild ihn ganz ausnutzt. Auf der Farbseite bleibt der Rahmen
+     rechnerisch aussen, darum die Rücknahme um zwei Rahmenbreiten. */
+  .ist-mobil .karussell-foto {
+    max-width: 100%;
+  }
+  :root[data-modus='farbe'] .ist-mobil .karussell-foto {
+    max-width: calc(100% - 2 * var(--rahmen-breite));
+  }
+  /* Senkrecht einrasten: eine Serie je Snap-Punkt, mittig. Die Klasse setzt das
+     Skript nur, wenn es Serien gibt — andere Seiten scrollen normal weiter. */
+  html.galerie-mobil {
+    scroll-snap-type: y mandatory;
+  }
+}
+
 /* About-Bilder: Format dynamisch (echtes Seitenverhältnis), Grösse passend zur
    Seite — etwa halbe Spaltenbreite, gedeckelt, damit ein Upload nicht plötzlich
    die ganze Seite füllt. Steht global (das <img> kommt aus der Bild-Komponente). */

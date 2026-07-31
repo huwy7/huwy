@@ -81,6 +81,9 @@
      Abstände zum Titel und zum Zähler bei jedem Bild gleich bleiben. Etwas ruhiger
      als der Zähler, damit die Anpassung nicht zuckt. */
   --streifen-tempo: 240ms;
+  /* Nur mobil: zusätzlicher Abstand zwischen zwei Serien, damit die vorherige Serie
+     sicher ganz aus dem Bild ist, wenn die nächste die Bildschirmmitte erreicht. */
+  --serien-luft-extra: 20px;
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
   /* Druck-Rückmeldung auf Touch: derselbe abgerundete, invertierende Kasten, den

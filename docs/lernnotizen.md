@@ -184,6 +184,23 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
+- **Mobil und Desktop sind getrennt: `src/scripts/galerie-mobil.ts`.** Die mobile
+  Galerie rechnet ihre Masse selbst und setzt sie als Inline-Werte; die
+  Desktop-Fassung bleibt Wort für Wort wie sie war. Das Modul rechnet nur, solange
+  `MOBIL_QUERY` zutrifft, und räumt beim Wechsel auf Desktop alles restlos ab.
+  Verbindliche Masse (nur mobil): seitlich genau **eine Rahmenbreite** bis zur
+  sichtbaren Bildkante; **3 Rahmenbreiten** Mindestabstand vom Titel zur Kopfzeile
+  und vom Zähler zum unteren Rand; Titel↔Bild und Bild↔Zähler bleiben bei 24px; je
+  Serie ein Snap-Punkt, aktive Serie exakt mittig.
+- **Astro hängt sein Scope-Attribut an JEDEN Teil eines Selektors.** Eine Klasse auf
+  `<html>` trägt dieses Attribut nicht — `.wurzelklasse .serie { … }` in einer
+  `.astro`-Datei wird zu `.wurzelklasse[cid] .serie[cid]` und greift NIE. (`:root`
+  erkennt Astro und lässt es in Ruhe.) Darum sitzt die mobile Kennzeichnung als
+  Klasse `ist-mobil` auf der Serie selbst. Wer so etwas baut: immer am gebauten CSS
+  in `dist/_astro/*.css` nachsehen, nicht auf die Spezifität vertrauen.
+- **Höhen mit `getBoundingClientRect().height` messen, nicht mit `offsetHeight`.**
+  `offsetHeight` rundet auf ganze Pixel; dadurch lag der Abstand zum Zähler
+  gelegentlich einen Pixel daneben.
 - **„Gleich" heisst gleiche ABSTÄNDE, nicht gleiche Höhe.** Verbindliche Regel für
   die Serienansicht: Titel → sichtbare Bildoberkante = `--abstand-24`, sichtbare
   Bildunterkante → Zähler = `--abstand-24`. Immer. Die **Bildhöhe bleibt dynamisch**

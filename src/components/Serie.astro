@@ -123,6 +123,8 @@ const breiten = [640, 960, 1280, 1600, 2000];
 </section>
 
 <script>
+  import { starteMobileGalerie } from '../scripts/galerie-mobil';
+
   // Karussell und Vollbild sind beide horizontale scroll-snap-Streifen. Geblättert
   // wird immer gleich: den Streifen um eine Ansichtsbreite weiterschieben. Dadurch
   // wandert das nächste Foto seitlich herein — auf der Seite wie im Vollbild.
@@ -175,9 +177,12 @@ const breiten = [640, 960, 1280, 1600, 2000];
     const breite = spur.clientWidth;
     if (!breite) return;
     const letzte = spur.children.length - 1;
+    // Exakte statt gerundete Höhe: `offsetHeight` rundet auf ganze Pixel, wodurch
+    // der Abstand zum Zähler um einen Pixel danebenliegen konnte.
     const hoeheVon = (i: number) =>
-      (spur.children[i] as HTMLElement | undefined)?.querySelector<HTMLElement>('.karussell-buehne')
-        ?.offsetHeight || 0;
+      (spur.children[i] as HTMLElement | undefined)
+        ?.querySelector<HTMLElement>('.karussell-buehne')
+        ?.getBoundingClientRect().height || 0;
 
     const stelle = spur.scrollLeft / breite;
     const nächste = Math.round(stelle);
@@ -297,6 +302,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
       else if (e.key === 'Escape') schliessen();
     });
   }
+
+  // Mobile Galerie: eigene Höhen-, Abstands- und Einrast-Rechnung. Auf dem Desktop
+  // passiert hier nichts — das Modul prüft die Bedingung selbst und räumt beim
+  // Wechsel alles wieder ab.
+  starteMobileGalerie();
 </script>
 
 <style>
@@ -580,6 +590,50 @@ const breiten = [640, 960, 1280, 1600, 2000];
   }
 
   /* Kreuz oben rechts über allem, mit grosser Trefferfläche. */
+  /* ------------------------------------------------------------------------
+     NUR MOBIL. Alles darüber ist die Desktop-Fassung und bleibt unverändert;
+     dieser Block überschreibt sie ausschliesslich auf mobilen Geräten. Die
+     Bedingung steht wörtlich genauso in `galerie-mobil.ts` und `global.css` —
+     CSS kann sie nicht aus einem Token lesen, darum die Wiederholung.
+
+     Aufteilung: die festen Abstände (Titel↔Bild↔Zähler, Rahmen) stehen hier im
+     CSS, alle von der Viewportgrösse abhängigen Masse rechnet `galerie-mobil.ts`
+     und setzt sie als Inline-Werte bzw. als `--bild-deckel`.
+
+     Die Kennzeichnung sitzt als Klasse `ist-mobil` auf der SERIE selbst, nicht auf
+     der Wurzel: Astro hängt sein Scope-Attribut an jeden Teil eines Selektors, und
+     eine Klasse auf `<html>` trägt dieses Attribut nicht — solche Regeln greifen
+     dann nie (nachgeprüft am gebauten CSS).
+     ------------------------------------------------------------------------ */
+  @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    /* Die Desktop-Zentrierung (eine Bildschirmhöhe je Serie, Titel aus der
+       Zentrierung herausgerechnet) wird abgeschaltet. Mobil bekommt jede Serie
+       eine gemessene Höhe und rastet als Ganzes mittig ein. */
+    .serie.ist-mobil {
+      padding-block-start: 0;
+      scroll-snap-align: center;
+      /* Nicht in zwei Teilen einrasten, egal wie schnell gewischt wird. */
+      scroll-snap-stop: always;
+    }
+    .serie.ist-mobil:last-of-type {
+      padding-block-end: 0;
+    }
+    .ist-mobil .serie-kopf {
+      margin-block-start: 0;
+    }
+
+    /* Querformat nutzt die volle Breite: seitlich bleibt genau eine Rahmenbreite
+       bis zum Displayrand. Der Streifen greift dafür über den Seitenrand hinaus.
+       Was „bis zum Displayrand" heisst, richtet sich wie überall nach der
+       SICHTBAREN Kante — düster der weisse Rahmen, farbig das Foto. */
+    .ist-mobil .karussell {
+      margin-inline: calc(var(--rahmen-breite) - var(--rand));
+    }
+    :root[data-modus='farbe'] .ist-mobil .karussell {
+      margin-inline: calc(-1 * var(--rand));
+    }
+  }
+
   .lightbox-x {
     position: absolute;
     top: var(--abstand-8);

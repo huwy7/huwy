@@ -95,12 +95,12 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   zeigte über diesen Flächen zusätzlich den System-Zeiger. Lösung ohne `!important`:
   solche Regeln in `html:not(.cursor-aktiv) …` einpacken, dann greifen sie nur, wenn
   der eigene Cursor NICHT läuft.
-- **Cursor-Ausschlüsse an die Elementart binden**: Die grossen Blätter-Flächen
-  (`.blaettern`, `.lightbox-zone`) dürfen KEINEN Hover-/Box-Effekt auslösen — sonst
-  wird der Cursor zu einem bildschirmgrossen Kasten. Beim Umbau von `<a>` auf
-  `<button>` griff der alte Ausschluss nicht mehr, weil er nur am `a`-Teil des
-  Selektors stand. Ausschlüsse deshalb an JEDEN betroffenen Teil hängen
-  (`button:not(…)`, `[role="button"]:not(…)`) und nach solchen Umbauten gegenprüfen.
+- **Hover-Effekt: NUR im Vollbild aus** (Festlegung des Betreibers). Ausgeschlossen
+  ist allein `.lightbox-zone` (halbe Bildschirmseite → sonst bildschirmgrosser
+  Kasten). Die Blätter-Flächen der Portfolio-Ansicht (`.blaettern`) behalten ihren
+  Effekt — nicht „aufräumen"! Beim Umbau `<a>` → `<button>` griff der Ausschluss
+  nicht mehr, weil er nur am `a`-Teil des Selektors stand: Ausschlüsse an JEDEN
+  betroffenen Teil hängen (`button:not(…)`, `[role="button"]:not(…)`).
 - **Touch bleibt effektfrei** (Entscheidung des Betreibers): keine Cursor-, Puls-
   oder Nachlauf-Effekte bei Fingereingabe — weder mitlaufend noch beim Antippen von
   Bedienelementen. Alle Zeiger-Effekte gehören ausschliesslich der Maus.

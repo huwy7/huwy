@@ -523,17 +523,17 @@ const name = 'TODO_NAME';
         let morphEnde = 0; // bis wann der Box-Morph läuft (dann keine Verformung)
         const BOX_PAD = 10; // Luft rund um das Element
 
-        // Auswahl der Elemente, die der Cursor als Box umschliesst: nur KLEINE
-        // interaktive Elemente. Ausgenommen sind die grossen, unsichtbaren
-        // Blätter-Flächen — `.blaettern` am Bild und `.lightbox-zone` im Vollbild
-        // (je eine halbe Bildschirmseite). Über ihnen soll gar kein Effekt
-        // auftreten, sondern der normale Kreis wie über dem Bild; sonst würde der
-        // Cursor zu einem riesigen Kasten. Ebenso ausgenommen: Serienkarten
-        // (.serien-link), dort wirkt der Bild-Invert.
-        // ACHTUNG: Diese Flächen sind <button>, nicht <a> — der Ausschluss muss
-        // deshalb am button-Teil des Selektors stehen (früher stand er nur beim a,
-        // wodurch im Vollbild wieder eine bildschirmgrosse Box entstand).
-        const OHNE = ':not(.blaettern):not(.lightbox-zone)';
+        // Auswahl der Elemente, die der Cursor als Box umschliesst.
+        // Ausgenommen ist NUR `.lightbox-zone` — die Blätter-Flächen im Vollbild
+        // sind je eine halbe Bildschirmseite gross; dort soll gar kein Effekt
+        // auftreten, sonst wird der Cursor zu einem bildschirmgrossen Kasten.
+        // In der Portfolio-Ansicht bleiben die Blätter-Flächen am Bild
+        // (`.blaettern`) BEWUSST mit Effekt — so war es und so soll es bleiben.
+        // Ebenso ausgenommen: Serienkarten (.serien-link), dort wirkt der Bild-Invert.
+        // ACHTUNG: Die Flächen sind <button>, nicht <a> — der Ausschluss muss
+        // deshalb am button-Teil des Selektors stehen (stand er nur beim a, entstand
+        // im Vollbild wieder eine bildschirmgrosse Box).
+        const OHNE = ':not(.lightbox-zone)';
         const BOX_SELEKTOR =
           `a:not(.serien-link):not(.lightbox-flaeche), button${OHNE}, [role="button"]${OHNE}, input, label, summary`;
         const INTERAKTIV_SELEKTOR = `a, button${OHNE}, [role="button"]${OHNE}, input, label, summary`;

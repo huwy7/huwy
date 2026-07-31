@@ -275,8 +275,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
     margin-block-end: var(--abstand-24);
     /* Titel und Zähler werden aus der Zentrierung herausgerechnet: ihr Platz wird
        als negativer Aussenabstand wieder abgezogen. Dadurch zentriert die Sektion
-       faktisch nur das BILD — die Bildmitte liegt exakt in der Mitte des sichtbaren
-       Bereichs. Die Formel arbeitet mit den Tokens, passt sich also automatisch an. */
+       faktisch nur den BILDSTREIFEN im sichtbaren Bereich, nicht den ganzen Block
+       mit Titel. Bei Serien aus einem Format liegt damit die Bildmitte exakt in der
+       Mitte; bei gemischten Formaten sitzen die kürzeren Bilder etwas höher, weil
+       sie oben am Streifen hängen (siehe .karussell-bild). Die Formel arbeitet mit
+       den Tokens, passt sich also automatisch an. */
     margin-block-start: calc(
       -1 * (var(--groesse-14) * var(--zeilenhoehe-1-4) + var(--abstand-24))
     );
@@ -311,9 +314,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: flex;
-    /* Zentriert: enthält eine Serie Quer- UND Hochformate, ist der Streifen so hoch
-       wie das höchste Bild. Zentriert liegt damit jedes Bild mittig im Streifen. */
-    align-items: center;
+    /* Oben ausgerichtet, NICHT zentriert. Enthält eine Serie Quer- UND
+       Hochformate, ist der Streifen so hoch wie das höchste Bild; zentriert
+       rutschten die kürzeren Bilder nach unten und ihr Abstand zum Serientitel
+       wuchs mit (auf dem iPhone gemessen bis 176px statt 40px). Oben ausgerichtet
+       ist der Abstand Titel→Bild bei jedem Bild gleich — auf beiden Seiten und auf
+       allen Geräten. Der Preis ist bewusst in Kauf genommen: ein kurzes Querformat
+       sitzt dadurch etwas über der Mitte des Sichtbereichs, der Freiraum liegt
+       unter dem Bild. Entscheidung des Betreibers, nicht ohne Rückfrage ändern. */
+    align-items: flex-start;
     justify-content: center;
   }
   .karussell-buehne {

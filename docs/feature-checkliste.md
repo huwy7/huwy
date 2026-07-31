@@ -8,14 +8,7 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 ## Offen
 
 ### Gemeldet am 31.07. (Betreiber)
-- [ ] **Abstand Titel→Bild bei gemischten Formaten (Mobil).** Offen, wartet auf eine
-      Entscheidung: Der Streifen ist immer so hoch wie das höchste Bild der Serie,
-      kürzere Bilder liegen darin mittig — dadurch wächst ihr Abstand zum Titel
-      (iPhone Farbseite gemessen: 40 / 73 / 94 / 176 px). „Abstand konstant" und
-      „Bild exakt mittig im Sichtbereich" sind gleichzeitig nicht zu haben; das ist
-      keine Eigenheit der Farbseite, sondern trifft jede Serie mit Quer- UND
-      Hochformaten (düster iPhone ebenso: 40 / 52). Auf dem **Desktop erledigt** —
-      dort sind beide Seiten jetzt überall 40 px (siehe unten).
+_(zurzeit nichts offen)_
 
 ### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
@@ -91,9 +84,13 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
       um das Bild: das Bild behält exakt seine Grösse (so gross wie auf der düsteren
       Seite Bild + Rahmen zusammen), die Bildkante fluchtet weiterhin mit dem
       Serientitel, kein horizontaler Überlauf.
-- [x] **Abstand Titel→Bild auf dem Desktop vereinheitlicht**: düster und farbig
-      zeigen jetzt beide überall 40 px (vorher farbig 24 px bzw. deutlich mehr).
-      Ergab sich aus dem wieder eingeführten Rand.
+- [x] **Abstand Titel→Bild überall gleich: 40 px.** Beide Seiten, Mobil und Desktop,
+      jedes Bild — auch in Serien, die Quer- und Hochformate mischen (vorher bis
+      176 px). Die Bilder hängen dafür oben am Streifen statt mittig
+      (`align-items: flex-start` in `.karussell-bild`). Bewusst in Kauf genommen:
+      ein kurzes Querformat sitzt dadurch etwas über der Mitte des Sichtbereichs,
+      der Freiraum liegt unter dem Bild. Entscheidung des Betreibers (Variante 1
+      von drei) — nicht ohne Rückfrage zurückdrehen.
 - [x] **Vollbild nutzt auf Mobil die volle Breite** (iPhone, iPad hochkant): keine
       seitlichen Ränder mehr, die Bildfläche verschenken. Die Höhe bleibt gedeckelt,
       damit ✕ und Zähler ihren Platz behalten; sehr hohe Hochformate werden weiterhin

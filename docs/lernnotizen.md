@@ -178,6 +178,14 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
+- **Karussellbilder hängen OBEN am Streifen (`align-items: flex-start`), nicht
+  mittig.** Der Streifen ist so hoch wie das höchste Bild der Serie; zentriert
+  rutschten kürzere Bilder nach unten und ihr Abstand zum Serientitel wuchs mit
+  (iPhone gemessen: bis 176 px statt 40 px). Oben ausgerichtet ist der Abstand
+  Titel→Bild überall 40 px — beide Seiten, Mobil und Desktop. Der Preis ist bewusst
+  gewählt: ein kurzes Querformat sitzt etwas über der Sichtbereichsmitte. **Nicht
+  wieder auf `center` stellen** — die frühere Vorgabe „Bild exakt mittig im
+  Sichtbereich" ist damit abgelöst.
 - **Weisser Rahmen auf der Farbseite: er liegt AUSSEN (`box-sizing: content-box`).**
   Die Seite ist weiss, der Rahmen also unsichtbar — gebraucht wird er trotzdem,
   sonst stossen beim Wischen zwei Bilder direkt aneinander. Damit das Bild dabei

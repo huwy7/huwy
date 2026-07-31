@@ -16,6 +16,45 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Kein graues Aufblitzen des Browsers beim Antippen. Die Blätterflächen im
+     Karussell und im Vollbild sind <button>-Elemente; iOS/Android legten darüber
+     ihr eigenes Feedback, das beim Weiterblättern störte. Rückmeldung geben wir
+     nur dort bewusst selbst, wo sie hingehört: Kopfzeile und ✕ (siehe
+     .kopf-nav a / .kopf-switch in Basis.astro und .lightbox-x in Serie.astro).
+     Regel 10 bleibt unberührt: kein user-select: none, kein Rechtsklick-Blocker. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Druck-Rückmeldung auf Touch — bewusst NUR auf Kopfzeilen-Beschriftungen und dem
+   ✕ im Vollbild, und dort im gleichen Aussehen wie mit der Maus: ein abgerundeter
+   Kasten, der den Untergrund in Graustufen invertiert (der Text bleibt lesbar,
+   kein deckender Block). Reines CSS — kein Touch-Skript; die Entscheidung „Touch
+   ohne mitlaufende Effekte" bleibt bestehen. Diese Klasse setzen die jeweiligen
+   Komponenten auf ihr ::after. */
+@media (hover: none) {
+  .druck-box {
+    position: relative;
+  }
+  .druck-box::after {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--druck-polster));
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: var(--invert-grau);
+  }
+  /* Ältere iOS-Fassungen kennen nur die Prefix-Schreibweise. Sie steht in einem
+     eigenen Block, weil der Minifier zwei Schreibweisen in derselben Regel
+     zusammenlegt und eine davon wegwirft. */
+  @supports (-webkit-backdrop-filter: invert(1)) {
+    .druck-box::after {
+      -webkit-backdrop-filter: var(--invert-grau);
+    }
+  }
+  .druck-box:active::after {
+    opacity: 1;
+  }
 }
 
 /* Spaltenlayout der Seite. Die Kopfzeile ist sticky (Basis.astro) und bleibt beim
@@ -217,15 +256,25 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
-/* Farbseite: die ganze Seite ist weiss — das weisse Passepartout wäre unsichtbar,
-   würde das Bild aber um die Rahmenbreite einrücken (der linke Bildrand läge dann
-   nicht unter dem Serientitel). Darum auf der Farbseite kein Rahmen: das Bild sitzt
-   bündig, sein linker Rand fluchtet mit dem Titel. Farbbilder sind dadurch um die
-   Rahmenbreite grösser als die düsteren — bewusst, für einheitliche Ausrichtung
-   (düster mit Rahmen, farbig ohne Rahmen, beide fluchten aussen mit dem Titel). */
+/* Farbseite: die ganze Seite ist weiss, der weisse Rahmen also unsichtbar. Er wird
+   trotzdem gebraucht — ohne ihn stossen beim Weiterwischen zwei Bilder direkt
+   aneinander. Darum liegt er hier AUSSEN um das Bild (content-box statt
+   border-box): das Bild behält exakt seine Grösse — so gross wie auf der düsteren
+   Seite Bild und Rahmen zusammen —, der Rand kommt zusätzlich dazu. Gerechnet wird
+   auf der Farbseite also immer ab dem Bild.
+   Damit der zusätzliche Rand nicht über den Seitenrand hinausläuft, zieht sich der
+   Streifen um genau die Rahmenbreite in den Seitenrand hinein (--rand ist mit
+   mindestens 24px immer breiter als der Rahmen) — siehe .karussell in Serie.astro.
+   Dadurch fluchtet die Bildkante weiterhin mit dem Serientitel, und der Abstand
+   vom Titel zum sichtbaren Bild ist derselbe wie auf der düsteren Seite. */
 :root[data-modus='farbe'] .karussell-foto {
-  padding: 0;
-  background-color: transparent;
+  box-sizing: content-box;
+  padding: var(--rahmen-breite);
+  background-color: var(--farbe-rahmen);
+  /* Deckel gelten jetzt für das Bild selbst (content-box). Die Breite wird um den
+     Bleed des Streifens zurückgerechnet, damit das Bild exakt so gross bleibt wie
+     bisher und der Rahmen genau in den Bleed fällt. */
+  max-width: calc(100% - 2 * var(--rahmen-breite));
 }
 
 /* About-Bilder: Format dynamisch (echtes Seitenverhältnis), Grösse passend zur

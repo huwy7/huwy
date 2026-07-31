@@ -118,7 +118,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
         </>
       )
     }
-    <button class="lightbox-x" type="button" aria-label="Schliessen">×</button>
+    <button class="lightbox-x druck-box" type="button" aria-label="Schliessen">×</button>
   </div>
 </section>
 
@@ -285,6 +285,14 @@ const breiten = [640, 960, 1280, 1600, 2000];
   /* Inline-Karussell: horizontaler scroll-snap-Streifen, ein Bild pro Ansicht. */
   .karussell {
     position: relative;
+  }
+  /* Farbseite: der weisse Rand liegt aussen um das Bild (global.css). Damit das
+     Bild dabei seine Grösse behält, zieht sich der Streifen um genau die
+     Rahmenbreite in den Seitenrand hinein — der Rahmen fällt in diesen Bleed, die
+     Bildkante fluchtet weiterhin mit dem Serientitel. --rand ist mit mindestens
+     24px immer breiter als der Rahmen, es entsteht also kein Überlauf. */
+  :root[data-modus='farbe'] .karussell {
+    margin-inline: calc(-1 * var(--rahmen-breite));
   }
   .karussell-spur {
     list-style: none;

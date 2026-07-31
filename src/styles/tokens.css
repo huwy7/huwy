@@ -79,6 +79,13 @@
   --zaehler-tempo: 160ms; /* kurz und knackig — der Wechsel soll „schnappen" */
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
+  /* Druck-Rückmeldung auf Touch: derselbe abgerundete, invertierende Kasten, den
+     der Cursor mit der Maus um ein Element legt — nur eben beim Antippen. Das
+     Polster entspricht BOX_PAD im Cursor-Skript (Basis.astro), damit Maus und
+     Finger exakt gleich aussehen. Der Filter steht in einer Custom Property,
+     weil der CSS-Minifier `backdrop-filter: invert(1)` sonst verändert. */
+  --druck-polster: 10px;
+  --invert-grau: grayscale(1) invert(1);
 
   /* --- 3.5 / 5.1 / 6. Zeilenlänge, Bildnormierung, vertikaler Rhythmus ---
      Vertikale Abstände zwischen grossen Blöcken in vh (Spezifikation 4). */

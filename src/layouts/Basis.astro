@@ -126,14 +126,14 @@ const name = 'TODO_NAME';
       {
         farbe ? (
           <>
-            <a class="kopf-switch" href={switchZiel}>
+            <a class="kopf-switch druck-box" href={switchZiel}>
               {switchLabel}
             </a>
             <nav class="kopf-nav" aria-label="Hauptnavigation">
-              <a href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
+              <a class="druck-box" href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
                 {aboutLabel}
               </a>
-              <a href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
+              <a class="druck-box" href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
                 Portfolio
               </a>
             </nav>
@@ -141,14 +141,14 @@ const name = 'TODO_NAME';
         ) : (
           <>
             <nav class="kopf-nav" aria-label="Hauptnavigation">
-              <a href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
+              <a class="druck-box" href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
                 Portfolio
               </a>
-              <a href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
+              <a class="druck-box" href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
                 {aboutLabel}
               </a>
             </nav>
-            <a class="kopf-switch" href={switchZiel}>
+            <a class="kopf-switch druck-box" href={switchZiel}>
               {switchLabel}
             </a>
           </>

@@ -178,6 +178,29 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
+- **Weisser Rahmen auf der Farbseite: er liegt AUSSEN (`box-sizing: content-box`).**
+  Die Seite ist weiss, der Rahmen also unsichtbar — gebraucht wird er trotzdem,
+  sonst stossen beim Wischen zwei Bilder direkt aneinander. Damit das Bild dabei
+  seine Grösse behält (es ist so gross wie auf der düsteren Seite Bild + Rahmen
+  zusammen), zieht sich `.karussell` im Farbmodus um genau `--rahmen-breite` in den
+  Seitenrand hinein; der Rahmen fällt in diesen Bleed. **Auf der Farbseite immer ab
+  dem Bild rechnen, nicht ab dem Rahmen.** Nicht wieder auf `padding: 0` ändern.
+- **Touch-Rückmeldung: nur Kopfzeile und ✕, sonst nichts.** `html` hat
+  `-webkit-tap-highlight-color: transparent`, damit der Browser beim Blättern im
+  Vollbild kein eigenes graues Feedback zeigt. Die gewollte Rückmeldung macht die
+  Klasse `.druck-box` (global.css) in `@media (hover: none)`: ein `::after` mit
+  `--druck-polster` Luft, `border-radius: 999px` und `backdrop-filter:
+  var(--invert-grau)` — also exakt der Kasten, den der Cursor mit der Maus zieht.
+  Reines CSS, **kein Touch-Skript**. Sie hängt an `.kopf-nav a`, `.kopf-switch` und
+  `.lightbox-x` — nirgends sonst.
+- **Der CSS-Minifier legt Prefix- und Standard-Schreibweise in derselben Regel
+  zusammen und wirft eine weg.** Bei `backdrop-filter` deshalb die `-webkit-`-Fassung
+  in einen eigenen `@supports`-Block stellen. Der Filterwert selbst steht als Custom
+  Property (`--invert-grau`), weil der Minifier `invert(1)` sonst verändert.
+- **Blätterflächen im Vollbild liegen INNERHALB des Scroll-Streifens.** Lagen sie
+  darüber (Kind der Lightbox), verschluckten sie auf iOS den Wisch, weil ihr
+  Vorfahre nicht der Scroll-Container ist. Nicht wieder herausziehen.
+
 - **Immer erst auf `feature` bauen, dort testen lassen, dann mergen** — nie
   ungefragt auf `main` mergen (Ausnahme: reine Admin-Werkzeug-Dateien, die die
   öffentliche Seite nicht berühren, wenn Testen sonst unmöglich ist).

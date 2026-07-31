@@ -8,18 +8,14 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 ## Offen
 
 ### Gemeldet am 31.07. (Betreiber)
-- [ ] **iOS Vollbild: Wischen geht nicht**, nur Klicken. Blättern per Wisch muss
-      funktionieren wie in der Portfolio-Ansicht.
-- [ ] **iOS Vollbild: optisches Feedback beim Weiterklicken entfernen.** Feedback
-      soll es NUR auf den Kopfzeilen-Buttons und dem ✕ geben — und dort im gleichen
-      Aussehen wie im Web (die abgerundete, invertierte Box um das Element).
-- [ ] **Farbseite: weisse Ränder um die Bilder wieder einführen**, damit beim
-      Weiterwischen die Bilder nicht direkt aneinanderstossen. Randbreite wie auf der
-      düsteren Seite; das Bild selbst soll so gross bleiben wie jetzt (also so gross
-      wie auf der düsteren Seite Bild + Rahmen zusammen).
-- [ ] **Farbseite: Abstands-Design von der düsteren Seite übernehmen.** Bei
-      Querformat-Bildern ist der Abstand zum Titel zu gross — **auf Mobil UND auf
-      dem Desktop**.
+- [ ] **Abstand Titel→Bild bei gemischten Formaten (Mobil).** Offen, wartet auf eine
+      Entscheidung: Der Streifen ist immer so hoch wie das höchste Bild der Serie,
+      kürzere Bilder liegen darin mittig — dadurch wächst ihr Abstand zum Titel
+      (iPhone Farbseite gemessen: 40 / 73 / 94 / 176 px). „Abstand konstant" und
+      „Bild exakt mittig im Sichtbereich" sind gleichzeitig nicht zu haben; das ist
+      keine Eigenheit der Farbseite, sondern trifft jede Serie mit Quer- UND
+      Hochformaten (düster iPhone ebenso: 40 / 52). Auf dem **Desktop erledigt** —
+      dort sind beide Seiten jetzt überall 40 px (siehe unten).
 
 ### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
@@ -78,6 +74,24 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **Vollbild: Wischen geht jetzt auch auf iOS.** Die Blätterflächen lagen über
+      dem Scroll-Streifen und fingen die Berührung ab; sie liegen jetzt innerhalb
+      der Bildfläche im Streifen. Ein Wisch blättert genau ein Bild weiter; Tippen,
+      Tastatur und Zähler unverändert.
+- [x] **Optisches Feedback beim Antippen: nur noch Kopfzeile und ✕.** Das graue
+      Aufblitzen des Browsers ist überall aus (`-webkit-tap-highlight-color`), es
+      stört also beim Blättern im Vollbild nicht mehr. Kopfzeilen-Beschriftungen und
+      das ✕ bekommen beim Drücken denselben abgerundeten, invertierenden Kasten wie
+      mit der Maus — reines CSS (`.druck-box`), **kein Touch-Skript**. Die
+      Entscheidung „Touch ohne mitlaufende Effekte" bleibt bestehen.
+- [x] **Farbseite: weisser Rand wieder da**, damit beim Weiterwischen zwischen zwei
+      Bildern 2 × `--rahmen-breite` weisse Fläche liegt. Der Rand liegt **aussen**
+      um das Bild: das Bild behält exakt seine Grösse (so gross wie auf der düsteren
+      Seite Bild + Rahmen zusammen), die Bildkante fluchtet weiterhin mit dem
+      Serientitel, kein horizontaler Überlauf.
+- [x] **Abstand Titel→Bild auf dem Desktop vereinheitlicht**: düster und farbig
+      zeigen jetzt beide überall 40 px (vorher farbig 24 px bzw. deutlich mehr).
+      Ergab sich aus dem wieder eingeführten Rand.
 - [x] **Vollbild nutzt auf Mobil die volle Breite** (iPhone, iPad hochkant): keine
       seitlichen Ränder mehr, die Bildfläche verschenken. Die Höhe bleibt gedeckelt,
       damit ✕ und Zähler ihren Platz behalten; sehr hohe Hochformate werden weiterhin

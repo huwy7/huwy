@@ -64,6 +64,10 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **Vollbild nutzt auf Mobil die volle Breite** (iPhone, iPad hochkant): keine
+      seitlichen Ränder mehr, die Bildfläche verschenken. Die Höhe bleibt gedeckelt,
+      damit ✕ und Zähler ihren Platz behalten; sehr hohe Hochformate werden weiterhin
+      von der Höhe begrenzt und bleiben ganz sichtbar. Desktop unverändert.
 - [x] **Touch komplett effektfrei**: kein mitlaufender Kreis und kein Puls beim
       Antippen. Zeiger-Effekte gibt es nur mit der Maus (auch am Touch-Gerät mit
       angeschlossener Maus).

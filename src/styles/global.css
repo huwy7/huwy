@@ -272,6 +272,17 @@ img {
   pointer-events: none;
 }
 
+/* Mobil (iPhone, iPad hochkant …): das Vollbild nutzt die GANZE Breite — dort ist
+   Breite knapp, seitliche Ränder verschenken sichtbare Bildfläche. Die Höhe bleibt
+   gedeckelt, damit oben das ✕ und unten der Zähler ihren Platz behalten; bei sehr
+   hohen Hochformaten begrenzt weiterhin die Höhe (das Bild bleibt ganz sichtbar,
+   kein Beschnitt). */
+@media (max-width: 768px) {
+  .lightbox-bild {
+    max-width: 100vw;
+  }
+}
+
 /* Überschriften erben Grösse und Zeilenhöhe; konkrete Werte setzen die Seiten
    und Komponenten. Gewicht bleibt 400 — Schnitt 600/700 ist verboten (3.4). */
 h1,

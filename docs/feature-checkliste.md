@@ -84,19 +84,15 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
       um das Bild: das Bild behält exakt seine Grösse (so gross wie auf der düsteren
       Seite Bild + Rahmen zusammen), die Bildkante fluchtet weiterhin mit dem
       Serientitel, kein horizontaler Überlauf.
-- [x] **Serien sitzen überall identisch.** Der Bildstreifen hat eine feste Höhe
-      statt „so hoch wie das höchste Bild der Serie". Dadurch stehen Titel,
-      Bildoberkante und Zähler auf jeder Serie und auf beiden Seiten an derselben
-      Stelle (iPhone: Titel 105, Bild 164, Zähler 844; Desktop entsprechend).
-      Vorher wanderte der Zähler zwischen 40 und 501 px unter dem Bild, was die
-      düstere und die farbige Seite unterschiedlich aussehen liess.
-- [x] **Abstand Titel→Bild überall gleich: 40 px.** Beide Seiten, Mobil und Desktop,
-      jedes Bild — auch in Serien, die Quer- und Hochformate mischen (vorher bis
-      176 px). Die Bilder hängen dafür oben am Streifen statt mittig
-      (`align-items: flex-start` in `.karussell-bild`). Bewusst in Kauf genommen:
-      ein kurzes Querformat sitzt dadurch etwas über der Mitte des Sichtbereichs,
-      der Freiraum liegt unter dem Bild. Entscheidung des Betreibers (Variante 1
-      von drei) — nicht ohne Rückfrage zurückdrehen.
+- [x] **Gleiche Abstände rund ums Bild — auf beiden Seiten, bei jedem Bild.**
+      Titel → sichtbare Bildoberkante = 24 px, sichtbare Bildunterkante → Zähler =
+      24 px. Gemessen über alle Serien auf 430 px und 1440 px: durchgehend 24/24,
+      bei Bildhöhen von 252 bis 648 px. Die **Bildhöhe bleibt dynamisch**.
+      Sichtbare Kante ist auf der düsteren Seite der weisse Rahmen, auf der
+      farbigen das Foto selbst (dort ist der Rahmen unsichtbar) — deshalb rückt der
+      Streifen im Farbmodus um die Rahmenbreite zusammen. Damit die Abstände bei
+      jedem Bild stimmen, folgt die Streifenhöhe dem gerade sichtbaren Bild
+      (Skript in `Serie.astro`, ohne JavaScript bleibt die Seite voll bedienbar).
 - [x] **Vollbild nutzt auf Mobil die volle Breite** (iPhone, iPad hochkant): keine
       seitlichen Ränder mehr, die Bildfläche verschenken. Die Höhe bleibt gedeckelt,
       damit ✕ und Zähler ihren Platz behalten; sehr hohe Hochformate werden weiterhin

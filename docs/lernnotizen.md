@@ -167,6 +167,12 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 
 ## Arbeitsweise mit dem Betreiber
 
+- **Bei widersprüchlichen Vorgaben kurz nachfragen, nicht bauen.** Passiert
+  regelmässig, weil eine neue Bestellung eine frühere aufhebt oder zwei Ziele sich
+  ausschliessen. Dann in EINEM Satz nachfragen, statt eine Lesart zu wählen und
+  loszubauen — eine falsch geratene Lesart kostet mehr als die Rückfrage. Auch
+  scheinbar eindeutige Wörter prüfen: „gleiche Höhe" hiess **gleiche Abstände**,
+  nicht gleiche Höhe, und das falsche Verständnis hat eine ganze Runde gekostet.
 - **KONSTANZ hat Vorrang.** Der Betreiber musste mehrfach dieselben Dinge erneut
   bestellen, weil sie bei späteren Änderungen still verschwanden oder kaputtgingen.
   Darum: Nichts Bestehendes „nebenbei" ändern, entfernen oder aufräumen. Was einmal
@@ -178,24 +184,27 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
-- **Der Karussell-Streifen hat eine FESTE Höhe (`height: var(--karussell-hoehe)`),
-  nicht „so hoch wie das höchste Bild der Serie".** Vorher richtete er sich nach dem
-  grössten Bild — dadurch stand der Zähler bei jeder Serie woanders (iPhone gemessen
-  40 bis 501px unter dem Bild) und der ganze Block sass unterschiedlich hoch im
-  Bild­schirm; düstere und farbige Seite sahen dadurch verschieden aus, obwohl die
-  Regel dieselbe war. Mit fester Höhe liegen Titel, Bildoberkante und Zähler auf
-  JEDER Serie und BEIDEN Seiten auf derselben y-Position (gemessen: Titel 105,
-  Bild 164, Zähler 844 auf dem iPhone; erste Serie 80px höher, weil die Kopfzeile
-  dort im Fluss darüber steht). Nur die Bildhöhe selbst unterscheidet sich — die
-  kommt aus dem Foto. **Nicht auf `height: auto` zurückstellen.**
-- **Karussellbilder hängen OBEN am Streifen (`align-items: flex-start`), nicht
-  mittig.** Der Streifen ist so hoch wie das höchste Bild der Serie; zentriert
-  rutschten kürzere Bilder nach unten und ihr Abstand zum Serientitel wuchs mit
-  (iPhone gemessen: bis 176 px statt 40 px). Oben ausgerichtet ist der Abstand
-  Titel→Bild überall 40 px — beide Seiten, Mobil und Desktop. Der Preis ist bewusst
-  gewählt: ein kurzes Querformat sitzt etwas über der Sichtbereichsmitte. **Nicht
-  wieder auf `center` stellen** — die frühere Vorgabe „Bild exakt mittig im
-  Sichtbereich" ist damit abgelöst.
+- **„Gleich" heisst gleiche ABSTÄNDE, nicht gleiche Höhe.** Verbindliche Regel für
+  die Serienansicht: Titel → sichtbare Bildoberkante = `--abstand-24`, sichtbare
+  Bildunterkante → Zähler = `--abstand-24`. Immer. Die **Bildhöhe bleibt dynamisch**
+  (sie kommt aus dem Foto und wird nie angeglichen oder beschnitten).
+  **Sichtbare Kante heisst:** auf der düsteren Seite der **weisse Rahmen** (er ist
+  dort sichtbar und gehört zum Bild), auf der farbigen Seite das **Foto selbst**
+  (der weisse Rahmen ist auf Weiss unsichtbar). Darum hat `.karussell` im Farbmodus
+  `margin: calc(-1 * var(--rahmen-breite))` — seitlich für den Bleed, oben/unten
+  damit die Abstände zur sichtbaren Kante auf beiden Seiten gleich sind.
+- **Damit das aufgeht, folgt die Streifenhöhe dem gerade sichtbaren Bild.** Das
+  Skript in `Serie.astro` setzt `.karussell-spur { height }` auf die Höhe der
+  aktiven `.karussell-buehne` (Bild inkl. Rahmen), per `ResizeObserver` (nicht per
+  `load` — die Bilder werden aufgeschoben geladen, `complete` ist dann schon `true`)
+  und bei jedem Scrollen. Zwei Fallen dabei:
+  - `.karussell-buehne` darf **kein** `max-height: 100%` haben, sonst richtet sich
+    die Bühne nach dem Streifen und der Streifen nach der Bühne — beides schaukelt
+    sich herunter und der Streifen fällt auf ein paar Pixel zusammen.
+  - Ohne JavaScript bleibt es bei der Vorgabe (so hoch wie das höchste Bild); die
+    Seite funktioniert vollständig, nur die Abstände wandern.
+  Weder eine feste Streifenhöhe noch `align-items: center` wieder einführen —
+  beides wurde probiert und macht genau dieses Problem.
 - **Weisser Rahmen auf der Farbseite: er liegt AUSSEN (`box-sizing: content-box`).**
   Die Seite ist weiss, der Rahmen also unsichtbar — gebraucht wird er trotzdem,
   sonst stossen beim Wischen zwei Bilder direkt aneinander. Damit das Bild dabei

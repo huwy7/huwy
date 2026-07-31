@@ -161,6 +161,18 @@ const breiten = [640, 960, 1280, 1600, 2000];
     linie.style.setProperty('-webkit-backdrop-filter', strichFilter);
   }
 
+  // Der Streifen ist standardmässig so hoch wie sein höchstes Bild — kürzere Bilder
+  // hätten dann unterschiedlich viel Luft nach unten, und der Zähler stünde bei
+  // jedem Bild woanders. Darum setzen wir die Höhe auf das gerade sichtbare Bild.
+  // Gemessen wird die Bühne, also Bild INKLUSIVE weissem Rahmen: auf der düsteren
+  // Seite ist der Rahmen die sichtbare Kante. Ohne JavaScript passiert nichts und
+  // die Seite bleibt vollständig bedienbar (nur eben mit der alten Vorgabe-Höhe).
+  const passeHoeheAn = (spur: HTMLElement) => {
+    const kind = spur.children[index(spur)] as HTMLElement | undefined;
+    const buehne = kind?.querySelector<HTMLElement>('.karussell-buehne');
+    if (buehne?.offsetHeight) spur.style.height = `${buehne.offsetHeight}px`;
+  };
+
   for (const serie of document.querySelectorAll<HTMLElement>('.serie')) {
     const slug = serie.dataset.serie || '';
     const karussell = serie.querySelector<HTMLElement>('.karussell-spur');
@@ -180,11 +192,32 @@ const breiten = [640, 960, 1280, 1600, 2000];
       });
     };
 
-    // Zähler folgt dem Streifen.
-    karussell.addEventListener('scroll', () => markiere(striche.karussell, index(karussell)), {
-      passive: true,
-    });
+    // Zähler und Streifenhöhe folgen dem Streifen. Beides pro Frame höchstens
+    // einmal, damit das Scrollen flüssig bleibt.
+    let wartet = false;
+    karussell.addEventListener(
+      'scroll',
+      () => {
+        markiere(striche.karussell, index(karussell));
+        if (wartet) return;
+        wartet = true;
+        requestAnimationFrame(() => {
+          wartet = false;
+          passeHoeheAn(karussell);
+        });
+      },
+      { passive: true },
+    );
     markiere(striche.karussell, 0);
+    // Die Bilder werden aufgeschoben geladen (erst nach dem Entsperren), ihre Höhe
+    // steht also nicht von Anfang an fest. Ein ResizeObserver auf den Bühnen deckt
+    // alles ab: Nachladen, Drehung, Fensterwechsel — ohne auf load-Ereignisse zu
+    // bauen, die bei aufgeschobenen Bildern schon vorbei sein können.
+    passeHoeheAn(karussell);
+    const beobachter = new ResizeObserver(() => passeHoeheAn(karussell));
+    for (const buehne of karussell.querySelectorAll('.karussell-buehne')) {
+      beobachter.observe(buehne);
+    }
     striche.karussell.forEach((s) =>
       s.addEventListener('click', () => zuIndex(karussell, Number(s.dataset.index))),
     );
@@ -295,22 +328,24 @@ const breiten = [640, 960, 1280, 1600, 2000];
      Bildkante fluchtet weiterhin mit dem Serientitel. --rand ist mit mindestens
      24px immer breiter als der Rahmen, es entsteht also kein Überlauf. */
   :root[data-modus='farbe'] .karussell {
-    margin-inline: calc(-1 * var(--rahmen-breite));
+    /* Seitlich: der Rahmen fällt in den Seitenrand, das Bild behält seine Grösse.
+       Oben/unten: auf der weissen Seite ist der Rahmen unsichtbar, sichtbare Kante
+       ist also das Foto selbst. Der Streifen rückt darum um die Rahmenbreite
+       zusammen — dadurch ist der Abstand Titel→Foto und Foto→Zähler hier genauso
+       gross wie auf der düsteren Seite der Abstand Titel→weisser Rand und
+       weisser Rand→Zähler. Beide Seiten sehen damit gleich aus. */
+    margin: calc(-1 * var(--rahmen-breite));
   }
   .karussell-spur {
     list-style: none;
     display: flex;
-    /* FESTE Höhe, nicht „so hoch wie das höchste Bild der Serie". Vorher richtete
-       sich der Streifen nach dem grössten Bild — dadurch stand der Zähler bei jeder
-       Serie woanders (auf dem iPhone gemessen 40 bis 501px unter dem Bild) und der
-       ganze Block sass unterschiedlich hoch im Bildschirm. Beides sah auf der
-       düsteren und der farbigen Seite verschieden aus, obwohl die Regel dieselbe
-       war. Mit fester Höhe stehen Titel, Bild und Zähler auf JEDER Serie und auf
-       BEIDEN Seiten an derselben Stelle. Der Wert ist derselbe Deckel, den die
-       Bilder schon haben (--karussell-hoehe) — der Streifen wird also nie höher,
-       als er vorher im Extremfall ohnehin schon war. */
-    height: var(--karussell-hoehe);
+    /* Die Höhe folgt dem gerade sichtbaren Bild (das Skript setzt sie). Nur so ist
+       der Abstand vom Titel zur Bildoberkante und von der Bildunterkante zum Zähler
+       bei JEDEM Bild gleich — die Bildhöhe selbst bleibt dabei natürlich dynamisch.
+       Ohne JavaScript bleibt es beim Vorgabewert: so hoch wie das höchste Bild der
+       Serie (die Seite funktioniert dann unverändert, nur die Abstände wandern). */
     gap: 0;
+    transition: height var(--streifen-tempo) cubic-bezier(0.2, 0, 0, 1);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -338,7 +373,10 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .karussell-buehne {
     position: relative;
     max-width: 100%;
-    max-height: 100%;
+    /* KEIN max-height: 100% — die Streifenhöhe richtet sich nach der Bühne, die
+       Bühne dürfte sich also nicht umgekehrt nach dem Streifen richten (sonst
+       schaukelt sich beides gegenseitig herunter und der Streifen fällt zusammen).
+       Die Höhe ist ohnehin durch --karussell-hoehe am Bild selbst gedeckelt. */
   }
   .karussell-oeffnen {
     display: block;
@@ -421,7 +459,8 @@ const breiten = [640, 960, 1280, 1600, 2000];
   }
   @media (prefers-reduced-motion: reduce) {
     .zaehler-strich,
-    .zaehler-linie {
+    .zaehler-linie,
+    .karussell-spur {
       transition: none;
     }
   }

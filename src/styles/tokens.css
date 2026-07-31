@@ -77,6 +77,10 @@
   --zaehler-breite: 64px; /* feste Gesamtbreite; die Striche teilen sie unter sich auf */
   --zaehler-wachstum: 1.8; /* Anteil des aktiven Strichs gegenüber einem inaktiven */
   --zaehler-tempo: 160ms; /* kurz und knackig — der Wechsel soll „schnappen" */
+  /* Der Bildstreifen passt seine Höhe an das gerade sichtbare Bild an, damit die
+     Abstände zum Titel und zum Zähler bei jedem Bild gleich bleiben. Etwas ruhiger
+     als der Zähler, damit die Anpassung nicht zuckt. */
+  --streifen-tempo: 240ms;
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
   /* Druck-Rückmeldung auf Touch: derselbe abgerundete, invertierende Kasten, den

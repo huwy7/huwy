@@ -7,6 +7,20 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 
 ## Offen
 
+### Gemeldet am 31.07. (Betreiber)
+- [ ] **iOS Vollbild: Wischen geht nicht**, nur Klicken. Blättern per Wisch muss
+      funktionieren wie in der Portfolio-Ansicht.
+- [ ] **iOS Vollbild: optisches Feedback beim Weiterklicken entfernen.** Feedback
+      soll es NUR auf den Kopfzeilen-Buttons und dem ✕ geben — und dort im gleichen
+      Aussehen wie im Web (die abgerundete, invertierte Box um das Element).
+- [ ] **Farbseite: weisse Ränder um die Bilder wieder einführen**, damit beim
+      Weiterwischen die Bilder nicht direkt aneinanderstossen. Randbreite wie auf der
+      düsteren Seite; das Bild selbst soll so gross bleiben wie jetzt (also so gross
+      wie auf der düsteren Seite Bild + Rahmen zusammen).
+- [ ] **Farbseite: Abstands-Design von der düsteren Seite übernehmen.** Bei
+      Querformat-Bildern ist der Abstand zum Titel zu gross — **auf Mobil UND auf
+      dem Desktop**.
+
 ### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den
 Betreiber als Endkunde **so einfach wie möglich zu bedienen** und **so schlicht wie

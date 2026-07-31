@@ -167,6 +167,17 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 
 ## Arbeitsweise mit dem Betreiber
 
+- **KONSTANZ hat Vorrang.** Der Betreiber musste mehrfach dieselben Dinge erneut
+  bestellen, weil sie bei späteren Änderungen still verschwanden oder kaputtgingen.
+  Darum: Nichts Bestehendes „nebenbei" ändern, entfernen oder aufräumen. Was einmal
+  festgelegt ist, bleibt — Änderungen daran NUR nach ausdrücklicher Rückfrage. Vor
+  dem Commit prüfen, ob eine Änderung ungewollt etwas anderes mitnimmt (besonders
+  Cursor-/Hover-Effekte, Abstände, Rahmen, Zähler).
+- **Beide Seiten gleich behandeln.** Jede sinnvolle, auf Einheitlichkeit zielende
+  Änderung (Abstände, Rahmen, Verhalten …) IMMER auf beiden Seiten anwenden —
+  düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
+  es gerade gemeldet wurde.
+
 - **Immer erst auf `feature` bauen, dort testen lassen, dann mergen** — nie
   ungefragt auf `main` mergen (Ausnahme: reine Admin-Werkzeug-Dateien, die die
   öffentliche Seite nicht berühren, wenn Testen sonst unmöglich ist).

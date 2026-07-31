@@ -91,6 +91,16 @@ const breiten = [640, 960, 1280, 1600, 2000];
         bilder.map((bild) => (
           <div class="lightbox-ansicht">
             <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
+            {/* Blätter-Flächen liegen INNERHALB der Ansicht, also im scrollbaren
+                Streifen. Nur so wischt der Finger auf ihnen den Streifen weiter —
+                lagen sie darüber (Kind der Lightbox), verschluckten sie den Wisch,
+                weil ihr Vorfahre nicht der Scroll-Container ist. */}
+            {n > 1 && (
+              <>
+                <button class="lightbox-zone lightbox-prev" type="button" data-richtung="-1" aria-label="Zurück" />
+                <button class="lightbox-zone lightbox-next" type="button" data-richtung="1" aria-label="Weiter" />
+              </>
+            )}
           </div>
         ))
       }
@@ -98,8 +108,6 @@ const breiten = [640, 960, 1280, 1600, 2000];
     {
       n > 1 && (
         <>
-          <button class="lightbox-zone lightbox-prev" type="button" data-richtung="-1" aria-label="Zurück" />
-          <button class="lightbox-zone lightbox-next" type="button" data-richtung="1" aria-label="Weiter" />
           <div class="zaehler zaehler--lightbox" role="tablist" aria-label="Bilder der Serie">
             {bilder.map((_, i) => (
               <button class="zaehler-strich" type="button" data-index={i} role="tab" aria-label={`Bild ${i + 1} von ${n}`}>
@@ -426,6 +434,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     display: none;
   }
   .lightbox-ansicht {
+    position: relative; /* Bezugsrahmen der Blätter-Flächen */
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: flex;

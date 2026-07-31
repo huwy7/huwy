@@ -71,8 +71,8 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 - [x] **Galerie für Telefone im Hochformat neu gebaut**
       (`src/scripts/galerie-mobil.ts`). Bilder so gross wie möglich: seitlich genau
-      eine Rahmenbreite bis zur sichtbaren Kante, senkrecht mindestens drei
-      Rahmenbreiten zur Kopfzeile und zum unteren Rand. Immer nur eine Serie im Bild,
+      eine Rahmenbreite bis zur sichtbaren Kante, senkrecht mindestens ein
+      Abstandsschritt (24px) zur Kopfzeile und zum unteren Rand. Immer nur eine Serie im Bild,
       erste Serie steht sofort mittig. Abstand zwischen zwei Serien wird aus deren
       tatsächlichen Höhen gerechnet. Keine festen Bildgrössen, keine festen Höhen.
       **Kein Einrasten** — gescrollt wird frei (war zwischenzeitlich eingebaut und

@@ -187,16 +187,20 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
 - **Die eigene Galerie-Fassung gilt NUR für Telefone im Hochformat**
   (`src/scripts/galerie-mobil.ts`, `MOBIL_QUERY`). Tablets in beiden Ausrichtungen,
   **Telefone im Querformat** und der Desktop laufen unverändert über den bisherigen
-  Code-Pfad. Grund: die Mindestabstände (Kopfzeile + 3 Rahmenbreiten oben und unten)
-  fressen auf breiten oder flachen Bildschirmen zu viel Höhe — gemessen auf dem
-  iPhone quer 86px Bildhöhe statt 310px, auf dem iPad quer 476px statt 590px. Genau
-  dort ist die alte Darstellung besser. **Die Bedingung nicht ohne Rückfrage
-  aufweichen.** Sie steht wörtlich an drei Stellen (Modul, `Serie.astro`,
-  `global.css`) — CSS kann sie nicht aus einem Token lesen.
+  Code-Pfad. Grund: die Mindestabstände oben und unten fressen auf breiten oder
+  flachen Bildschirmen zu viel Höhe — gemessen auf dem iPhone quer 86px Bildhöhe
+  statt 310px, auf dem iPad quer 476px statt 590px. Genau dort ist die alte
+  Darstellung besser. **Die Bedingung nicht ohne Rückfrage aufweichen.** Sie steht
+  wörtlich an drei Stellen (Modul, `Serie.astro`, `global.css`) — CSS kann sie nicht
+  aus einem Token lesen.
   Verbindliche Masse dort: seitlich genau **eine Rahmenbreite** bis zur sichtbaren
-  Bildkante; **3 Rahmenbreiten** Mindestabstand vom Titel zur Kopfzeile und vom
-  Zähler zum unteren Rand; Titel↔Bild und Bild↔Zähler bleiben bei 24px; erste Serie
-  steht sofort mittig.
+  Bildkante; **ein Abstandsschritt (`--abstand-24`)** Mindestabstand vom Titel zur
+  Kopfzeile und vom Zähler zum unteren Rand — derselbe Wert wie zwischen Titel, Bild
+  und Zähler, also ein durchgehender Rhythmus; erste Serie steht sofort mittig.
+  Dieser Randabstand war zuerst mit 3 Rahmenbreiten (48px) angesetzt und wurde auf
+  24px gesenkt: auf dem iPhone SE quetschte er Hochformate auf 250px Breite, obwohl
+  343px Platz waren (jetzt 286px, und mehr Bilder erreichen die volle Breite). Auf
+  grossen Telefonen ändert es nichts, dort begrenzt ohnehin die Breite.
 - **NIE mit `window.innerHeight` rechnen — auf dem Telefon springt der Wert.** Die
   Adressleiste fährt beim Scrollen ein und aus und ändert die Fensterhöhe um rund
   80px; die Bilder änderten dadurch mitten im Scrollen ihre Grösse (gemessen: Deckel

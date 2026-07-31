@@ -166,16 +166,24 @@ export function starteMobileGalerie(): void {
     //    aber dauerhaft kleiner — darum ausdrücklich nicht.)
     //
     //    Zwei Grenzen müssen halten, es gilt die kleinere:
-    //      a) Über dem Titel: Kopfzeile + 3 Rahmenbreiten. Die Serie steht mittig
-    //         im grossen Viewport, also gilt derselbe Abstand auch darunter.
+    //      a) Über dem Titel: Kopfzeile + ein Abstandsschritt. Die Serie steht
+    //         mittig im grossen Viewport, also gilt derselbe Abstand auch darunter.
     //      b) Unter dem Zähler bei SICHTBARER Adressleiste: dann endet der
     //         sichtbare Bereich schon bei `svh`. Die Serienmitte liegt weiterhin
-    //         bei `lvh/2`, der Zähler also bei `(lvh + hoehe)/2` — davon müssen
-    //         noch 3 Rahmenbreiten bis `svh` übrig bleiben.
-    const mindestLuft = kopfHoehe + 3 * rahmen;
+    //         bei `lvh/2`, der Zähler also bei `(lvh + hoehe)/2` — davon muss noch
+    //         ein Abstandsschritt bis `svh` übrig bleiben.
+    //
+    //    Der Randabstand war zuerst mit 3 Rahmenbreiten (48px) angesetzt. Auf
+    //    kleinen Telefonen frass das zu viel: auf dem iPhone SE wurden Hochformate
+    //    dadurch auf 250px Breite gequetscht, obwohl 343px Platz gewesen wären.
+    //    Jetzt gilt derselbe Abstand wie zwischen Titel, Bild und Zähler — die
+    //    Seite bekommt dadurch einen durchgehenden Rhythmus und die Fotos deutlich
+    //    mehr Fläche. Auf grossen Telefonen ändert es nichts: dort begrenzt ohnehin
+    //    die Breite. Bewusste Entscheidung des Betreibers, nicht zurückdrehen.
+    const mindestLuft = kopfHoehe + luft;
     const serienDeckel = Math.max(
       0,
-      Math.min(sicht - 2 * mindestLuft, 2 * klein - sicht - 6 * rahmen),
+      Math.min(sicht - 2 * mindestLuft, 2 * klein - sicht - 2 * luft),
     );
 
     // 2. Je Serie den Deckel für die Bildhöhe setzen. Titel- und Zählerhöhe werden

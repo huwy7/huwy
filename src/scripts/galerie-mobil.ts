@@ -19,27 +19,38 @@
  */
 
 /**
- * Was als „mobil" gilt: schmale Fenster ODER ein Gerät ohne Zeigegerät zum Hovern
- * (Handy, Tablet — beide Ausrichtungen). Ein Desktop mit Maus fällt nie darunter,
- * auch nicht mit Touchscreen: dort meldet der Browser `hover: hover`.
+ * Was hier als „mobil" gilt: **ausschliesslich ein Telefon im Hochformat.**
+ *
+ * Die drei Teile der Bedingung, jeder mit einem Grund:
+ *   - `hover: none` + `pointer: coarse` — ein echtes Berührgerät. Ein Desktop mit
+ *     Maus fällt nie darunter, auch nicht mit Touchscreen (dort `hover: hover`),
+ *     und ein schmal gezogenes Desktop-Fenster behält seine bisherige Darstellung.
+ *   - `max-width: 500px` — trennt Telefon von Tablet. Über die Breite allein geht
+ *     das nicht: ein iPhone quer ist 932px breit, ein iPad mini hochkant nur 744px.
+ *     Im Hochformat sind Telefone aber immer schmaler als 500px und Tablets immer
+ *     breiter — zusammen mit der Ausrichtung trennt das sauber.
+ *   - `orientation: portrait` — im Querformat bleibt vom Bildschirm nach Kopfzeile
+ *     und Mindestabständen zu wenig übrig (gemessen: 86px Bildhöhe statt 310px).
+ *     Dort gilt darum die bisherige Darstellung, genau wie auf Tablets.
+ *
+ * Alles ausserhalb dieser Bedingung — Tablet in beiden Ausrichtungen, Telefon quer,
+ * Desktop — läuft unverändert über den bisherigen Code-Pfad.
  *
  * CSS kann keine Custom Property in einer Media-Query auswerten — dieselbe
  * Bedingung steht darum wörtlich in `global.css` und in `Serie.astro`. Wird sie hier
  * geändert, müssen beide Stellen mitgeändert werden.
  */
-export const MOBIL_QUERY = '(max-width: 768px), (hover: none) and (pointer: coarse)';
+export const MOBIL_QUERY =
+  '(hover: none) and (pointer: coarse) and (max-width: 500px) and (orientation: portrait)';
 
 /**
- * Kennzeichnung, solange die mobile Galerie rechnet.
- *
- * `SERIEN_MARKE` sitzt auf jeder Serie und steuert das mobile CSS. Sie sitzt
- * bewusst dort und nicht auf `<html>`: Astro hängt sein Scope-Attribut an jeden
- * Teil eines Selektors, und eine Klasse auf der Wurzel trägt dieses Attribut nicht
- * — Regeln wie `.wurzelklasse .serie` greifen dann nie (am gebauten CSS geprüft).
- * `WURZEL_MARKE` steuert nur das senkrechte Einrasten, das ohnehin global steht.
+ * Kennzeichnung, solange die mobile Galerie rechnet. Sie sitzt auf jeder Serie und
+ * steuert das mobile CSS — bewusst dort und nicht auf `<html>`: Astro hängt sein
+ * Scope-Attribut an jeden Teil eines Selektors, und eine Klasse auf der Wurzel trägt
+ * dieses Attribut nicht; Regeln wie `.wurzelklasse .serie` greifen dann nie (am
+ * gebauten CSS geprüft).
  */
 const SERIEN_MARKE = 'ist-mobil';
-const WURZEL_MARKE = 'galerie-mobil';
 
 const zahl = (wert: string) => Number.parseFloat(wert) || 0;
 
@@ -77,7 +88,6 @@ export function starteMobileGalerie(): void {
   const letzterDeckel = new WeakMap<HTMLElement, number>();
 
   const raeumeAb = () => {
-    wurzel.classList.remove(WURZEL_MARKE);
     for (const s of serien) {
       s.el.classList.remove(SERIEN_MARKE);
       s.el.style.removeProperty('height');
@@ -105,7 +115,6 @@ export function starteMobileGalerie(): void {
       raeumeAb();
       return;
     }
-    wurzel.classList.add(WURZEL_MARKE);
     for (const s of serien) s.el.classList.add(SERIEN_MARKE);
 
     const stil = getComputedStyle(wurzel);

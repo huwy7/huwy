@@ -605,15 +605,12 @@ const breiten = [640, 960, 1280, 1600, 2000];
      eine Klasse auf `<html>` trägt dieses Attribut nicht — solche Regeln greifen
      dann nie (nachgeprüft am gebauten CSS).
      ------------------------------------------------------------------------ */
-  @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  @media (hover: none) and (pointer: coarse) and (max-width: 500px) and (orientation: portrait) {
     /* Die Desktop-Zentrierung (eine Bildschirmhöhe je Serie, Titel aus der
        Zentrierung herausgerechnet) wird abgeschaltet. Mobil bekommt jede Serie
        eine gemessene Höhe und rastet als Ganzes mittig ein. */
     .serie.ist-mobil {
       padding-block-start: 0;
-      scroll-snap-align: center;
-      /* Nicht in zwei Teilen einrasten, egal wie schnell gewischt wird. */
-      scroll-snap-stop: always;
     }
     .serie.ist-mobil:last-of-type {
       padding-block-end: 0;

@@ -184,14 +184,24 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   düster und farbig — und auf allen Geräten (Mobil und Desktop). Nicht nur dort, wo
   es gerade gemeldet wurde.
 
-- **Mobil und Desktop sind getrennt: `src/scripts/galerie-mobil.ts`.** Die mobile
-  Galerie rechnet ihre Masse selbst und setzt sie als Inline-Werte; die
-  Desktop-Fassung bleibt Wort für Wort wie sie war. Das Modul rechnet nur, solange
-  `MOBIL_QUERY` zutrifft, und räumt beim Wechsel auf Desktop alles restlos ab.
-  Verbindliche Masse (nur mobil): seitlich genau **eine Rahmenbreite** bis zur
-  sichtbaren Bildkante; **3 Rahmenbreiten** Mindestabstand vom Titel zur Kopfzeile
-  und vom Zähler zum unteren Rand; Titel↔Bild und Bild↔Zähler bleiben bei 24px; je
-  Serie ein Snap-Punkt, aktive Serie exakt mittig.
+- **Die eigene Galerie-Fassung gilt NUR für Telefone im Hochformat**
+  (`src/scripts/galerie-mobil.ts`, `MOBIL_QUERY`). Tablets in beiden Ausrichtungen,
+  **Telefone im Querformat** und der Desktop laufen unverändert über den bisherigen
+  Code-Pfad. Grund: die Mindestabstände (Kopfzeile + 3 Rahmenbreiten oben und unten)
+  fressen auf breiten oder flachen Bildschirmen zu viel Höhe — gemessen auf dem
+  iPhone quer 86px Bildhöhe statt 310px, auf dem iPad quer 476px statt 590px. Genau
+  dort ist die alte Darstellung besser. **Die Bedingung nicht ohne Rückfrage
+  aufweichen.** Sie steht wörtlich an drei Stellen (Modul, `Serie.astro`,
+  `global.css`) — CSS kann sie nicht aus einem Token lesen.
+  Verbindliche Masse dort: seitlich genau **eine Rahmenbreite** bis zur sichtbaren
+  Bildkante; **3 Rahmenbreiten** Mindestabstand vom Titel zur Kopfzeile und vom
+  Zähler zum unteren Rand; Titel↔Bild und Bild↔Zähler bleiben bei 24px; erste Serie
+  steht sofort mittig.
+- **KEIN senkrechtes Einrasten.** Es war einmal gebaut (Reels-/TikTok-Mechanik) und
+  auf Wunsch des Betreibers wieder entfernt: gescrollt wird frei. Der gerechnete
+  Abstand zwischen zwei Serien bleibt — er sorgt dafür, dass immer nur eine Serie im
+  Bild ist, und ist enger als der Abstand im bisherigen Zustand. Nicht ungefragt
+  wieder einbauen.
 - **Astro hängt sein Scope-Attribut an JEDEN Teil eines Selektors.** Eine Klasse auf
   `<html>` trägt dieses Attribut nicht — `.wurzelklasse .serie { … }` in einer
   `.astro`-Datei wird zu `.wurzelklasse[cid] .serie[cid]` und greift NIE. (`:root`

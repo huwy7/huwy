@@ -277,12 +277,13 @@ picture > source {
   max-width: calc(100% - 2 * var(--rahmen-breite));
 }
 
-/* NUR MOBIL: Der Höhendeckel kommt nicht mehr aus einem festen vh-Wert, sondern aus
-   der Rechnung in `galerie-mobil.ts` (Viewporthöhe minus Kopfzeile, Mindestabstände,
-   Titel- und Zählerhöhe). Er steht als `--bild-deckel` auf der Serie und wirkt hier.
-   Fehlt er (kein JavaScript), bleibt der bisherige Deckel — die Seite sieht dann aus
-   wie bisher. Die Bedingung steht wörtlich genauso in `galerie-mobil.ts`. */
-@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+/* NUR TELEFON IM HOCHFORMAT: Der Höhendeckel kommt dort nicht mehr aus einem festen
+   vh-Wert, sondern aus der Rechnung in `galerie-mobil.ts` (Viewporthöhe minus
+   Kopfzeile, Mindestabstände, Titel- und Zählerhöhe). Er steht als `--bild-deckel`
+   auf der Serie und wirkt hier. Fehlt er (kein JavaScript), bleibt der bisherige
+   Deckel — die Seite sieht dann aus wie bisher. Die Bedingung steht wörtlich genauso
+   in `galerie-mobil.ts`; dort ist auch begründet, warum jeder Teil nötig ist. */
+@media (hover: none) and (pointer: coarse) and (max-width: 500px) and (orientation: portrait) {
   .ist-mobil .karussell-foto {
     max-height: var(--bild-deckel, var(--karussell-hoehe));
   }
@@ -296,11 +297,11 @@ picture > source {
   :root[data-modus='farbe'] .ist-mobil .karussell-foto {
     max-width: calc(100% - 2 * var(--rahmen-breite));
   }
-  /* Senkrecht einrasten: eine Serie je Snap-Punkt, mittig. Die Klasse setzt das
-     Skript nur, wenn es Serien gibt — andere Seiten scrollen normal weiter. */
-  html.galerie-mobil {
-    scroll-snap-type: y mandatory;
-  }
+  /* KEIN senkrechtes Einrasten. Es war einmal da (Entscheidung des Betreibers,
+     wieder entfernt): gescrollt wird frei. Der gerechnete Abstand zwischen zwei
+     Serien bleibt trotzdem — er sorgt dafür, dass immer nur eine Serie im Bild ist,
+     und er ist enger als der Abstand im bisherigen Zustand. Nicht ungefragt wieder
+     einbauen. */
 }
 
 /* About-Bilder: Format dynamisch (echtes Seitenverhältnis), Grösse passend zur

@@ -69,18 +69,22 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
-- [x] **Mobile Galerie neu gebaut** (`src/scripts/galerie-mobil.ts`), Desktop bleibt
-      unverändert. Bilder so gross wie möglich: seitlich genau eine Rahmenbreite bis
-      zur sichtbaren Kante, senkrecht mindestens drei Rahmenbreiten zur Kopfzeile und
-      zum unteren Rand. Genau eine Serie im Fokus, senkrechtes Einrasten je Serie,
-      aktive Serie exakt mittig; erste Serie steht sofort mittig, letzte lässt sich
-      bis in die Mitte scrollen. Abstand zwischen zwei Serien wird aus deren
-      tatsächlichen Höhen gerechnet, damit die vorherige Serie ganz aus dem Bild ist,
-      sobald die nächste die Mitte erreicht. Keine festen Bildgrössen, keine festen
-      Höhen; alles aus gemessenen Elementgrössen und der Viewportgrösse.
-      Geprüft: 4 Geräte × 2 Seiten, 6 Bildformate (sehr hohes Hochformat bis
-      Panorama und sehr kleines Bild), langsames/schnelles Scrollen, mehrere Wische
-      hintereinander, Drehen, Grössenänderung — überall eingehalten.
+- [x] **Galerie für Telefone im Hochformat neu gebaut**
+      (`src/scripts/galerie-mobil.ts`). Bilder so gross wie möglich: seitlich genau
+      eine Rahmenbreite bis zur sichtbaren Kante, senkrecht mindestens drei
+      Rahmenbreiten zur Kopfzeile und zum unteren Rand. Immer nur eine Serie im Bild,
+      erste Serie steht sofort mittig. Abstand zwischen zwei Serien wird aus deren
+      tatsächlichen Höhen gerechnet. Keine festen Bildgrössen, keine festen Höhen.
+      **Kein Einrasten** — gescrollt wird frei (war zwischenzeitlich eingebaut und
+      wurde auf Wunsch wieder entfernt).
+      **Tablets, Telefone im Querformat und der Desktop bleiben unverändert** beim
+      bisherigen Verhalten; dort machten die neuen Mindestabstände die Bilder kleiner
+      (iPhone quer 86px statt 310px Bildhöhe, iPad quer 476px statt 590px).
+      Geprüft: 3 iPhones × 2 Seiten × 6 Bildformate (sehr hohes Hochformat bis
+      Panorama und sehr kleines Bild), Drehen, Grössenänderung, freies Scrollen.
+      Gegenprobe gegen den Stand davor über Desktop, iPad hochkant/quer, iPad mini,
+      iPhone quer und schmales Fenster: 385 Werte verglichen, 14 weichen um je 1px
+      ab (genauere Höhenmessung), keine einzige Bildgrösse verändert.
 - [x] **Vollbild: Wischen geht jetzt auch auf iOS.** Die Blätterflächen lagen über
       dem Scroll-Streifen und fingen die Berührung ab; sie liegen jetzt innerhalb
       der Bildfläche im Streifen. Ein Wisch blättert genau ein Bild weiter; Tippen,

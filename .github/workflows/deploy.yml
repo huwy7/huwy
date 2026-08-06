@@ -29,24 +29,15 @@ jobs:
         with:
           node-version: 22
 
-      # --- main -> Wurzel ---
+      # --- Beide Branches holen ---
+      # Bewusst BEIDE zuerst auschecken, erst danach installieren und bauen: die
+      # Zwischenspeicher unten brauchen beide Arbeitsverzeichnisse, bevor sie
+      # zurückgespielt werden können.
       - name: main auschecken
         uses: actions/checkout@v4
         with:
           ref: main
           path: main
-      - name: main bauen (Basis /)
-        working-directory: main
-        run: |
-          npm ci
-          npm run build
-      - name: main in die Wurzel legen
-        run: |
-          rm -rf _site
-          mkdir -p _site
-          cp -r main/dist/. _site/
-
-      # --- feature -> /feature (darf die Live-Seite NIE blockieren) ---
       - name: feature auschecken
         id: featco
         continue-on-error: true
@@ -54,16 +45,86 @@ jobs:
         with:
           ref: feature
           path: feature
+
+      # --- Zwischenspeicher 1: npm-Pakete ---
+      # Spart das erneute Herunterladen aller Pakete. Muss VOR `npm ci` liegen.
+      # Schlägt der Cache-Dienst fehl, läuft der Deploy trotzdem weiter
+      # (continue-on-error) — die Live-Seite darf nie an einem Cache hängen.
+      - name: Zwischenspeicher npm-Pakete
+        continue-on-error: true
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('main/package-lock.json', 'feature/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+      - name: Pakete installieren (main)
+        working-directory: main
+        run: npm ci
+      - name: Pakete installieren (feature)
+        id: featnpm
+        if: steps.featco.outcome == 'success'
+        continue-on-error: true
+        working-directory: feature
+        run: npm ci
+
+      # --- Zwischenspeicher 2: vorberechnete Bilder ---
+      # DAS ist der grosse Brocken. Ohne ihn rechnet jeder Bau alle Bilder in alle
+      # Grössen und Formate neu durch (lokal gemessen: 136 Sekunden statt 3 — und
+      # der Workflow baut zweimal).
+      #
+      # MUSS NACH `npm ci` stehen: Astro legt seinen Bild-Cache unter
+      # node_modules/.astro ab, und `npm ci` löscht node_modules vor der
+      # Installation komplett. Vorher zurückgespielt wäre er sofort wieder weg.
+      #
+      # Kein Risiko für falsche Bilder: Astro benennt jede vorberechnete Datei nach
+      # einer Prüfsumme aus Originalbild und Umrechnung. Ändert sich ein Foto,
+      # passt der alte Eintrag nicht mehr und es wird neu gerechnet. Ein veralteter
+      # Cache kann also höchstens langsam sein, nie falsch.
+      #
+      # Der Schlüssel hängt an den Quellbildern: bleiben sie gleich, gibt es einen
+      # Volltreffer und am Ende wird nichts neu hochgeladen. Kommt ein Foto dazu,
+      # greift `restore-keys`, der bisherige Stand wird geholt und nur das neue Bild
+      # gerechnet.
+      #
+      # Zwei Eigenheiten von GitHub, damit später niemand rätselt:
+      #   - Zwischenspeicher sind nach Branch getrennt. Was ein Push auf `feature`
+      #     ablegt, sieht nur `feature`; was beim Bau von `main` entsteht, sehen
+      #     alle. Beide Branches bekommen Pushes, also füllt sich beides von selbst.
+      #   - Einträge, die 7 Tage nicht gebraucht wurden, räumt GitHub weg. Nach
+      #     einer längeren Pause ist der erste Deploy wieder langsam, danach wieder
+      #     schnell. Das ist kein Fehler.
+      - name: Zwischenspeicher vorberechnete Bilder
+        continue-on-error: true
+        uses: actions/cache@v4
+        with:
+          path: |
+            main/node_modules/.astro
+            feature/node_modules/.astro
+          key: bilder-${{ runner.os }}-${{ hashFiles('main/src/assets/**', 'feature/src/assets/**') }}
+          restore-keys: |
+            bilder-${{ runner.os }}-
+
+      # --- main -> Wurzel ---
+      - name: main bauen (Basis /)
+        working-directory: main
+        run: npm run build
+      - name: main in die Wurzel legen
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -r main/dist/. _site/
+
+      # --- feature -> /feature (darf die Live-Seite NIE blockieren) ---
       - name: feature bauen (Basis /feature)
         id: featbuild
-        if: steps.featco.outcome == 'success'
+        if: steps.featnpm.outcome == 'success'
         continue-on-error: true
         working-directory: feature
         env:
           BASE_PATH: /feature
-        run: |
-          npm ci
-          npm run build
+        run: npm run build
       - name: feature nach /feature legen
         if: steps.featbuild.outcome == 'success'
         run: |

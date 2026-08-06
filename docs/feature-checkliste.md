@@ -8,7 +8,50 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 ## Offen
 
 ### Gemeldet am 31.07. (Betreiber)
-_(zurzeit nichts offen)_
+
+- [ ] **Bauzeit verkürzen — Cache im Deploy einrichten.** Damit eine Änderung
+      schneller live ist, vor allem nach einem Foto-Upload über `/admin`.
+
+      **Stand heute:** `.github/workflows/deploy.yml` speichert **nichts** zwischen
+      (kein `actions/cache`, kein `cache: npm`). Jeder Deploy lädt zweimal alle
+      Pakete neu (`npm ci` für `main` und für `feature`) und rechnet zweimal alle
+      Bilder neu durch — und das bei **jedem** Push, egal auf welchen Branch.
+
+      **Was zu cachen wäre:**
+      1. die npm-Pakete (`~/.npm` bzw. `cache: npm` an `setup-node`)
+      2. **Astros Bild-Cache: `node_modules/.astro/assets`** — aktuell 161 MB,
+         559 Einträge. Das ist der grosse Brocken. Liegt er vor, meldet der Build
+         „reused cache entry" statt neu zu rechnen.
+
+      **Frage des Betreibers — geht das ohne Backend? Ja.** Der Cache liegt auf der
+      Baumaschine bei GitHub, nicht auf dem Server, der die Seite ausliefert. Die
+      Seite bleibt vollständig statisch, es kommt keine Server-Komponente dazu und
+      für Besucher ändert sich nichts. GitHub stellt dafür 10 GB pro Repo bereit,
+      161 MB passen also bequem.
+
+      **Erwartete Wirkung:** nach einem Foto-Upload muss nur noch das eine neue Bild
+      gerechnet werden statt aller 559. Die restliche Bauzeit sind Paketinstallation
+      und Seitenbau — beides klein.
+
+      **Zu beachten beim Umsetzen:** GitHub räumt Cache-Einträge weg, die 7 Tage
+      nicht benutzt wurden (dann ist der nächste Deploy wieder langsam, danach
+      wieder schnell). Der Cache-Schlüssel muss so gewählt sein, dass geänderte
+      Bilder sicher neu gerechnet werden — lieber ein Treffer zu wenig als ein
+      veraltetes Bild live.
+
+- [ ] **Abstände auf dem iPhone überarbeiten.** Betreiber: „die Abstände sind besser,
+      wenn auch noch nicht perfekt". **Was genau geändert werden soll, ist noch nicht
+      definiert** — erst festlegen, dann bauen.
+
+      Stand heute als Ausgangspunkt (Telefon hochkant, beide Seiten):
+      - Titel → sichtbare Bildoberkante: 24px
+      - sichtbare Bildunterkante → Zähler: 24px
+      - Kopfzeile → Titel: mindestens 24px
+      - Zähler → unterer Bildschirmrand: mindestens 24px
+      - seitlich bis zur sichtbaren Bildkante: 16px (eine Rahmenbreite)
+      - zwischen zwei Serien: gerechnet aus deren Höhen, rund 240px auf dem iPhone
+
+      Sichtbare Kante heisst wie überall: düster der weisse Rahmen, farbig das Foto.
 
 ### Leitprinzip für `/admin` (verbindlich)
 **Viel möglich, aber übersichtlich.** Alles, was hier hinzukommt, muss für den

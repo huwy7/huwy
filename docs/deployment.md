@@ -41,8 +41,10 @@ die Quelldateien statt der gebauten Seite. Quelle muss **GitHub Actions** sein.
 
 ## Vor dem Live-Gang noch offen
 
-- Restliche `TODO_`-Platzhalter ersetzen: `TODO_NAME`, `TODO_MAIL`,
-  `TODO_INSTAGRAM` (Domain ist gesetzt).
+- Platzhalter: **erledigt.** `TODO_NAME` ist auf `nicolas huwyler - portfolio`
+  gesetzt, die Domain auf `hey.hu-wy.ch`. `TODO_MAIL` und `TODO_INSTAGRAM` sind
+  gegenstandslos — Kontaktseite, Fusszeile und die Mail-/Instagram-Links wurden
+  entfernt (CLAUDE.md Abschnitt 1).
 - Echte körnige Schwarzweissbilder einsetzen, Qualität kalibrieren, Budget messen
   (`docs/bilder-pipeline.md`).
 - Impressum/Datenschutz: laut Betreiber vorerst nicht nötig (private Nutzung).

@@ -138,7 +138,8 @@ Jede Phase enthält einen fertigen Prompt zum Einfügen in Claude Code.
 > die Startcheckliste unten durch. Berichte jeden Punkt einzeln mit Befund.
 
 **Checkliste**
-- [ ] Domain `TODO_DOMAIN` aufgeschaltet, `www` leitet auf die nackte Domain um
+- [x] Domain `hey.hu-wy.ch` aufgeschaltet (`astro.config.mjs` und `public/CNAME`).
+      Offen: ob `hu-wy.ch` und `www` einmal darauf umleiten sollen.
 - [ ] HTTPS erzwungen, HSTS aktiv
 - [ ] Auf einem echten iPhone in Safari geprüft, nicht nur im Responsive-Modus
 - [ ] Alle internen Links funktionieren, keine 404 ausser der 404-Seite

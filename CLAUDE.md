@@ -102,8 +102,8 @@ Auftreten einmal nachfragen — nicht erfinden, nicht raten:
 
 | Platzhalter | Bedeutung |
 |---|---|
-| `TODO_NAME` | Name der Fotografin / des Fotografen, Wortmarke im Header |
-| `TODO_DOMAIN` | Die bereits registrierte Domain |
+| ~~`TODO_NAME`~~ | **Festgelegt: `nicolas huwyler - portfolio`.** Steht in Tab-Titeln, `og:site_name` und der unsichtbaren `h1`. Auf der Seite selbst nicht sichtbar — die Kopfzeile trägt keine Wortmarke. |
+| ~~`TODO_DOMAIN`~~ | **Festgelegt: `hey.hu-wy.ch`** (`astro.config.mjs` und `public/CNAME`). Ausgeliefert über GitHub Pages, nicht Cloudflare. |
 | `TODO_MAIL` | Kontakt-Mailadresse |
 | `TODO_SERIEN` | Titel und Jahr der Serien |
 

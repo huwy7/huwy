@@ -22,8 +22,10 @@ const serien = serienMeta
   .filter((s) => s.bilder.length > 0);
 ---
 
-<Basis titel="Portfolio — color — TODO_NAME" modus="farbe" vollhoehe>
-  <h1 class="visuell-versteckt">TODO_NAME — color</h1>
+{/* Kein führendes „Portfolio" mehr: das Wort steckt bereits im Namen, sonst stünde
+    es zweimal im selben Tab-Titel. */}
+<Basis titel="color — nicolas huwyler - portfolio" modus="farbe" vollhoehe>
+  <h1 class="visuell-versteckt">nicolas huwyler - portfolio — color</h1>
 
   <div class="serien-liste">
     {

@@ -236,6 +236,11 @@ Sechs Seiten. Keine weiteren.
 
 ### 6.1 Startseite `/`
 
+> **Überholt.** Die Kopfzeile trägt **keine Wortmarke** und ist **sticky**; sie
+> zeigt nur Portfolio und About me plus den Modus-Umschalter. Der Name steht
+> ausschliesslich in den Metadaten (Abschnitt 10). Der Block unten ist der alte
+> Entwurfsstand und bleibt nur als Historie stehen.
+
 ```
 Header (80px hoch)
   links:  TODO_NAME, mono 15px/500
@@ -384,7 +389,10 @@ keine Abhängigkeit.
 
 ## 10. Meta und SEO
 
-- Sprechender `<title>` je Seite: `Serientitel — TODO_NAME`
+- Sprechender `<title>` je Seite, endet auf den Namen: `nicolas huwyler - portfolio`
+  (Startseite nur der Name; Unterseiten davor der Seitenname, z. B.
+  `About me — nicolas huwyler - portfolio`). Die Farb-Startseite lässt das führende
+  „Portfolio" weg, weil das Wort schon im Namen steckt.
 - `meta description` je Serie aus dem Einleitungstext
 - Open-Graph-Bild je Serie: das Titelbild, auf 1200×630 zugeschnitten
 - `sitemap.xml` und `robots.txt` generieren
@@ -398,7 +406,12 @@ Keine Keyword-Optimierung, keine versteckten Textblöcke, kein Blog „für SEO"
 ## 11. Deployment
 
 - Repository auf GitHub, Branch `main` ist produktiv
-- Cloudflare Pages baut bei jedem Push auf `main`
+- **GitHub Pages** baut bei jedem Push auf `main` — und zusätzlich `feature` nach
+  `/feature` als Vorschau, beides in einem Artefakt
+  (`.github/workflows/deploy.yml`). Die frühere Angabe „Cloudflare Pages" ist
+  überholt.
 - Build: `npm run build`, Ausgabeverzeichnis `dist`
-- Domain `TODO_DOMAIN` auf Cloudflare, `www` leitet auf die nackte Domain um
+- Domain **`hey.hu-wy.ch`** — steht in `astro.config.mjs` (`site`) und in
+  `public/CNAME`, ist aufgeschaltet und in Betrieb.
+  Offen: ob die nackte Domain `hu-wy.ch` und `www` einmal darauf umleiten sollen.
 - HTTPS erzwingen, HSTS aktiv

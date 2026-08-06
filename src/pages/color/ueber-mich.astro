@@ -9,7 +9,7 @@ const eintrag = await getEntry('seiten', 'mehr-ueber-mich');
 const eintraege = eintrag!.data.bilder.map((b) => ({ bild: b.bild, text: b.text }));
 ---
 
-<Basis titel="More about me — TODO_NAME" modus="farbe">
+<Basis titel="More about me — nicolas huwyler - portfolio" modus="farbe">
   <h1 class="seiten-titel">More about me</h1>
   <UeberInhalt eintraege={eintraege} />
 </Basis>

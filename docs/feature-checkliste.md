@@ -39,51 +39,6 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
       Bilder sicher neu gerechnet werden — lieber ein Treffer zu wenig als ein
       veraltetes Bild live.
 
-- [ ] **`TODO_NAME` festlegen — Name der Fotografin / des Fotografen.** Muss noch
-      definiert werden; **nicht erfinden**, der Betreiber entscheidet.
-
-      **Wo er auftaucht (8 Stellen in `src/`):** im `<title>` jeder Seite (also im
-      Browser-Tab), in `og:site_name` und `og:title` (die Vorschau beim Teilen eines
-      Links) und als unsichtbare `h1` für Screenreader und Suchmaschinen. **Auf der
-      Seite selbst ist er nirgends zu sehen** — die Kopfzeile trägt bewusst keine
-      Wortmarke. Wer die Seite heute weiterschickt, sieht in der Vorschau wörtlich
-      „TODO_NAME".
-
-      **Zwei verschiedene Jobs, die man getrennt entscheiden kann:**
-      1. *Für Titel und Teilen-Vorschau* zählt Auffindbarkeit — hier spricht viel
-         für den vollen Namen, damit die Seite unter dem Namen gefunden wird und in
-         geteilten Links seriös aussieht.
-      2. *Für eine sichtbare Wortmarke* (gibt es heute nicht, könnte aber kommen)
-         zählt der Ton der Seite — dort passt eine knappe Kleinschreibung besser zur
-         Mono-Typografie und zur rauen Richtung.
-
-      **Vorschläge (Betreiber wählt):**
-      - `Nicolas Huwyler` — voller Name, gut auffindbar, seriös in geteilten Links
-      - `nicolas huwyler` — derselbe Name, klein geschrieben; passt zur
-        Mono-Typografie und zur „old school"-Härte
-      - `huwy` — kurz, passt zum Repo und zur Domain, sehr reduziert; als Tab-Titel
-        aber wenig aussagekräftig für Fremde
-      - `hu-wy` — deckt sich exakt mit der Domain
-      - Kombination: voller Name in Titel und Teilen-Vorschau, Kurzform nur für eine
-        spätere Wortmarke
-
-      Mein Vorschlag: **voller Name** für die Metadaten. Die Seite ist ein Portfolio;
-      der Name ist dort kein Dekor, sondern die Zuordnung zum Werk. Die Kurzform
-      hebt man sich für den Fall auf, dass doch eine Wortmarke sichtbar wird.
-
-- [ ] **`TODO_DOMAIN` aufräumen — der Platzhalter ist überholt.** Die Domain steht
-      längst fest und ist in Betrieb: `hey.hu-wy.ch` (in `astro.config.mjs` als
-      `site` und in `public/CNAME`). Nur `docs/01-spezifikation.md` (Abschnitt 11)
-      und `docs/02-build-plan.md` führen noch `TODO_DOMAIN`.
-
-      Zu klären, bevor man es einträgt:
-      - Bleibt `hey.hu-wy.ch` die endgültige Adresse, oder soll die nackte Domain
-        `hu-wy.ch` (und `www`) einmal darauf umleiten? In den Dokumenten steht eine
-        solche Umleitung als Ziel, gebaut ist sie nicht.
-      - Die Dokumente nennen Cloudflare Pages als Hosting; ausgeliefert wird die
-        Seite tatsächlich über GitHub Pages mit eigener Domain. Beim Aufräumen
-        mitkorrigieren, damit die Doku nicht in die Irre führt.
-
 - [ ] **Abstände auf dem iPhone überarbeiten.** Betreiber: „die Abstände sind besser,
       wenn auch noch nicht perfekt". **Was genau geändert werden soll, ist noch nicht
       definiert** — erst festlegen, dann bauen.
@@ -157,6 +112,18 @@ Schutzmechanismus. Also: kein OAuth-Login als Aufgabe führen.
 
 ## Erledigt
 
+- [x] **`TODO_NAME` festgelegt: `nicolas huwyler - portfolio`.** Entscheidung des
+      Betreibers. Eingesetzt an allen 8 Stellen: Tab-Titel jeder Seite,
+      `og:site_name`, `og:title` und die unsichtbare `h1`. Auf der Seite selbst
+      weiterhin nicht sichtbar — die Kopfzeile trägt bewusst keine Wortmarke.
+      Eine Stelle angepasst: der Titel der Farb-Startseite hiess „Portfolio — color
+      — …" und hätte „Portfolio" doppelt enthalten; das führende Wort ist weg.
+- [x] **`TODO_DOMAIN` aufgeräumt.** Die Domain `hey.hu-wy.ch` war längst in Betrieb
+      (`astro.config.mjs`, `public/CNAME`); der Platzhalter lebte nur noch in
+      `docs/01-spezifikation.md` und `docs/02-build-plan.md`. Dort eingetragen und
+      zugleich die falsche Hosting-Angabe korrigiert: ausgeliefert wird über GitHub
+      Pages, nicht über Cloudflare. **Weiterhin offen und dort vermerkt:** ob die
+      nackte Domain `hu-wy.ch` und `www` einmal auf `hey.hu-wy.ch` umleiten sollen.
 - [x] **Galerie für Telefone im Hochformat neu gebaut**
       (`src/scripts/galerie-mobil.ts`). Bilder so gross wie möglich: seitlich genau
       eine Rahmenbreite bis zur sichtbaren Kante, senkrecht mindestens ein

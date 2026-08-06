@@ -57,8 +57,10 @@ const istUeber = farbe ? rel === '/color/ueber-mich' : rel === '/ueber-mich';
 const kanonisch = new URL(Astro.url.pathname, Astro.site);
 const ogBildAbsolut = ogBild ? new URL(ogBild, Astro.site) : undefined;
 
-// Nur für Meta (og:site_name), nicht sichtbar. TODO_NAME bleibt Platzhalter.
-const name = 'TODO_NAME';
+// Nur für Meta (og:site_name), auf der Seite selbst nicht sichtbar — die Kopfzeile
+// trägt bewusst keine Wortmarke. Festgelegt vom Betreiber; klein geschrieben wie
+// alle Beschriftungen (CLAUDE.md Regel 8).
+const name = 'nicolas huwyler - portfolio';
 ---
 
 <!doctype html>

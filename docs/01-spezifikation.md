@@ -389,10 +389,13 @@ keine Abhängigkeit.
 
 ## 10. Meta und SEO
 
-- Sprechender `<title>` je Seite, endet auf den Namen: `nicolas huwyler - portfolio`
-  (Startseite nur der Name; Unterseiten davor der Seitenname, z. B.
-  `About me — nicolas huwyler - portfolio`). Die Farb-Startseite lässt das führende
-  „Portfolio" weg, weil das Wort schon im Namen steckt.
+- Sprechender `<title>` je Seite, endet auf den Namen: `nicolas huwyler - portfolio`.
+  **Beide Startseiten — düster und farbig — tragen nur den Namen**, ohne Zusatz: die
+  Farbseite ist kein eigener Bereich, sondern dieselbe Seite in einem anderen Modus
+  (Entscheidung des Betreibers). Unterseiten stellen den Seitennamen davor, z. B.
+  `About me — nicolas huwyler - portfolio`.
+- Die unsichtbare `h1` bleibt dagegen unterscheidbar (`… — color` auf der Farbseite),
+  damit Screenreader und Suchmaschinen die beiden Startseiten auseinanderhalten.
 - `meta description` je Serie aus dem Einleitungstext
 - Open-Graph-Bild je Serie: das Titelbild, auf 1200×630 zugeschnitten
 - `sitemap.xml` und `robots.txt` generieren

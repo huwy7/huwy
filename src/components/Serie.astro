@@ -352,12 +352,9 @@ const breiten = [640, 960, 1280, 1600, 2000];
     );
   }
 
-  /* Farbseite: Serientitel und Jahr in der Display-Schrift. Bewusst NUR hier —
-     Kopfzeile, Umschalt-Button und Fliesstext bleiben in Mono, sonst geht der
-     Kontrast verloren, der den Reiz ausmacht. Die düstere Seite ist unberührt. */
-  :root[data-modus='farbe'] .serie-kopf {
-    font-family: var(--schrift-display);
-  }
+  /* Kein eigener Font-Override für die Farbseite mehr: dort ist --schrift-mono
+     global auf die Display-Schrift umgestellt (global.css), der Serientitel zieht
+     über die Regel oben automatisch mit. Die düstere Seite bleibt bei Mono. */
 
   /* Inline-Karussell: horizontaler scroll-snap-Streifen, ein Bild pro Ansicht. */
   .karussell {

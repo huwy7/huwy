@@ -366,7 +366,11 @@ const name = 'nicolas huwyler - portfolio';
       #tor-code {
         width: 14ch;
         padding: var(--abstand-8) var(--abstand-16);
-        font-family: var(--schrift-mono);
+        /* --schrift-tor, nicht --schrift-mono: der Farbmodus biegt --schrift-mono
+           auf die Display-Schrift um, das Tor soll aber in beiden Modi gleich
+           aussehen (wie bei --farbe-tor-feld). Die 14ch Breite hängen ausserdem
+           an der Zeichenbreite einer Monospace. */
+        font-family: var(--schrift-tor);
         font-size: var(--groesse-16);
         color: var(--farbe-hintergrund);
         text-align: center;

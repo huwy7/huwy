@@ -186,9 +186,17 @@ body::after {
      statt 46): warmes Sonnenlicht statt blasse Haut. Bewusst vom Betreiber
      gewählt — der Grund trägt hier mehr Farbe als die frühere Doktrin vorsah. */
   --farbe-rahmen: #ffe4b5;
-  /* Der Serientitel steht hier in der Display-Schrift (Serie.astro) und braucht
-     mehr Grösse als die 14px der Mono — eine fette Retro-Schrift wirkt erst ab
-     etwa 20px. Die Zentrier-Formel rechnet mit demselben Token und zieht mit. */
+  /* Die GESAMTE Beschriftung der Farbseite läuft in der Display-Schrift —
+     Kopfzeile, Serientitel, Seitentitel, Fliesstext. Statt jede Regel einzeln
+     umzubiegen, werden hier die beiden Familien-Token umgestellt; alles, was
+     --schrift-mono oder --schrift-text benutzt, zieht damit automatisch mit,
+     auch künftige Regeln. Einzige Ausnahme ist das Eingabefeld am Zugangs-Tor:
+     es hängt an --schrift-tor und bleibt in beiden Modi Mono. */
+  --schrift-mono: var(--schrift-display);
+  --schrift-text: var(--schrift-display);
+  /* Der Serientitel braucht in der Display-Schrift mehr Grösse als die 14px der
+     Mono — eine fette Retro-Schrift wirkt erst ab etwa 20px. Die Zentrier-Formel
+     in Serie.astro rechnet mit demselben Token und zieht mit. */
   --serientitel-groesse: var(--groesse-22);
   /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#ffe4b5). */
   --kopf-schleier: linear-gradient(

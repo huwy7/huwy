@@ -24,9 +24,17 @@
 
   /* --- 3.3 Schriftfamilien --- */
   --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  /* Display-Schrift für Serientitel — wird NUR im Farbmodus eingesetzt (global.css).
-     Auf der düsteren Seite bleibt der Titel in Mono; der Bruch zwischen technischer
-     Mono und fetter Retro-Schrift ist die Idee, nicht ein Versehen. */
+  /* Eigene Kopie des Mono-Stacks für das Eingabefeld am Zugangs-Tor. Bewusst ein
+     EIGENER Token und nicht --schrift-mono: der Farbmodus stellt --schrift-mono
+     und --schrift-text auf die Display-Schrift um (global.css), das Tor sieht in
+     beiden Modi aber gleich aus und darf sich nicht mitverwandeln. Dieselbe
+     Trennung wie bei --farbe-tor-feld. */
+  --schrift-tor: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Display-Schrift der Farbseite — wird NUR im Farbmodus eingesetzt (global.css)
+     und trägt dort die GESAMTE Beschriftung: Kopfzeile, Serientitel, Seitentitel,
+     Fliesstext. Auf der düsteren Seite kommt sie nirgends vor; dort bleibt alles
+     bei Mono und Instrument Sans. Der Bruch zwischen der technischen düsteren
+     Seite und der fetten Retro-Farbseite ist die Idee, nicht ein Versehen. */
   --schrift-display: "Caprasimo", Georgia, serif;
   /* Grösse des Serientitels. Eigener Token, weil die Zentrier-Formel in
      Serie.astro damit rechnet (`.serie-kopf { margin-block-start }`): wird die

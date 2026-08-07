@@ -205,8 +205,12 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   Hintergrunds durchgemessen: mit dem weichen `korn.png` (Werte 6–135, Streuung 18)
   liessen sich per CSS nur 8–15% mehr Rauheit holen, und jedes Mal bezahlte man mit
   einem helleren Grund oder damit, dass der verwischte Hund verschwand. Mit
-  `korn-hart.png` (gleiche mittlere Helligkeit 31,4, aber volle Spanne 0–255 und
-  dreifache Streuung) verdoppelte sich die Rauheit, ohne dass der Grund heller wurde.
+  `korn-hart.png` (gleiche mittlere Helligkeit, aber grössere Spanne und höhere
+  Streuung) stieg die Rauheit deutlich, ohne dass der Grund heller wurde.
+  **Die Stärke ist eine gewählte Mitte, kein Maximum:** die erste Fassung
+  (Streuung 52, Spanne bis 255) war dem Betreiber zu wild; jetzt Streuung 34,6 und
+  Spanne bis 220. Gemessene Hintergrund-Rauheit Desktop: vorher 7,9 — zu wild 16,9 —
+  jetzt 12,8. Zum Nachjustieren die **Textur neu erzeugen**, nicht am CSS drehen.
   Zwei Sackgassen, nicht nochmal versuchen:
   - `mix-blend-mode: overlay` fürs Korn — overlay behält die Helligkeit des
     Untergrunds bei, auf near-black wird jedes Korn zu Null und der Grund war danach

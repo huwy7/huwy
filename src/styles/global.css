@@ -162,36 +162,44 @@ body::after {
    finale warme/sonnige, verwaschene Look (eigenes Bild + Palette) kommt später —
    siehe docs/farbmodus-ideensammlung.md. Nur der Farbmodus (data-modus="farbe")
    ist betroffen; die düstere Seite bleibt unverändert. */
-/* Sonnen-/Farbseite als HELLES, warmes Thema: Cremeton als Grund, rotbraune
-   Schrift — Farbwerte vom Betreiber vorgegeben. Damit ist die frühere Fassung
-   „weisser Grund, fast schwarzer Text" abgelöst; der noch ältere Versuch mit einem
-   FARBIGEN Grund („war zu viel") bleibt verworfen — creme ist ein Grundton, keine
-   Farbfläche. --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕).
+/* Sonnen-/Farbseite als HELLES, warmes Thema: beige-weisser Grund, rotbraune
+   Schrift. Damit ist die frühere Fassung „weisser Grund, fast schwarzer Text"
+   abgelöst; der noch ältere Versuch mit einem FARBIGEN Grund („war zu viel")
+   bleibt verworfen — der Grund ist ein warmer Weisston, keine Farbfläche.
+   --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕).
    Die düstere Seite bleibt vollständig unverändert. */
 :root[data-modus='farbe'] {
-  --farbe-text: #832d24; /* rotbraun auf Creme — gemessen 7,0:1, also AAA */
-  /* Leiser Text (About-Seiten): das globale Grau hätte auf Creme nur 2,7:1. Ein
-     gedämpftes Rotbraun aus derselben Familie kommt auf 4,9:1 und erfüllt AA. */
+  --farbe-text: #832d24; /* rotbraun auf dem warmen Grund — gemessen 7,2:1, also AAA */
+  /* Leiser Text (About-Seiten): das globale Grau käme auf diesem Grund nur auf
+     2,5:1. Ein gedämpftes Rotbraun aus derselben Familie kommt auf 5,1:1 und
+     erfüllt AA. */
   --farbe-text-leise: #8f4f42;
   /* Grund, Passepartout und Vollbild-Fläche tragen denselben Ton. Damit bleibt der
      weisse Rahmen auf der Farbseite unsichtbar — darauf beruht die gesamte
      Abstandsrechnung (sichtbare Kante = das Foto, siehe docs/lernnotizen.md).
-     Das Eingabefeld am Tor hängt bewusst NICHT hier dran (--farbe-tor-feld). */
-  --farbe-rahmen: #f1e4c3;
+     Das Eingabefeld am Tor hängt bewusst NICHT hier dran (--farbe-tor-feld).
+
+     Warum genau dieser Ton: der frühere #f1e4c3 wirkte fahl („wie kranke Haut").
+     Schuld war nicht allein die Menge Farbe, sondern der Farbton — 43° ist Gelb,
+     und ein gedecktes Gelb-Beige liest sich als kranker Hautton. Dieser Wert
+     sitzt bei 38° und ist zugleich deutlich heller und satter (Kanalabstand 74
+     statt 46): warmes Sonnenlicht statt blasse Haut. Bewusst vom Betreiber
+     gewählt — der Grund trägt hier mehr Farbe als die frühere Doktrin vorsah. */
+  --farbe-rahmen: #ffe4b5;
   /* Der Serientitel steht hier in der Display-Schrift (Serie.astro) und braucht
      mehr Grösse als die 14px der Mono — eine fette Retro-Schrift wirkt erst ab
      etwa 20px. Die Zentrier-Formel rechnet mit demselben Token und zieht mit. */
   --serientitel-groesse: var(--groesse-22);
-  /* Schleier der sticky Kopfzeile, im selben Cremeton wie der Grund. */
+  /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#ffe4b5). */
   --kopf-schleier: linear-gradient(
     to bottom,
-    rgba(241, 228, 195, 0.94) 0%,
-    rgba(241, 228, 195, 0.8) 55%,
-    rgba(241, 228, 195, 0) 100%
+    rgba(255, 228, 181, 0.94) 0%,
+    rgba(255, 228, 181, 0.8) 55%,
+    rgba(255, 228, 181, 0) 100%
   );
 }
 :root[data-modus='farbe'] body {
-  background-color: var(--farbe-rahmen); /* warmer Cremeton */
+  background-color: var(--farbe-rahmen); /* warmes Beige-Weiss */
 }
 /* Kein Sonnenuntergang, kein Korn/Vignette — sauberer heller Grund. */
 :root[data-modus='farbe'] body::before,
@@ -288,8 +296,8 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
-/* Farbseite: Rahmen und Grund tragen denselben Cremeton, der Rahmen ist dort also
-   unsichtbar. Er wird
+/* Farbseite: Rahmen und Grund tragen denselben Beige-Weiss-Ton, der Rahmen ist
+   dort also unsichtbar. Er wird
    trotzdem gebraucht — ohne ihn stossen beim Weiterwischen zwei Bilder direkt
    aneinander. Darum liegt er hier AUSSEN um das Bild (content-box statt
    border-box): das Bild behält exakt seine Grösse — so gross wie auf der düsteren

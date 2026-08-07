@@ -1,7 +1,8 @@
 # Schrift-Lizenzen
 
-Befund der Lizenzprüfung aus Build-Plan Phase 0. Beide Schriften sind frei
-nutzbar, selbst hostbar und kommerziell einsetzbar. **Kein Blocker.**
+Befund der Lizenzprüfung aus Build-Plan Phase 0, später um die Display-Schrift
+der Farbseite ergänzt. Alle Schriften sind frei nutzbar, selbst hostbar und
+kommerziell einsetzbar. **Kein Blocker.**
 
 ## Commit Mono — Beschriftungen (Spezifikation 3.1)
 
@@ -28,14 +29,28 @@ nutzbar, selbst hostbar und kommerziell einsetzbar. **Kein Blocker.**
 - **Lizenztext im Repo:** `public/fonts/instrument-sans-OFL.txt`
 - **Subsets:** `latin` und `latin-ext`.
 
+## Caprasimo — Serientitel, nur Farbseite (CLAUDE.md 1a)
+
+- **Lizenz:** SIL Open Font License, Version 1.1 (OFL-1.1)
+- **Urheber:** The Caprasimo Project Authors, 2022
+- **Verifiziert an:** der `OFL.txt` im offiziellen Repository
+  <https://github.com/thomasjockin/Caprasimo> sowie der Lizenzangabe auf
+  <https://fonts.google.com/specimen/Caprasimo>.
+- **Lizenztext im Repo:** `public/fonts/caprasimo-OFL.txt`
+- **Subsets:** `latin` und `latin-ext`.
+- **Schnitte:** nur 400 — die Schrift hat keinen weiteren Schnitt, sie ist von
+  Haus aus fett. Deshalb steht sie nur im Serientitel der Farbseite; die
+  düstere Seite behält dort ihre Mono.
+
 ## Einbindung
 
 - Format WOFF2, selbst gehostet unter `public/fonts/`, kein Fremd-CDN.
 - Nur Schnitt 400 und 500 je Familie, `font-display: swap`
   (`src/styles/schriften.css`).
 - Bezugsquelle der WOFF2-Dateien: die oben genannten Fontsource-npm-Pakete
-  (identische OFL-Dateien). Die Pakete selbst sind **keine** Projekt-Dependency —
-  die WOFF2-Dateien wurden entnommen und liegen direkt im Repo.
+  (identische OFL-Dateien), bei Caprasimo direkt der WOFF2-Auslieferung von
+  Google Fonts. Die Pakete selbst sind **keine** Projekt-Dependency — die
+  WOFF2-Dateien wurden entnommen und liegen direkt im Repo.
 
 ## OFL-Pflichten (erfüllt)
 

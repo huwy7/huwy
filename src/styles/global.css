@@ -178,6 +178,10 @@ body::after {
      Abstandsrechnung (sichtbare Kante = das Foto, siehe docs/lernnotizen.md).
      Das Eingabefeld am Tor hängt bewusst NICHT hier dran (--farbe-tor-feld). */
   --farbe-rahmen: #f1e4c3;
+  /* Der Serientitel steht hier in der Display-Schrift (Serie.astro) und braucht
+     mehr Grösse als die 14px der Mono — eine fette Retro-Schrift wirkt erst ab
+     etwa 20px. Die Zentrier-Formel rechnet mit demselben Token und zieht mit. */
+  --serientitel-groesse: var(--groesse-22);
   /* Schleier der sticky Kopfzeile, im selben Cremeton wie der Grund. */
   --kopf-schleier: linear-gradient(
     to bottom,

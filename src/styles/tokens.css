@@ -24,6 +24,15 @@
 
   /* --- 3.3 Schriftfamilien --- */
   --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Display-Schrift für Serientitel — wird NUR im Farbmodus eingesetzt (global.css).
+     Auf der düsteren Seite bleibt der Titel in Mono; der Bruch zwischen technischer
+     Mono und fetter Retro-Schrift ist die Idee, nicht ein Versehen. */
+  --schrift-display: "Caprasimo", Georgia, serif;
+  /* Grösse des Serientitels. Eigener Token, weil die Zentrier-Formel in
+     Serie.astro damit rechnet (`.serie-kopf { margin-block-start }`): wird die
+     Grösse geändert, muss die Formel automatisch mitziehen — sonst sitzt das Bild
+     nicht mehr mittig. Der Farbmodus überschreibt den Wert (global.css). */
+  --serientitel-groesse: var(--groesse-14);
   --schrift-text: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* --- 3.4 Schriftgrössen ---

@@ -336,7 +336,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     gap: var(--abstand-16);
     align-items: baseline;
     font-family: var(--schrift-mono);
-    font-size: var(--groesse-14);
+    font-size: var(--serientitel-groesse);
     line-height: var(--zeilenhoehe-1-4);
     font-variant-ligatures: none;
     margin-block-end: var(--abstand-24);
@@ -348,8 +348,15 @@ const breiten = [640, 960, 1280, 1600, 2000];
        sie oben am Streifen hängen (siehe .karussell-bild). Die Formel arbeitet mit
        den Tokens, passt sich also automatisch an. */
     margin-block-start: calc(
-      -1 * (var(--groesse-14) * var(--zeilenhoehe-1-4) + var(--abstand-24))
+      -1 * (var(--serientitel-groesse) * var(--zeilenhoehe-1-4) + var(--abstand-24))
     );
+  }
+
+  /* Farbseite: Serientitel und Jahr in der Display-Schrift. Bewusst NUR hier —
+     Kopfzeile, Umschalt-Button und Fliesstext bleiben in Mono, sonst geht der
+     Kontrast verloren, der den Reiz ausmacht. Die düstere Seite ist unberührt. */
+  :root[data-modus='farbe'] .serie-kopf {
+    font-family: var(--schrift-display);
   }
 
   /* Inline-Karussell: horizontaler scroll-snap-Streifen, ein Bild pro Ansicht. */

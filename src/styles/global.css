@@ -162,22 +162,32 @@ body::after {
    finale warme/sonnige, verwaschene Look (eigenes Bild + Palette) kommt später —
    siehe docs/farbmodus-ideensammlung.md. Nur der Farbmodus (data-modus="farbe")
    ist betroffen; die düstere Seite bleibt unverändert. */
-/* Sonnen-/Farbseite als HELLES, ruhiges Thema: weisser Grund, dunkler Text. Die
-   Farbfotos tragen die Farbe — der Grund bleibt bewusst weiss (Farbe im Grund war
-   zu viel). --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕, Tor);
-   nur der Seitengrund wird hell gesetzt. Die düstere Seite bleibt unverändert. */
+/* Sonnen-/Farbseite als HELLES, warmes Thema: Cremeton als Grund, rotbraune
+   Schrift — Farbwerte vom Betreiber vorgegeben. Damit ist die frühere Fassung
+   „weisser Grund, fast schwarzer Text" abgelöst; der noch ältere Versuch mit einem
+   FARBIGEN Grund („war zu viel") bleibt verworfen — creme ist ein Grundton, keine
+   Farbfläche. --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕).
+   Die düstere Seite bleibt vollständig unverändert. */
 :root[data-modus='farbe'] {
-  --farbe-text: #1c1a17; /* dunkler Text auf hellem Grund */
-  /* Schleier der sticky Kopfzeile in Hell (Pendant zum dunklen Wert in tokens.css). */
+  --farbe-text: #832d24; /* rotbraun auf Creme — gemessen 7,0:1, also AAA */
+  /* Leiser Text (About-Seiten): das globale Grau hätte auf Creme nur 2,7:1. Ein
+     gedämpftes Rotbraun aus derselben Familie kommt auf 4,9:1 und erfüllt AA. */
+  --farbe-text-leise: #8f4f42;
+  /* Grund, Passepartout und Vollbild-Fläche tragen denselben Ton. Damit bleibt der
+     weisse Rahmen auf der Farbseite unsichtbar — darauf beruht die gesamte
+     Abstandsrechnung (sichtbare Kante = das Foto, siehe docs/lernnotizen.md).
+     Das Eingabefeld am Tor hängt bewusst NICHT hier dran (--farbe-tor-feld). */
+  --farbe-rahmen: #f1e4c3;
+  /* Schleier der sticky Kopfzeile, im selben Cremeton wie der Grund. */
   --kopf-schleier: linear-gradient(
     to bottom,
-    rgba(237, 237, 237, 0.94) 0%,
-    rgba(237, 237, 237, 0.8) 55%,
-    rgba(237, 237, 237, 0) 100%
+    rgba(241, 228, 195, 0.94) 0%,
+    rgba(241, 228, 195, 0.8) 55%,
+    rgba(241, 228, 195, 0) 100%
   );
 }
 :root[data-modus='farbe'] body {
-  background-color: var(--farbe-rahmen); /* ruhiges Weiss */
+  background-color: var(--farbe-rahmen); /* warmer Cremeton */
 }
 /* Kein Sonnenuntergang, kein Korn/Vignette — sauberer heller Grund. */
 :root[data-modus='farbe'] body::before,
@@ -274,7 +284,8 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
-/* Farbseite: die ganze Seite ist weiss, der weisse Rahmen also unsichtbar. Er wird
+/* Farbseite: Rahmen und Grund tragen denselben Cremeton, der Rahmen ist dort also
+   unsichtbar. Er wird
    trotzdem gebraucht — ohne ihn stossen beim Weiterwischen zwei Bilder direkt
    aneinander. Darum liegt er hier AUSSEN um das Bild (content-box statt
    border-box): das Bild behält exakt seine Grösse — so gross wie auf der düsteren

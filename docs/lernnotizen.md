@@ -253,7 +253,8 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   (sie kommt aus dem Foto und wird nie angeglichen oder beschnitten).
   **Sichtbare Kante heisst:** auf der düsteren Seite der **weisse Rahmen** (er ist
   dort sichtbar und gehört zum Bild), auf der farbigen Seite das **Foto selbst**
-  (der weisse Rahmen ist auf Weiss unsichtbar). Darum hat `.karussell` im Farbmodus
+  (der Rahmen trägt dort denselben Ton wie der Grund und ist unsichtbar). Darum hat
+  `.karussell` im Farbmodus
   `margin: calc(-1 * var(--rahmen-breite))` — seitlich für den Bleed, oben/unten
   damit die Abstände zur sichtbaren Kante auf beiden Seiten gleich sind.
 - **Damit das aufgeht, folgt die Streifenhöhe dem gerade sichtbaren Bild.** Das
@@ -281,7 +282,8 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   Weder eine feste Streifenhöhe noch `align-items: center` wieder einführen —
   beides wurde probiert und macht genau dieses Problem.
 - **Weisser Rahmen auf der Farbseite: er liegt AUSSEN (`box-sizing: content-box`).**
-  Die Seite ist weiss, der Rahmen also unsichtbar — gebraucht wird er trotzdem,
+  Rahmen und Grund tragen denselben Ton, der Rahmen ist also unsichtbar — gebraucht
+  wird er trotzdem,
   sonst stossen beim Wischen zwei Bilder direkt aneinander. Damit das Bild dabei
   seine Grösse behält (es ist so gross wie auf der düsteren Seite Bild + Rahmen
   zusammen), zieht sich `.karussell` im Farbmodus um genau `--rahmen-breite` in den

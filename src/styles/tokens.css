@@ -15,7 +15,12 @@
      dunklem wie hellem Grund sichtbar (Bild-Platzhalter, About-Seiten) */
   --farbe-rahmen: #ededed; /* ruhiges Weiss für Passepartout + Vollbild-Fläche;
      bewusst nicht rein #fff — grosse weisse Flächen (Lightbox) wirken sonst zu
-     grell und springen gegen das weichere Weiss der Fotos. Ein Wert überall. */
+     grell und springen gegen das weichere Weiss der Fotos. Auf der Farbseite wird
+     dieser Wert auf den Cremeton umgestellt (global.css), damit Grund, Passepartout
+     und Vollbild-Fläche dort denselben Ton tragen und der Rahmen unsichtbar bleibt. */
+  --farbe-tor-feld: #ededed; /* Eingabefeld am Zugangs-Tor. Bewusst ein EIGENER Wert
+     und nicht --farbe-rahmen: das Tor sieht in beiden Modi gleich aus und darf sich
+     nicht mitverfärben, wenn die Farbseite ihren Grundton ändert. */
 
   /* --- 3.3 Schriftfamilien --- */
   --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;

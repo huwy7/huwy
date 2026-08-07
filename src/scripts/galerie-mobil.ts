@@ -130,7 +130,8 @@ export function starteMobileGalerie(): void {
   /**
    * Sichtbare Bildhöhe einer Bühne. „Sichtbar" heisst auf der düsteren Seite Bild
    * INKLUSIVE weissem Rahmen (der Rahmen ist dort zu sehen), auf der farbigen Seite
-   * nur das Foto (der Rahmen ist auf Weiss unsichtbar). Genau diese Unterscheidung
+   * nur das Foto (der Rahmen trägt dort denselben Ton wie der Grund und ist damit
+   * unsichtbar). Genau diese Unterscheidung
    * gilt auf der Seite schon für alle Abstände — sie bleibt unverändert.
    */
   const sichtbareHoehe = (buehne: HTMLElement, rahmen: number, farbe: boolean) => {

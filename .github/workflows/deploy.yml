@@ -150,3 +150,19 @@ jobs:
       - name: Auf GitHub Pages veröffentlichen
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Standard sind 10 Minuten (600000). Das reichte ab dem 06.08. nicht mehr:
+          # Der Bau lief jedes Mal sauber durch, aber die Veröffentlichung brach mit
+          # „Timeout reached, aborting!" ab und machte sich selbst rückgängig — vier
+          # Läufe hintereinander, die Live-Seite blieb dadurch auf altem Stand.
+          #
+          # Grund ist die Grösse: Das Paket enthält die Live-Seite UND die Vorschau
+          # unter /feature, zusammen rund 210 MB mit über 400 Bilddateien. Pages
+          # verarbeitet die Dateien einzeln, und mit jedem hochgeladenen Foto wird es
+          # mehr. Wir sind also in eine Grenze hineingewachsen, es ist kein Defekt.
+          #
+          # 30 Minuten geben Luft, ohne irgendetwas an der Seite zu ändern. Reicht
+          # auch das eines Tages nicht, ist der nächste Schritt, das Paket kleiner zu
+          # machen (weniger Bildformate je Foto) — das betrifft dann aber die
+          # Bildauslieferung und braucht eine Entscheidung des Betreibers.
+          timeout: 1800000

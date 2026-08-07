@@ -84,6 +84,12 @@
   /* Nur mobil: zusätzlicher Abstand zwischen zwei Serien, damit die vorherige Serie
      sicher ganz aus dem Bild ist, wenn die nächste die Bildschirmmitte erreicht. */
   --serien-luft-extra: 20px;
+
+  /* Korn im Hintergrund (global.css `body::after`, Textur `public/korn-hart.png`).
+     Gilt nur für den Grund hinter der Seite — nie über den Fotos.
+     Die Kachel ist deckend: höhere Werte verdecken den verwischten Hund darunter,
+     niedrigere schwächen das Korn. 0.6 ist der Wert, bei dem beides zu sehen ist. */
+  --korn-staerke: 0.6;
   --fokus-breite: 2px; /* 9 Fokusring */
   --fokus-offset: 3px; /* 9 Fokusring */
   /* Druck-Rückmeldung auf Touch: derselbe abgerundete, invertierende Kasten, den

@@ -9,6 +9,16 @@ ergänzen; Erledigtes nach unten verschieben und abhaken.
 
 ### Gemeldet am 31.07. (Betreiber)
 
+- [ ] **Schrift auf dem rauen Hintergrund prüfen.** Der Grund hinter Portfolio und
+      About me hat jetzt deutlich härteres Korn (Rauheit mehr als verdoppelt). Damit
+      liegt hinter den Beschriftungen keine ruhige Fläche mehr. Anzuschauen:
+      - Serientitel und Jahr (Mono, `--groesse-14`) über dem gesprenkelten Grund
+      - Kopfzeile: der Verlauf-Schleier (`--kopf-schleier`) muss vielleicht kräftiger
+        werden, damit `Portfolio` / `About me` / der Umschalt-Button ruhig stehen
+      - die Zählerstriche: sie kehren ihren Untergrund um — auf Korn wird das unruhig
+      - Kontrast auf kleinen Geräten in echter Umgebung, nicht nur im Testbrowser
+      Betreiber: „die schrift machen wir später".
+
 - [ ] **Abstände auf dem iPhone überarbeiten.** Betreiber: „die Abstände sind besser,
       wenn auch noch nicht perfekt". **Was genau geändert werden soll, ist noch nicht
       definiert** — erst festlegen, dann bauen.

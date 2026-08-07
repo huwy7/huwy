@@ -104,14 +104,18 @@ body::before {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  /* Stark verwischt: keine erkennbaren Details. brightness/contrast leicht höher
-     als zuvor (~10% mehr Sichtbarkeit) für etwas mehr Schwarzweiss-Dynamik im
-     Grund — weiterhin ruhig, Fokus bleibt auf den Bildern.
+  /* Stark verwischt: keine erkennbaren Details. Kontrast höher als zuvor
+     (1.4 → 1.9) — die Tonwerte spreizen sich, hell und dunkel stossen härter
+     aneinander. Nicht weiter hochgedreht: bei 2.1 lief der Grund in weiten Teilen
+     auf reines Schwarz zu und das Korn hatte nichts mehr, worauf es sitzen konnte.
+     Der Blur bleibt bei 72px: der Hund soll weiterhin nicht erkennbar sein, die
+     Härte kommt aus Kontrast und Korn, nicht aus Bilddetails.
      WICHTIG: dieser filter (und die Hochkant-Verschiebung unten) gilt NUR für
      diesen Blur-Layer. Das Zugangs-Tor (#tor, Sperrbildschirm) nutzt dieselbe
      Bilddatei, hat aber KEINEN filter — es bleibt scharf/natürlich und darf hier
-     nicht mitverändert werden. */
-  filter: blur(72px) brightness(0.48) contrast(1.4) grayscale(1);
+     nicht mitverändert werden. Der Betreiber hat es selbst bearbeitet, es trägt
+     Korn und Kontrast bereits im Bild. */
+  filter: blur(72px) brightness(0.52) contrast(1.9) grayscale(1);
 }
 
 /* Hochkant (Smartphone): der Ausschnitt wirkt mittig sehr gleichmässig. Das Bild
@@ -123,9 +127,19 @@ body::before {
   }
 }
 
-/* Darüber Korn + Vignette (leicht transparent), damit die Textur erhalten bleibt
-   und der Blick zur Mitte geführt wird. Nur im Hintergrund — die Bilder liegen
-   mit weissem Passepartout darüber und bleiben kornfrei. */
+/* Korn + Vignette über dem Blur-Layer.
+   Die Rauheit steckt in der TEXTUR, nicht in Mischmodi. Das alte `korn.png` ist
+   weiches Rauschen (Werte 6–135, Streuung 18) — damit liessen sich per CSS nur
+   8–15% mehr Rauheit herausholen, und jedes Mal bezahlte man es mit einem helleren
+   Grund oder damit, dass der Hund verschwand (durchgemessen).
+   `korn-hart.png` hat bei GLEICHER mittlerer Helligkeit (31,4 statt 31,5) die volle
+   Spanne 0–255 und dreifache Streuung (52 statt 18): vereinzelte helle Sprenkel auf
+   fast schwarzem Grund statt gleichmässigem Grau. Der Grund wird dadurch rauer,
+   ohne heller zu werden.
+   Deckkraft bleibt bei 0,6 — die Kachel ist deckend, bei mehr würde sie den
+   verwischten Hund darunter zudecken.
+   Nur im Hintergrund — die Fotos liegen mit weissem Passepartout darüber und
+   bleiben kornfrei (CLAUDE.md 1a). */
 body::after {
   content: '';
   position: fixed;
@@ -134,9 +148,9 @@ body::after {
   pointer-events: none;
   background-image:
     radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.72) 100%),
-    url('/korn.png');
+    url('/korn-hart.png');
   background-repeat: no-repeat, repeat;
-  opacity: 0.6;
+  opacity: var(--korn-staerke);
 }
 
 /* --- Farbmodus (Platzhalter) ---

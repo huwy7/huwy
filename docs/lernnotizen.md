@@ -201,6 +201,24 @@ Zeit schneller/sicherer werden. Kurz halten, konkret, mit dem *Warum*.
   24px gesenkt: auf dem iPhone SE quetschte er Hochformate auf 250px Breite, obwohl
   343px Platz waren (jetzt 286px, und mehr Bilder erreichen die volle Breite). Auf
   grossen Telefonen ändert es nichts, dort begrenzt ohnehin die Breite.
+- **Rauheit steckt in der TEXTUR, nicht in Mischmodi.** Beim Härter-Machen des
+  Hintergrunds durchgemessen: mit dem weichen `korn.png` (Werte 6–135, Streuung 18)
+  liessen sich per CSS nur 8–15% mehr Rauheit holen, und jedes Mal bezahlte man mit
+  einem helleren Grund oder damit, dass der verwischte Hund verschwand. Mit
+  `korn-hart.png` (gleiche mittlere Helligkeit 31,4, aber volle Spanne 0–255 und
+  dreifache Streuung) verdoppelte sich die Rauheit, ohne dass der Grund heller wurde.
+  Zwei Sackgassen, nicht nochmal versuchen:
+  - `mix-blend-mode: overlay` fürs Korn — overlay behält die Helligkeit des
+    Untergrunds bei, auf near-black wird jedes Korn zu Null und der Grund war danach
+    flach schwarz.
+  - `filter: contrast()` auf die Kornebene — `korn.png` ist dunkles Rauschen, der
+    Kontrast drückt es vollständig auf Schwarz (gemessen: Rauheit 9,97 → 1,8).
+  - Die Kachel hat **kein Alpha** (Modus `L`): bei Deckkraft 1.0 verdeckt sie den
+    Hund komplett. Darum bleibt `--korn-staerke` bei 0.6.
+- **Das Zugangs-Tor bleibt vom Hintergrund-Look ausgenommen.** Es nutzt dieselbe
+  Bilddatei, ist aber selbst bearbeitet und trägt Korn und Kontrast schon im Bild
+  (Entscheidung des Betreibers). Bei Änderungen am Grund immer per Screenshot-
+  Vergleich prüfen, dass `#tor` bitgenau gleich bleibt.
 - **NIE mit `window.innerHeight` rechnen — auf dem Telefon springt der Wert.** Die
   Adressleiste fährt beim Scrollen ein und aus und ändert die Fensterhöhe um rund
   80px; die Bilder änderten dadurch mitten im Scrollen ihre Grösse (gemessen: Deckel

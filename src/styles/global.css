@@ -169,9 +169,9 @@ body::after {
    --farbe-hintergrund bleibt dunkel als Kontrastfarbe (Vollbild-✕).
    Die düstere Seite bleibt vollständig unverändert. */
 :root[data-modus='farbe'] {
-  --farbe-text: #832d24; /* rotbraun auf dem warmen Grund — gemessen 7,3:1, also AAA */
+  --farbe-text: #832d24; /* rotbraun auf dem warmen Grund — gemessen 7,7:1, also AAA */
   /* Leiser Text (About-Seiten): das globale Grau käme auf diesem Grund nur auf
-     2,8:1. Ein gedämpftes Rotbraun aus derselben Familie kommt auf 5,1:1 und
+     3,0:1. Ein gedämpftes Rotbraun aus derselben Familie kommt auf 5,4:1 und
      erfüllt AA. */
   --farbe-text-leise: #8f4f42;
   /* Grund, Passepartout und Vollbild-Fläche tragen denselben Ton. Damit bleibt der
@@ -179,16 +179,18 @@ body::after {
      Abstandsrechnung (sichtbare Kante = das Foto, siehe docs/lernnotizen.md).
      Das Eingabefeld am Tor hängt bewusst NICHT hier dran (--farbe-tor-feld).
 
-     Warum genau dieser Ton — drei Versuche haben die Grenzen abgesteckt:
+     Warum genau dieser Ton — mehrere Versuche haben die Grenzen abgesteckt:
      · #f1e4c3 (Ton 43°, Kanalabstand 46) wirkte fahl, „wie kranke Haut". Nicht
        die Menge Farbe war schuld, sondern der gelbe Ton.
-     · #ffe4b5 (Ton 38°, Kanalabstand 74) war zwar warm, aber zu viel Farbe —
-       der Grund wurde zur Farbfläche und nahm den Fotos die Bühne.
-     Dieser Wert liegt bei 35° und damit im Bernstein, in derselben Familie wie
-     die Schriftfarbe, trägt mit Kanalabstand 22 aber weniger als ein Drittel der
-     Farbe von #ffe4b5. Wer den Ton ändert: im Bereich 30–40° bleiben (darüber
-     wird es fahl, darunter rosa) und beim Kanalabstand unter etwa 25. */
-  --farbe-rahmen: #f0e7da;
+     · #ffe4b5 (Ton 38°, Kanalabstand 74) war warm, aber zu viel Farbe — der
+       Grund wurde zur Farbfläche und nahm den Fotos die Bühne.
+     · #f0e7da (Ton 35°, Kanalabstand 22) war immer noch eine Spur zu viel.
+     Dieser Wert trägt mit Kanalabstand 11 nur noch einen Hauch Wärme und liegt
+     damit näher an einem gebrochenen Weiss als an einem Beige — genau so viel,
+     dass der Grund nicht kalt wirkt, aber nichts mehr vom Foto abzieht.
+     Wer den Ton ändert: unter etwa Kanalabstand 15 bleiben, sonst kippt der
+     Grund wieder in die Farbfläche. */
+  --farbe-rahmen: #f1eee6;
   /* Die GESAMTE Beschriftung der Farbseite läuft in der Display-Schrift —
      Kopfzeile, Serientitel, Seitentitel, Fliesstext. Statt jede Regel einzeln
      umzubiegen, werden hier die beiden Familien-Token umgestellt; alles, was
@@ -201,12 +203,12 @@ body::after {
      Mono — eine fette Retro-Schrift wirkt erst ab etwa 20px. Die Zentrier-Formel
      in Serie.astro rechnet mit demselben Token und zieht mit. */
   --serientitel-groesse: var(--groesse-22);
-  /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#f0e7da). */
+  /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#f1eee6). */
   --kopf-schleier: linear-gradient(
     to bottom,
-    rgba(240, 231, 218, 0.94) 0%,
-    rgba(240, 231, 218, 0.8) 55%,
-    rgba(240, 231, 218, 0) 100%
+    rgba(241, 238, 230, 0.94) 0%,
+    rgba(241, 238, 230, 0.8) 55%,
+    rgba(241, 238, 230, 0) 100%
   );
 }
 :root[data-modus='farbe'] body {

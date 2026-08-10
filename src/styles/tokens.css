@@ -35,7 +35,7 @@
      Doktrin ab, nach der Mono der einzige typografische Bruch sein sollte
      (CLAUDE.md Regel 6). Der Kontrast zwischen der rauen, plakatartigen düsteren
      Seite und der fetten Retro-Farbseite ist die Idee. */
-  --schrift-display: "Protest Revolution", Impact, sans-serif;
+  --schrift-display: "Bebas Neue", "Arial Narrow", Impact, sans-serif;
   /* Die Display-Schrift trägt die GESAMTE Beschriftung — Kopfzeile, Serientitel,
      Seitentitel, Fliesstext. Statt jede Regel einzeln umzubiegen, zeigen die
      beiden Familien-Token hierher; alles zieht damit automatisch mit, auch

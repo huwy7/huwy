@@ -42,22 +42,29 @@ und kommerziell einsetzbar. **Kein Blocker.**
   Haus aus fett.
 - **Einsatz:** trägt im Farbmodus die **gesamte** Beschriftung — Kopfzeile,
   Serientitel, Seitentitel, Fliesstext. Auf der düsteren Seite kommt sie nicht
-  vor; dort steht Protest Revolution.
+  vor; dort steht Bebas Neue.
 
-## Protest Revolution — Display-Schrift der düsteren Seite (CLAUDE.md 1a)
+## Bebas Neue — Display-Schrift der düsteren Seite (CLAUDE.md 1a)
 
 - **Lizenz:** SIL Open Font License, Version 1.1 (OFL-1.1)
-- **Urheber:** The Protest Project Authors, 2013 (Octavio Pardo)
+- **Urheber:** Dharma Type (Ryoichi Tsunekawa), 2010
 - **Verifiziert an:** der `OFL.txt` im offiziellen Google-Fonts-Repository
-  (<https://raw.githubusercontent.com/google/fonts/main/ofl/protestrevolution/OFL.txt>),
-  die auf das Upstream-Repository <https://github.com/octaviopardo/Protest>
-  verweist. Die Datei wurde heruntergeladen und liegt im Repo, nicht nur
-  referenziert.
-- **Lizenztext im Repo:** `public/fonts/protest-revolution-OFL.txt`
+  (<https://raw.githubusercontent.com/google/fonts/main/ofl/bebasneue/OFL.txt>).
+  Die Datei wurde heruntergeladen und liegt im Repo, nicht nur referenziert.
+- **Lizenztext im Repo:** `public/fonts/bebas-neue-OFL.txt`
 - **Subsets:** `latin` und `latin-ext`.
-- **Schnitte:** nur 400 — die Familie hat keinen weiteren.
+- **Schnitte:** nur 400 — die Google-Fonts-Fassung hat keinen weiteren.
 - **Einsatz:** trägt im düsteren Modus die **gesamte** Beschriftung, spiegelbildlich
   zu Caprasimo auf der Farbseite.
+- **Besonderheit:** keine Kleinbuchstaben. Gemeine werden als Versalien
+  gezeichnet. Das Markup bleibt in Sentence case (Regel 8), es gibt kein
+  `text-transform` — die Grossschreibung kommt allein aus der Schrift.
+
+### Verworfen: Protest Revolution
+
+Ein erster Versuch für die düstere Seite (OFL-1.1, Octavio Pardo) wurde vom
+Betreiber abgelehnt. Schriftdateien und Lizenztext sind wieder aus dem Repo
+entfernt.
 
 ## Commit Mono — heute nur noch das Zugangs-Tor
 
@@ -73,7 +80,7 @@ Schrift bleibt deshalb im Repo und in `schriften.css`.
 - Nur Schnitt 400 und 500 je Familie, `font-display: swap`
   (`src/styles/schriften.css`).
 - Bezugsquelle der WOFF2-Dateien: die oben genannten Fontsource-npm-Pakete
-  (identische OFL-Dateien), bei Caprasimo und Protest Revolution direkt die
+  (identische OFL-Dateien), bei Caprasimo und Bebas Neue direkt die
   WOFF2-Auslieferung von Google Fonts. Die Pakete selbst sind **keine**
   Projekt-Dependency — die WOFF2-Dateien wurden entnommen und liegen direkt im
   Repo.

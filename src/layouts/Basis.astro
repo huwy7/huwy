@@ -220,10 +220,14 @@ const name = 'nicolas huwyler - portfolio';
         white-space: nowrap;
       }
 
+      /* Desktop-Grösse der Kopfzeile. Bewusst eine Stufe über den früheren 14px:
+         auf breiten Screens wirkte die Zeile verloren. Gilt in BEIDEN Modi —
+         Entscheidung des Betreibers, damit düster und farbig gleich auftreten.
+         Auf Mobil bleibt es bei 14px (Block weiter unten am 768px-Breakpoint). */
       .kopf-nav,
       .kopf-switch {
         font-family: var(--schrift-mono);
-        font-size: var(--groesse-14);
+        font-size: var(--groesse-19);
         line-height: var(--zeilenhoehe-1-4);
         font-variant-ligatures: none;
       }
@@ -250,8 +254,15 @@ const name = 'nicolas huwyler - portfolio';
         .kopf-nav {
           gap: var(--abstand-16);
         }
-        /* Schriftgrösse bleibt überall gleich (keine kleinere Stufe auf Mobil).
-           Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
+        /* Mobil bleibt die Kopfzeile bei 14px: nur der Desktop war zu klein, auf
+           dem Smartphone sass die Grösse bereits richtig. Der Wert steht hier und
+           nicht als min-width-Regel, damit die Seite bei genau EINEM Breakpoint
+           bleibt (tokens.css --breakpoint). */
+        .kopf-nav,
+        .kopf-switch {
+          font-size: var(--groesse-14);
+        }
+        /* Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
            bündig an seiner Seite: düster oben rechts, farbig oben links. */
         .kopf-switch {
           white-space: normal;

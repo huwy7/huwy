@@ -1,6 +1,7 @@
 ---
 import Bild from './Bild.astro';
 import type { ImageMetadata } from 'astro';
+import type { Aufnahmedaten } from '../lib/exif';
 
 // Eine Serie als inline-Karussell (kein Untermenü): die Bilder liegen nebeneinander
 // in einem horizontalen scroll-snap-Streifen; man wischt/blättert direkt auf der
@@ -14,11 +15,15 @@ import type { ImageMetadata } from 'astro';
 //
 // Flaches Bild-Modell: Titel/Jahr/Slug + fertig sortierte Bilder-Liste kommen von
 // der Seite (Bilder werden dort aus der bilder-Sammlung nach Serie gruppiert).
+// Zu jedem Bild optional die Aufnahmedaten (Blende, Zeit, ISO, Brennweite). Sie
+// werden zur Bauzeit aus der Bilddatei gelesen (src/lib/aufnahmedaten.ts) und
+// stehen im Polaroid-Fuss unter dem Foto. Fehlen sie, bleibt der Rahmen ringsum
+// gleich breit — es gibt dann keinen leeren Fuss.
 interface Props {
   slug: string;
   titel: string;
   jahr: number;
-  bilder: ImageMetadata[];
+  bilder: { bild: ImageMetadata; daten?: Aufnahmedaten }[];
 }
 const { slug, titel, jahr, bilder } = Astro.props;
 const n = bilder.length;
@@ -35,11 +40,13 @@ const breiten = [640, 960, 1280, 1600, 2000];
   <div class="karussell">
     <ul class="karussell-spur">
       {
-        bilder.map((bild, i) => (
+        bilder.map(({ bild, daten }, i) => (
           <li id={`k-${slug}-${i}`} class="karussell-bild">
             {/* Bühne schrumpft auf die tatsächliche Bildbreite — so sitzen die
-                Blätter-Zonen an den Bildkanten, egal ob Quer- oder Hochformat. */}
-            <div class="karussell-buehne">
+                Blätter-Zonen an den Bildkanten, egal ob Quer- oder Hochformat.
+                `hat-daten` verbreitert den Rahmen unten (global.css) und gibt dem
+                Datenstreifen darin seinen Platz. */}
+            <div class:list={['karussell-buehne', { 'hat-daten': daten }]}>
               <a
                 href={`#lb-${slug}`}
                 class="karussell-oeffnen"
@@ -56,6 +63,17 @@ const breiten = [640, 960, 1280, 1600, 2000];
                   fetchpriority={i === 0 ? 'high' : undefined}
                 />
               </a>
+              {daten && (
+                /* Liegt im verbreiterten unteren Rahmen, nicht über dem Bild.
+                   Nur Blende, Zeit, ISO und Brennweite — keine Kamera, kein
+                   Objektiv, kein Datum, kein Ort (Entscheidung des Betreibers). */
+                <p class="aufnahmedaten">
+                  <span>{daten.blende}</span>
+                  <span>{daten.zeit}</span>
+                  <span>{daten.iso}</span>
+                  <span>{daten.brennweite}</span>
+                </p>
+              )}
               {n > 1 && (
                 <>
                   {/* Unsichtbare Blätter-Flächen an den Bildkanten. */}
@@ -87,8 +105,11 @@ const breiten = [640, 960, 1280, 1600, 2000];
       umzuschalten — dasselbe Verhalten wie im Karussell. */}
   <div id={`lb-${slug}`} class="lightbox">
     <div class="lightbox-spur">
+      {/* Im Vollbild bewusst OHNE Polaroid-Fuss und ohne Aufnahmedaten: dort zählt
+          nur das Bild auf der freien Fläche. Die Daten stehen auf der Startseite
+          (Entscheidung des Betreibers). */}
       {
-        bilder.map((bild) => (
+        bilder.map(({ bild }) => (
           <div class="lightbox-ansicht">
             <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
             {/* Blätter-Flächen liegen INNERHALB der Ansicht, also im scrollbaren
@@ -439,6 +460,33 @@ const breiten = [640, 960, 1280, 1600, 2000];
     display: block;
     line-height: 0;
     text-decoration: none;
+  }
+
+  /* Aufnahmedaten im Polaroid-Fuss. Liegt absolut im unteren, verbreiterten Teil
+     des Rahmens: die Bühne umschliesst das Bild exakt, also fluchtet der Streifen
+     mit den Bildkanten, ohne dass ein zusätzlicher Wrapper die Breitenrechnung
+     des Bildes stören müsste. `--polaroid-fuss` ist die Höhe dieses Bereichs, der
+     Text wird darin senkrecht zentriert.
+     Nicht anklickbar und für Screenreader unauffällig — es ist eine Fussnote zum
+     Bild, kein Bedienelement; die Blätter-Flächen liegen darüber und bleiben
+     benutzbar. */
+  .aufnahmedaten {
+    position: absolute;
+    left: var(--rahmen-breite);
+    right: var(--rahmen-breite);
+    bottom: 0;
+    height: calc(var(--rahmen-breite) + var(--polaroid-fuss));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 var(--abstand-16);
+    margin: 0;
+    font-family: var(--schrift-daten);
+    font-size: var(--groesse-12);
+    font-weight: var(--gewicht-400);
+    line-height: var(--zeilenhoehe-1-5);
+    color: var(--farbe-daten);
   }
 
   /* Unsichtbare Blätter-Flächen an den Bildkanten — kein sichtbarer Pfeil mehr,

@@ -18,6 +18,13 @@
      grell und springen gegen das weichere Weiss der Fotos. Auf der Farbseite wird
      dieser Wert auf ein warmes Beige-Weiss umgestellt (global.css), damit Grund, Passepartout
      und Vollbild-Fläche dort denselben Ton tragen und der Rahmen unsichtbar bleibt. */
+  /* Aufnahmedaten im Polaroid-Fuss. ACHTUNG, hier nicht --farbe-text einsetzen:
+     der Text steht auf dem RAHMEN, nicht auf dem Seitengrund. Auf der düsteren
+     Seite ist der Rahmen fast weiss und --farbe-text ebenfalls fast weiss — das
+     wäre unlesbar. Darum trägt die düstere Seite hier die Grundfarbe als
+     Gegenfarbe (dasselbe Prinzip wie beim Vollbild-✕ auf weisser Fläche). Auf der
+     Farbseite ist Rahmen = Grund, dort gilt die normale Textfarbe (global.css). */
+  --farbe-daten: var(--farbe-hintergrund);
   --farbe-tor-feld: #ededed; /* Eingabefeld am Zugangs-Tor. Bewusst ein EIGENER Wert
      und nicht --farbe-rahmen: das Tor sieht in beiden Modi gleich aus und darf sich
      nicht mitverfärben, wenn die Farbseite ihren Grundton ändert. */
@@ -29,6 +36,11 @@
      mitverwandeln — dieselbe Trennung wie bei --farbe-tor-feld. Zusätzlich hängt
      die Feldbreite (14ch) an der Zeichenbreite einer Monospace. */
   --schrift-tor: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Aufnahmedaten im Polaroid-Fuss: bewusst eine schlichte Grotesk statt der
+     Display-Schrift des Modus — die Zahlen sollen technisch und leise wirken und
+     dem Foto nicht die Schau stehlen. Instrument Sans liegt ohnehin im Repo
+     (früher Fliesstext) und braucht keinen zusätzlichen Download. */
+  --schrift-daten: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   /* Display-Schrift der Seite. JEDER Modus hat eine eigene: hier steht die der
      düsteren Seite, der Farbmodus überschreibt den Wert mit Caprasimo
      (global.css). Beide sind Entscheidungen des Betreibers und lösen die frühere
@@ -142,6 +154,12 @@
      Vertikale Abstände zwischen grossen Blöcken in vh (Spezifikation 4). */
   --textbreite: 60ch; /* 3.5 Zeilenlänge Fliesstext */
   --rahmen-breite: 16px; /* weisses Passepartout um jedes Bild */
+  /* Polaroid-Fuss: NUR unten kommt zusätzlich zum Passepartout dieser Streifen
+     dazu, darin stehen die Aufnahmedaten (Serie.astro). Bewusste Entscheidung des
+     Betreibers — hebt den Nicht-Ziel-Punkt „Polaroid-Rahmen" aus CLAUDE.md
+     ausdrücklich auf. Gilt in BEIDEN Modi gleich, damit die Geometrie identisch
+     bleibt; auf der Farbseite ist der Rahmen nur farblich unsichtbar. */
+  --polaroid-fuss: var(--abstand-32);
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
   --vorschau-max-hoehe: 72vh; /* Deckel für Titelbilder der Startseite (Hochformat) */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */

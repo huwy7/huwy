@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Basis from '../layouts/Basis.astro';
 import Serie from '../components/Serie.astro';
+import { ladeAufnahmedaten } from '../lib/aufnahmedaten';
 
 // Startseite (düsterer Standard-Modus). Kein Untermenü mehr: jede Serie liegt als
 // inline-Karussell direkt auf der Seite, gestapelt (neueste oben — der Betreiber
@@ -14,13 +15,17 @@ const serienMeta = (await getCollection('serien')).sort(
   (a, b) => a.data.reihenfolge - b.data.reihenfolge,
 );
 const alleBilder = await getCollection('serienbilder');
+// Aufnahmedaten (Blende/Zeit/ISO/Brennweite) zur Bauzeit aus den Bilddateien, für
+// den Polaroid-Streifen unter dem Foto. Bilder ohne EXIF bekommen `undefined` und
+// zeigen keinen Streifen.
+const daten = ladeAufnahmedaten('serienbilder');
 const serien = serienMeta
   .map((serie) => ({
     serie,
     bilder: alleBilder
       .filter((b) => b.data.serie === serie.id)
       .sort((a, b) => a.data.reihenfolge - b.data.reihenfolge)
-      .map((b) => b.data.bild),
+      .map((b) => ({ bild: b.data.bild, daten: daten.get(b.id) })),
   }))
   .filter((s) => s.bilder.length > 0);
 ---

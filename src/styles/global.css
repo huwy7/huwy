@@ -198,6 +198,11 @@ body::after {
      steht in tokens.css. Einzige Ausnahme bleibt das Eingabefeld am Zugangs-Tor:
      es hängt an --schrift-tor und ist in beiden Modi Mono. */
   --schrift-display: "Caprasimo", Georgia, serif;
+  /* Aufnahmedaten im Polaroid-Fuss: hier ist der Rahmen derselbe Ton wie der
+     Grund, also gilt die normale Textfarbe. Auf der düsteren Seite steht der Text
+     dagegen auf dem fast weissen Passepartout und braucht die Gegenfarbe
+     (tokens.css). */
+  --farbe-daten: var(--farbe-text);
   /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#f1eee6). */
   --kopf-schleier: linear-gradient(
     to bottom,
@@ -315,6 +320,15 @@ picture > source {
   padding: var(--rahmen-breite);
 }
 
+/* Polaroid: nur UNTEN wächst der Rahmen, damit die Aufnahmedaten darin Platz
+   haben. Die Klasse sitzt auf der Bühne und nicht am Bild, weil das <img> aus
+   Bild.astro kommt; gesetzt wird sie nur, wenn die Datei auch wirklich Blende,
+   Zeit, ISO und Brennweite trägt (Serie.astro). Ohne Daten bleibt der Rahmen
+   ringsum gleich breit — lieber kein Fuss als ein leerer. */
+.hat-daten .karussell-foto {
+  padding-block-end: calc(var(--rahmen-breite) + var(--polaroid-fuss));
+}
+
 /* Farbseite: Rahmen und Grund tragen denselben Beige-Weiss-Ton, der Rahmen ist
    dort also unsichtbar. Er wird
    trotzdem gebraucht — ohne ihn stossen beim Weiterwischen zwei Bilder direkt
@@ -335,6 +349,13 @@ picture > source {
      Bleed des Streifens zurückgerechnet, damit das Bild exakt so gross bleibt wie
      bisher und der Rahmen genau in den Bleed fällt. */
   max-width: calc(100% - 2 * var(--rahmen-breite));
+}
+/* Der Fuss wächst auf der Farbseite genauso — Entscheidung des Betreibers: das
+   Vorgehen soll auf beiden Seiten gleich sein, auch wenn man den Rahmen dort
+   nicht sieht. Eigene Regel, weil hier content-box gilt und die Kurzform oben
+   sonst die Farbseiten-Regel überschreibt. */
+:root[data-modus='farbe'] .hat-daten .karussell-foto {
+  padding-block-end: calc(var(--rahmen-breite) + var(--polaroid-fuss));
 }
 
 /* NUR TELEFON IM HOCHFORMAT: Der Höhendeckel kommt dort nicht mehr aus einem festen

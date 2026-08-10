@@ -77,6 +77,12 @@ Verspielter, augenzwinkernder **spanischer** Ton. Erste Ideen:
   - `Me gusta la noche` — „Ich mag die Nacht"
   - kurz: `La noche`
 
+> **Entschieden.** Umgesetzt sind `A quién le gusta el sol?` (düster → Farbe) und
+> `A mí me gusta la noche!` (Farbe → düster), beide bewusst **ohne** das im
+> Spanischen übliche einleitende `¿` bzw. `¡` — nur das Zeichen am Ende. Das ist
+> eine typografische Entscheidung des Betreibers und kein Versehen; nicht
+> „korrigieren". Quelle: `src/layouts/Basis.astro`.
+
 Offen: finale Formulierung, Länge (Satz vs. kurz), Stil/Platzierung. Nur diese
 Umschalt-Buttons sind spanisch; alle übrigen Beschriftungen englisch (A2b).
 

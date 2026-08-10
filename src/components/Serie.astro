@@ -157,10 +157,16 @@ const breiten = [640, 960, 1280, 1600, 2000];
 
   // Invertierung der Zähler-Striche inline setzen (wie beim Cursor): Graustufen +
   // Umkehr, damit über farbigen Fotos keine bunten Striche entstehen.
-  const strichFilter = 'grayscale(1) invert(1)';
-  for (const linie of document.querySelectorAll<HTMLElement>('.zaehler-linie')) {
-    linie.style.setProperty('backdrop-filter', strichFilter);
-    linie.style.setProperty('-webkit-backdrop-filter', strichFilter);
+  // NUR auf der düsteren Seite. Die Farbseite gibt den Strichen stattdessen die
+  // Textfarbe (CSS weiter unten) — dort soll der Zähler zur Schrift gehören und
+  // nicht als fast schwarzer Balken auf dem hellen Grund stehen. Die Zuweisung
+  // muss hier ausbleiben: ein Inline-Stil schlägt jede CSS-Regel.
+  if (document.documentElement.dataset.modus !== 'farbe') {
+    const strichFilter = 'grayscale(1) invert(1)';
+    for (const linie of document.querySelectorAll<HTMLElement>('.zaehler-linie')) {
+      linie.style.setProperty('backdrop-filter', strichFilter);
+      linie.style.setProperty('-webkit-backdrop-filter', strichFilter);
+    }
   }
 
   // Der Streifen ist standardmässig so hoch wie sein höchstes Bild — kürzere Bilder
@@ -497,6 +503,17 @@ const breiten = [640, 960, 1280, 1600, 2000];
   .ist-aktiv .zaehler-linie {
     height: var(--strich-staerke-aktiv);
   }
+  /* Farbseite: kein Invertieren, sondern die Textfarbe — der Zähler gehört dort
+     zur Schrift (dasselbe Rotbraun) statt als fast schwarzer Balken auf dem
+     hellen Grund zu stehen. Das Skript setzt den backdrop-filter in diesem Modus
+     bewusst nicht, sonst würde der Inline-Stil diese Regel schlagen.
+     Kein Unterschied in der Deckkraft zwischen aktiv und inaktiv: wie auf der
+     düsteren Seite unterscheidet sich der aktive Strich nur über Länge und
+     Dicke. */
+  :root[data-modus='farbe'] .zaehler-linie {
+    background-color: var(--farbe-text);
+  }
+
   /* Ohne backdrop-filter (alte Browser) bleibt der Strich sichtbar: dann als
      einfache Fläche in der Textfarbe. */
   @supports not (backdrop-filter: invert(1)) {

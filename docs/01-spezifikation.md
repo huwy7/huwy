@@ -80,6 +80,15 @@ Standardantwort und begegnet Besuchern auf jeder zweiten Portfolio-Seite.
 --schrift-text:    "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 ```
 
+> **Überholt.** Beide Modi tragen inzwischen je eine eigene Display-Schrift, die
+> die gesamte Beschriftung stellt: **Protest Revolution** auf der düsteren Seite,
+> **Caprasimo** auf der farbigen (`--schrift-display`, pro Modus überschrieben).
+> Die Familien-Token heissen heute `--schrift-beschriftung` und `--schrift-text`
+> und zeigen beide auf `--schrift-display`. `--schrift-mono` gibt es nicht mehr;
+> Commit Mono steht nur noch im Eingabefeld des Zugangs-Tors (`--schrift-tor`),
+> Instrument Sans wird derzeit nirgends verwendet. Lizenzstand aller Schriften:
+> `docs/schrift-lizenzen.md`.
+
 - Selbst gehostet als WOFF2, kein Google-Fonts-CDN (Datenschutz und Ladezeit)
 - Nur Schnitt 400 und 500 je Familie
 - `font-display: swap`

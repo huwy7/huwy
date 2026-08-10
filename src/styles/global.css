@@ -191,18 +191,13 @@ body::after {
      Wer den Ton ändert: unter etwa Kanalabstand 15 bleiben, sonst kippt der
      Grund wieder in die Farbfläche. */
   --farbe-rahmen: #f1eee6;
-  /* Die GESAMTE Beschriftung der Farbseite läuft in der Display-Schrift —
-     Kopfzeile, Serientitel, Seitentitel, Fliesstext. Statt jede Regel einzeln
-     umzubiegen, werden hier die beiden Familien-Token umgestellt; alles, was
-     --schrift-mono oder --schrift-text benutzt, zieht damit automatisch mit,
-     auch künftige Regeln. Einzige Ausnahme ist das Eingabefeld am Zugangs-Tor:
-     es hängt an --schrift-tor und bleibt in beiden Modi Mono. */
-  --schrift-mono: var(--schrift-display);
-  --schrift-text: var(--schrift-display);
-  /* Der Serientitel braucht in der Display-Schrift mehr Grösse als die 14px der
-     Mono — eine fette Retro-Schrift wirkt erst ab etwa 20px. Die Zentrier-Formel
-     in Serie.astro rechnet mit demselben Token und zieht mit. */
-  --serientitel-groesse: var(--groesse-22);
+  /* Die Farbseite tauscht NUR die Display-Schrift aus. --schrift-beschriftung und
+     --schrift-text zeigen bereits in tokens.css auf --schrift-display, also zieht
+     die gesamte Beschriftung automatisch mit — Kopfzeile, Serientitel,
+     Seitentitel, Fliesstext. Auch die Grösse des Serientitels ist gemeinsam und
+     steht in tokens.css. Einzige Ausnahme bleibt das Eingabefeld am Zugangs-Tor:
+     es hängt an --schrift-tor und ist in beiden Modi Mono. */
+  --schrift-display: "Caprasimo", Georgia, serif;
   /* Schleier der sticky Kopfzeile, im selben Ton wie der Grund (#f1eee6). */
   --kopf-schleier: linear-gradient(
     to bottom,
@@ -430,7 +425,7 @@ h6 {
    Spezifikation legt für diese Seiten keine eigene Grösse fest — bewusst am
    Serientitel Serienseite orientiert (22px, Mobile 19px). */
 .seiten-titel {
-  font-family: var(--schrift-mono);
+  font-family: var(--schrift-beschriftung);
   font-size: var(--groesse-22);
   font-weight: var(--gewicht-400);
   line-height: var(--zeilenhoehe-1-3);

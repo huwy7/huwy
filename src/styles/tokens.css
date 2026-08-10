@@ -22,26 +22,34 @@
      und nicht --farbe-rahmen: das Tor sieht in beiden Modi gleich aus und darf sich
      nicht mitverfärben, wenn die Farbseite ihren Grundton ändert. */
 
-  /* --- 3.3 Schriftfamilien --- */
-  --schrift-mono: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  /* Eigene Kopie des Mono-Stacks für das Eingabefeld am Zugangs-Tor. Bewusst ein
-     EIGENER Token und nicht --schrift-mono: der Farbmodus stellt --schrift-mono
-     und --schrift-text auf die Display-Schrift um (global.css), das Tor sieht in
-     beiden Modi aber gleich aus und darf sich nicht mitverwandeln. Dieselbe
-     Trennung wie bei --farbe-tor-feld. */
+  /* --- 3.3 Schriftfamilien ---
+     Commit Mono trägt nur noch das Eingabefeld am Zugangs-Tor. Überall sonst
+     steht die Display-Schrift des jeweiligen Modus. Das Tor hat bewusst einen
+     EIGENEN Token: es sieht in beiden Modi gleich aus und darf sich nicht
+     mitverwandeln — dieselbe Trennung wie bei --farbe-tor-feld. Zusätzlich hängt
+     die Feldbreite (14ch) an der Zeichenbreite einer Monospace. */
   --schrift-tor: "Commit Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  /* Display-Schrift der Farbseite — wird NUR im Farbmodus eingesetzt (global.css)
-     und trägt dort die GESAMTE Beschriftung: Kopfzeile, Serientitel, Seitentitel,
-     Fliesstext. Auf der düsteren Seite kommt sie nirgends vor; dort bleibt alles
-     bei Mono und Instrument Sans. Der Bruch zwischen der technischen düsteren
-     Seite und der fetten Retro-Farbseite ist die Idee, nicht ein Versehen. */
-  --schrift-display: "Caprasimo", Georgia, serif;
+  /* Display-Schrift der Seite. JEDER Modus hat eine eigene: hier steht die der
+     düsteren Seite, der Farbmodus überschreibt den Wert mit Caprasimo
+     (global.css). Beide sind Entscheidungen des Betreibers und lösen die frühere
+     Doktrin ab, nach der Mono der einzige typografische Bruch sein sollte
+     (CLAUDE.md Regel 6). Der Kontrast zwischen der rauen, plakatartigen düsteren
+     Seite und der fetten Retro-Farbseite ist die Idee. */
+  --schrift-display: "Protest Revolution", Impact, sans-serif;
+  /* Die Display-Schrift trägt die GESAMTE Beschriftung — Kopfzeile, Serientitel,
+     Seitentitel, Fliesstext. Statt jede Regel einzeln umzubiegen, zeigen die
+     beiden Familien-Token hierher; alles zieht damit automatisch mit, auch
+     künftige Regeln. Wird --schrift-display pro Modus überschrieben, folgen sie.
+     (Der Token hiess früher --schrift-mono; umbenannt, weil er seit dem Wechsel
+     auf Display-Schriften keine Monospace mehr hält.) */
+  --schrift-beschriftung: var(--schrift-display);
+  --schrift-text: var(--schrift-display);
   /* Grösse des Serientitels. Eigener Token, weil die Zentrier-Formel in
      Serie.astro damit rechnet (`.serie-kopf { margin-block-start }`): wird die
      Grösse geändert, muss die Formel automatisch mitziehen — sonst sitzt das Bild
-     nicht mehr mittig. Der Farbmodus überschreibt den Wert (global.css). */
-  --serientitel-groesse: var(--groesse-14);
-  --schrift-text: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+     nicht mehr mittig. Beide Modi tragen denselben Wert: eine fette
+     Display-Schrift wirkt erst ab etwa 20px. */
+  --serientitel-groesse: var(--groesse-22);
 
   /* --- 3.4 Schriftgrössen ---
      15 Wortmarke · 14 Navigation/Serientitel Start/Jahr ·

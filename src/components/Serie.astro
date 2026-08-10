@@ -335,7 +335,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     display: flex;
     gap: var(--abstand-16);
     align-items: baseline;
-    font-family: var(--schrift-mono);
+    font-family: var(--schrift-beschriftung);
     font-size: var(--serientitel-groesse);
     line-height: var(--zeilenhoehe-1-4);
     font-variant-ligatures: none;
@@ -352,7 +352,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     );
   }
 
-  /* Kein eigener Font-Override für die Farbseite mehr: dort ist --schrift-mono
+  /* Kein eigener Font-Override für die Farbseite mehr: dort ist --schrift-beschriftung
      global auf die Display-Schrift umgestellt (global.css), der Serientitel zieht
      über die Regel oben automatisch mit. Die düstere Seite bleibt bei Mono. */
 
@@ -648,7 +648,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
     padding: 0;
     border: none;
     background: none;
-    font-family: var(--schrift-mono);
+    font-family: var(--schrift-beschriftung);
     font-size: var(--groesse-28);
     line-height: 1;
     color: var(--farbe-hintergrund);

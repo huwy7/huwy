@@ -220,14 +220,15 @@ const name = 'nicolas huwyler - portfolio';
         white-space: nowrap;
       }
 
-      /* Desktop-Grösse der Kopfzeile. Bewusst eine Stufe über den früheren 14px:
-         auf breiten Screens wirkte die Zeile verloren. Gilt in BEIDEN Modi —
-         Entscheidung des Betreibers, damit düster und farbig gleich auftreten.
-         Auf Mobil bleibt es bei 14px (Block weiter unten am 768px-Breakpoint). */
+      /* Grösse der Kopfzeile. Gilt in BEIDEN Modi — Entscheidung des Betreibers,
+         damit düster und farbig gleich auftreten. Der Wert steht als Token, weil
+         der Serientitel sich daraus ableitet (tokens.css --titel-zu-nav): das
+         Verhältnis Titel zu Navigation bleibt so auf jedem Gerät gleich.
+         Mobil wird der Token eine Stufe kleiner gesetzt (global.css). */
       .kopf-nav,
       .kopf-switch {
         font-family: var(--schrift-beschriftung);
-        font-size: var(--groesse-19);
+        font-size: var(--nav-groesse);
         line-height: var(--zeilenhoehe-1-4);
         font-variant-ligatures: none;
       }
@@ -254,15 +255,10 @@ const name = 'nicolas huwyler - portfolio';
         .kopf-nav {
           gap: var(--abstand-16);
         }
-        /* Mobil bleibt die Kopfzeile bei 14px: nur der Desktop war zu klein, auf
-           dem Smartphone sass die Grösse bereits richtig. Der Wert steht hier und
-           nicht als min-width-Regel, damit die Seite bei genau EINEM Breakpoint
-           bleibt (tokens.css --breakpoint). */
-        .kopf-nav,
-        .kopf-switch {
-          font-size: var(--groesse-14);
-        }
-        /* Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
+        /* Die mobile Grösse steht als Token-Überschreibung in global.css, nicht
+           hier: der Serientitel (Serie.astro) rechnet mit demselben Token und
+           muss mitziehen. Eine Regel nur auf .kopf-nav würde ihn nicht erreichen.
+           Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
            bündig an seiner Seite: düster oben rechts, farbig oben links. */
         .kopf-switch {
           white-space: normal;

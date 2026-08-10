@@ -44,12 +44,20 @@
      auf Display-Schriften keine Monospace mehr hält.) */
   --schrift-beschriftung: var(--schrift-display);
   --schrift-text: var(--schrift-display);
-  /* Grösse des Serientitels. Eigener Token, weil die Zentrier-Formel in
-     Serie.astro damit rechnet (`.serie-kopf { margin-block-start }`): wird die
-     Grösse geändert, muss die Formel automatisch mitziehen — sonst sitzt das Bild
-     nicht mehr mittig. Beide Modi tragen denselben Wert: eine fette
-     Display-Schrift wirkt erst ab etwa 20px. */
-  --serientitel-groesse: var(--groesse-22);
+  /* Grösse der Kopfzeilen-Beschriftungen. Mobil eine Stufe kleiner (global.css,
+     am 768px-Breakpoint) — dort muss die Zeile einzeilig bleiben. */
+  --nav-groesse: var(--groesse-19);
+  /* Serientitel zu Navigation: EIN festes Verhältnis für alle Geräte. Der Titel
+     rechnet sich aus der Navigationsgrösse, statt eine eigene Stufe zu haben —
+     dadurch stehen Titel und Navigation auf dem Smartphone im selben Verhältnis
+     zueinander wie am Desktop. Ausgangspunkt ist das Desktop-Paar 22/19; wird
+     --nav-groesse mobil auf 15px gesetzt, ergibt das rund 17px Titel.
+     Eigener Token, weil die Zentrier-Formel in Serie.astro damit rechnet
+     (`.serie-kopf { margin-block-start }`): wird die Grösse geändert, muss die
+     Formel automatisch mitziehen — sonst sitzt das Bild nicht mehr mittig.
+     Beide Modi tragen denselben Wert. */
+  --titel-zu-nav: calc(22 / 19);
+  --serientitel-groesse: calc(var(--nav-groesse) * var(--titel-zu-nav));
 
   /* --- 3.4 Schriftgrössen ---
      15 Wortmarke · 14 Navigation/Serientitel Start/Jahr ·

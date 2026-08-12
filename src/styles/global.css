@@ -250,11 +250,11 @@ picture > source {
   max-width: 100%;
 }
 
-/* Mobil eine Stufe kleiner. Der Wert steht auf :root und nicht als Regel an der
-   Kopfzeile, weil der Serientitel (Serie.astro) über --titel-zu-nav mit demselben
-   Token rechnet: beide müssen gemeinsam kleiner werden, damit ihr Verhältnis auf
-   jedem Gerät gleich bleibt. Die 15px sind die Obergrenze, bei der die Kopfzeile
-   auf 375px noch einzeilig bleibt (nachgemessen). */
+/* Mobil eine Stufe kleiner. Die 15px sind die Obergrenze, bei der die Kopfzeile
+   auf 375px noch einzeilig bleibt (nachgemessen). Betrifft nur noch die
+   Kopfzeile: der Serientitel hing früher über ein festes Verhältnis an diesem
+   Token, skaliert seit dem Wechsel auf Plakatschrift aber selbst mit dem Fenster
+   (tokens.css --serientitel-groesse). */
 @media (max-width: 768px) {
   :root {
     --nav-groesse: var(--groesse-15);

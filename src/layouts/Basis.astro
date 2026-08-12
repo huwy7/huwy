@@ -224,10 +224,10 @@ const name = 'nicolas huwyler - portfolio';
       }
 
       /* Grösse der Kopfzeile. Gilt in BEIDEN Modi — Entscheidung des Betreibers,
-         damit düster und farbig gleich auftreten. Der Wert steht als Token, weil
-         der Serientitel sich daraus ableitet (tokens.css --titel-zu-nav): das
-         Verhältnis Titel zu Navigation bleibt so auf jedem Gerät gleich.
-         Mobil wird der Token eine Stufe kleiner gesetzt (global.css). */
+         damit düster und farbig gleich auftreten. Mobil wird der Token eine Stufe
+         kleiner gesetzt (global.css). Der Serientitel hing früher über ein festes
+         Verhältnis an diesem Wert; seit er als Plakatschrift läuft, rechnet er
+         eigenständig (tokens.css --serientitel-groesse). */
       .kopf-nav,
       .kopf-switch {
         font-family: var(--schrift-beschriftung);

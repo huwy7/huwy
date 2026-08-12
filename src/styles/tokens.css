@@ -72,6 +72,14 @@
      Verhältnis zur Navigation ist damit aufgegeben.) */
   --serientitel-groesse: clamp(40px, 9vw, 128px);
 
+  /* Menü der Serien rechts neben der Bühne (Galerie.astro), erst ab dem
+     Breakpoint. Eigene Grösse: deutlich kleiner als der Serientitel, aber klar
+     grösser als die Kopfzeile — es ist die Hauptnavigation der Startseite.
+     Fliessend wie der Serientitel, damit Menü und Titel gemeinsam mitwachsen. */
+  --menu-breite: clamp(200px, 24vw, 380px);
+  --menu-groesse: clamp(26px, 3.2vw, 52px);
+  --menu-abstand: var(--abstand-8);
+
   /* --- 3.4 Schriftgrössen ---
      15 Wortmarke · 14 Navigation/Serientitel Start/Jahr ·
      22 Serientitel Serienseite (Mobile 19) · 16 Fliesstext · 12 Fusszeile/Meta.

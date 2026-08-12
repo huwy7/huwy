@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Basis from '../../layouts/Basis.astro';
-import Serie from '../../components/Serie.astro';
+import Galerie from '../../components/Galerie.astro';
 import { ladeAufnahmedaten } from '../../lib/aufnahmedaten';
 
 // Farbmodus — Portfolio (Startseite der farbigen Seite). Kein Untermenü mehr:
@@ -33,20 +33,6 @@ const serien = serienMeta
 <Basis titel="nicolas huwyler - portfolio" modus="farbe" vollhoehe>
   <h1 class="visuell-versteckt">nicolas huwyler - portfolio — color</h1>
 
-  <div class="serien-liste">
-    {
-      serien.map(({ serie, bilder }) => (
-        <Serie slug={serie.id} titel={serie.data.titel} jahr={serie.data.jahr} bilder={bilder} />
-      ))
-    }
-  </div>
+  <Galerie serien={serien} />
 </Basis>
 
-<style>
-  /* Kein Zwischenabstand nötig: jede Serie ist eine volle Bildschirmhöhe hoch
-     (Serie.astro) und zentriert ihren Inhalt selbst. */
-  .serien-liste {
-    display: flex;
-    flex-direction: column;
-  }
-</style>

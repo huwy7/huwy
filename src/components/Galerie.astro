@@ -1,0 +1,192 @@
+---
+import Serie from './Serie.astro';
+import type { ImageMetadata } from 'astro';
+import type { Aufnahmedaten } from '../lib/exif';
+
+// Die Galerie der Startseite in ZWEI Darstellungen, umgeschaltet am einzigen
+// Breakpoint der Seite (768px, tokens.css --breakpoint):
+//
+//   ab 768px (Desktop, iPad)   eine Serie steht gross auf der Bühne, rechts das
+//                              Menü mit allen Serientiteln. Gewählt wird dort,
+//                              gescrollt wird nicht mehr — die sichtbare Serie
+//                              füllt genau eine Bildschirmhöhe.
+//   unter 768px (iPhone)       unverändert wie bisher: alle Serien gestapelt,
+//                              man scrollt hindurch. Für das Menü ist die Breite
+//                              zu knapp.
+//
+// Die Auswahl läuft über versteckte Radio-Buttons — KEIN JavaScript (CLAUDE.md
+// Regel 2). Bewusst Radios und nicht `:target` wie beim Vollbild: das Vollbild
+// belegt den Hash bereits, ein Klick darauf würde die Serienauswahl sonst wieder
+// aufheben. Radios halten ihren Zustand unabhängig davon, brauchen keinen
+// Hash-Sprung und bringen die Tastaturbedienung (Pfeiltasten in der Gruppe) mit.
+// Der erste Radio trägt `checked` — damit steht die oberste Serie beim Laden.
+interface Props {
+  serien: {
+    serie: { id: string; data: { titel: string; jahr: number } };
+    bilder: { bild: ImageMetadata; daten?: Aufnahmedaten }[];
+  }[];
+}
+const { serien } = Astro.props;
+
+// Welche Serie zu welchem Radio gehört, lässt sich nicht mit EINER statischen
+// Regel ausdrücken — jedes Paar braucht seine eigene. Darum hier erzeugt statt
+// im <style>-Block. Läuft nur ab dem Breakpoint; darunter greift keine dieser
+// Regeln und alle Serien bleiben sichtbar.
+// `:has()` am Wurzelelement, weil Radio (im Menü, unten) und Serie (auf der
+// Bühne, oben) keine Geschwister sind und `~` daher nicht greift.
+const regeln = `@media (min-width: 768px) {
+${serien
+  .map(
+    ({ serie }) => `  .galerie:has(#wahl-${serie.id}:checked) .serie[data-serie="${serie.id}"] { display: flex; }
+  .galerie:has(#wahl-${serie.id}:checked) .serien-eintrag[data-fuer="${serie.id}"] { --eintrag-aktiv: 1; }`,
+  )
+  .join('\n')}
+}`;
+---
+
+<div class="galerie">
+  <div class="serien-buehne">
+    {
+      serien.map(({ serie, bilder }) => (
+        <Serie slug={serie.id} titel={serie.data.titel} jahr={serie.data.jahr} bilder={bilder} />
+      ))
+    }
+  </div>
+
+  {/* Das Menü steht im Markup NACH der Bühne, damit die Tastatur zuerst durchs
+      Bild läuft. Optisch sitzt es rechts (order in der CSS-Regel unten). */}
+  <nav class="serien-menu" aria-label="Serien">
+    {
+      serien.map(({ serie }, i) => (
+        <label class="serien-eintrag" data-fuer={serie.id}>
+          {/* Radio IM Label: so schaltet ein Klick auf den Titel die Serie um und
+              `:focus-within` kann den Fokusring am ganzen Eintrag zeigen, obwohl
+              das Feld selbst unsichtbar ist. */}
+          <input
+            type="radio"
+            name="serie"
+            id={`wahl-${serie.id}`}
+            class="serien-wahl"
+            checked={i === 0}
+          />
+          <span class="serien-eintrag-text">{serie.data.titel}</span>
+        </label>
+      ))
+    }
+  </nav>
+</div>
+
+<style set:html={regeln} is:inline></style>
+
+<style>
+  /* --- unter 768px: unverändert wie bisher ---------------------------------
+     Kein Menü, keine Auswahl, alle Serien gestapelt. Die Bühne ist nur ein
+     Behälter ohne eigenes Layout. */
+  .serien-buehne {
+    display: flex;
+    flex-direction: column;
+  }
+  .serien-menu {
+    display: none;
+  }
+
+  /* Das Radio ist nie sichtbar, aber immer fokussierbar — nicht `display: none`,
+     sonst fiele es aus der Tastaturreihenfolge und die Serien wären ohne Maus
+     nicht mehr wählbar. */
+  .serien-wahl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* --- ab 768px: Bühne links, Menü rechts ---------------------------------- */
+  @media (min-width: 768px) {
+    .galerie {
+      display: flex;
+      align-items: stretch;
+      gap: var(--rand);
+      padding-inline-end: var(--rand);
+    }
+    .serien-buehne {
+      /* `min-width: 0` ist Pflicht: ohne das weigert sich ein Flex-Kind, unter
+         die Breite seines Inhalts zu schrumpfen, und das Bild drückte das Menü
+         aus dem Fenster. */
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Nur die gewählte Serie steht auf der Bühne. Sichtbar gemacht wird sie von
+       den erzeugten Regeln oben. */
+    .serien-buehne :global(.serie) {
+      display: none;
+    }
+    /* Die sichtbare Serie füllt genau eine Bildschirmhöhe — es gibt nichts mehr
+       zu scrollen. Serie.astro rechnet den Platz der Kopfzeile sonst nur bei der
+       ERSTEN Serie heraus; hier kann jede Serie die erste sein, also gilt die
+       Rechnung für alle. */
+    .serien-buehne :global(.serie) {
+      min-height: calc(100svh - var(--header-hoehe));
+      padding-block-start: 0;
+      padding-block-end: 0;
+    }
+
+    .serien-menu {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: var(--menu-abstand);
+      width: var(--menu-breite);
+      flex: none;
+    }
+    .serien-eintrag {
+      /* --eintrag-aktiv wird von den erzeugten Regeln auf 1 gesetzt; darüber
+         hängen Deckkraft und der Balken links, ohne dass eine zweite Klasse
+         nötig wäre. */
+      --eintrag-aktiv: 0;
+      display: block;
+      width: 100%;
+      font-family: var(--schrift-beschriftung);
+      font-size: var(--menu-groesse);
+      line-height: var(--zeilenhoehe-1-2);
+      font-variant-ligatures: none;
+      color: var(--farbe-text);
+      /* Die nicht gewählten Titel treten zurück, ohne zu verschwinden. */
+      opacity: calc(0.45 + 0.55 * var(--eintrag-aktiv));
+      padding-block: var(--abstand-8);
+      transition: opacity var(--zaehler-tempo) ease;
+    }
+    .serien-eintrag-text {
+      display: block;
+    }
+
+    /* Fokusring am ganzen Eintrag, weil das Radio selbst unsichtbar ist. */
+    .serien-eintrag:focus-within {
+      outline: var(--fokus-breite) solid var(--farbe-text);
+      outline-offset: var(--fokus-offset);
+    }
+
+    /* Ohne JavaScript kein invertierender Cursor — dann übernimmt der Hover die
+       Umkehr selbst, wie bei den Textlinks (global.css). Mit aktivem Cursor
+       bleibt es aus, sonst invertiert es doppelt. */
+    @media (hover: hover) and (pointer: fine) {
+      html:not(.cursor-aktiv) .serien-eintrag:hover {
+        background-color: var(--farbe-text);
+        color: var(--farbe-hintergrund);
+        opacity: 1;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .serien-eintrag {
+      transition: none;
+    }
+  }
+</style>

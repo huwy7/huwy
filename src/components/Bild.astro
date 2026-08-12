@@ -4,9 +4,12 @@ import type { ImageMetadata } from 'astro';
 
 // Ein responsives Bild als <picture> mit AVIF + WebP und JPEG als Fallback
 // (Spezifikation 5.4). Qualität je Format getrennt (5.3): AVIF 65, WebP 80.
-// Zwei Modi:
+// Drei Modi:
 //   - responsiv (widths + sizes): Seitenverhältnis bleibt erhalten
-//   - Crop (breite + hoehe + densities): fester Zuschnitt, z. B. 3:2-Vorschau
+//   - Crop (breite + hoehe + densities): fester Zuschnitt in einer Grösse
+//   - responsiver Crop (widths + verhaeltnis): mehrere Breiten, alle im selben
+//     Seitenverhältnis zugeschnitten — das ist der Normalfall für Fotos, seit
+//     nur noch 5:4 und 4:5 gezeigt werden (src/lib/format.ts)
 interface Props {
   src: ImageMetadata;
   // Alt-Text optional (CLAUDE.md Regel 4): fehlt er, wird alt="" ausgegeben.
@@ -16,6 +19,8 @@ interface Props {
   fetchpriority?: 'high' | 'auto';
   sizes?: string;
   widths?: number[];
+  /** Ziel-Seitenverhältnis (Breite/Höhe). Mit `widths` kombinierbar. */
+  verhaeltnis?: number;
   breite?: number;
   hoehe?: number;
   densities?: number[];
@@ -29,6 +34,7 @@ const {
   fetchpriority,
   sizes,
   widths,
+  verhaeltnis,
   breite,
   hoehe,
   densities,
@@ -38,23 +44,62 @@ const {
 const QUALITAET = { avif: 65, webp: 80, jpeg: 80 };
 
 const cropModus = typeof breite === 'number' && typeof hoehe === 'number';
+const responsiverCrop = !cropModus && typeof verhaeltnis === 'number' && !!widths;
 
-// Keine Breiten anfragen, die grösser als die Quelle sind (kein Upscaling).
-const gefiltert = widths?.filter((w) => w <= src.width);
-const echteWidths = widths ? (gefiltert && gefiltert.length ? gefiltert : [src.width]) : undefined;
+// Keine Breiten anfragen, die grösser als die Quelle sind (kein Upscaling). Beim
+// responsiven Crop ist die Obergrenze das BESCHNITTENE Bild, nicht das Original:
+// wird die Breite gekürzt, gibt die Quelle weniger her, als src.width verspricht.
+const grenze = responsiverCrop
+  ? Math.min(src.width, Math.round(src.height * verhaeltnis!))
+  : src.width;
+const gefiltert = widths?.filter((w) => w <= grenze);
+const echteWidths = widths ? (gefiltert && gefiltert.length ? gefiltert : [grenze]) : undefined;
+
+// Ein srcset je Format. Beim responsiven Crop wird es von Hand gebaut: Astro
+// leitet die Höhen sonst aus dem ORIGINAL-Seitenverhältnis ab, wir brauchen aber
+// zu jeder Breite die Höhe des ZIELformats. Also eine Variante je Breite,
+// jeweils mit `fit: cover` (schneidet nur die überschüssige Achse) und
+// `position: center` (gleich viel auf beiden Seiten weg).
+const schneide = async (format: 'avif' | 'webp' | 'jpeg', quality: number) => {
+  const teile = await Promise.all(
+    echteWidths!.map(async (w) => {
+      const v = await getImage({
+        src,
+        width: w,
+        height: Math.round(w / verhaeltnis!),
+        fit: 'cover' as const,
+        position: 'center' as const,
+        format,
+        quality,
+      });
+      return { w, src: v.src };
+    }),
+  );
+  return { srcSet: teile.map((t) => `${t.src} ${t.w}w`).join(', '), src: teile[teile.length - 1].src };
+};
 
 const basis = cropModus
   ? { src, width: breite, height: hoehe, fit: 'cover' as const, position: 'center' as const, densities }
   : { src, widths: echteWidths };
 
-const avif = await getImage({ ...basis, format: 'avif', quality: QUALITAET.avif });
-const webp = await getImage({ ...basis, format: 'webp', quality: QUALITAET.webp });
-const jpeg = await getImage({ ...basis, format: 'jpeg', quality: QUALITAET.jpeg });
+const hole = async (format: 'avif' | 'webp' | 'jpeg', quality: number) => {
+  if (responsiverCrop) return schneide(format, quality);
+  const v = await getImage({ ...basis, format, quality });
+  return { srcSet: v.srcSet.attribute, src: v.src };
+};
+
+const avif = await hole('avif', QUALITAET.avif);
+const webp = await hole('webp', QUALITAET.webp);
+const jpeg = await hole('jpeg', QUALITAET.jpeg);
 
 // Breite/Höhe explizit ins Markup, damit kein Layout-Shift entsteht (5.4).
 const maxW = cropModus ? breite! : Math.max(...(echteWidths ?? [src.width]));
 const w = cropModus ? breite! : maxW;
-const h = cropModus ? hoehe! : Math.round((src.height * maxW) / src.width);
+const h = cropModus
+  ? hoehe!
+  : responsiverCrop
+    ? Math.round(maxW / verhaeltnis!)
+    : Math.round((src.height * maxW) / src.width);
 ---
 
 {/*
@@ -66,12 +111,12 @@ const h = cropModus ? hoehe! : Math.round((src.height * maxW) / src.width);
   darum ist das aufgeschobene Laden hier konsistent.
 */}
 <picture class="bild-defer">
-  <source type="image/avif" data-srcset={avif.srcSet.attribute} sizes={sizes} />
-  <source type="image/webp" data-srcset={webp.srcSet.attribute} sizes={sizes} />
+  <source type="image/avif" data-srcset={avif.srcSet} sizes={sizes} />
+  <source type="image/webp" data-srcset={webp.srcSet} sizes={sizes} />
   <img
     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
     data-src={jpeg.src}
-    data-srcset={jpeg.srcSet.attribute}
+    data-srcset={jpeg.srcSet}
     sizes={sizes}
     width={w}
     height={h}

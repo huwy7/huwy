@@ -2,6 +2,7 @@
 import Bild from './Bild.astro';
 import type { ImageMetadata } from 'astro';
 import type { Aufnahmedaten } from '../lib/exif';
+import { zielVerhaeltnis } from '../lib/format';
 
 // Eine Serie als inline-Karussell (kein Untermenü): die Bilder liegen nebeneinander
 // in einem horizontalen scroll-snap-Streifen; man wischt/blättert direkt auf der
@@ -58,6 +59,7 @@ const breiten = [640, 960, 1280, 1600, 2000];
                   src={bild}
                   alt=""
                   widths={breiten}
+                  verhaeltnis={zielVerhaeltnis(bild.width, bild.height)}
                   sizes="100vw"
                   loading={i === 0 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}
@@ -111,7 +113,17 @@ const breiten = [640, 960, 1280, 1600, 2000];
       {
         bilder.map(({ bild }) => (
           <div class="lightbox-ansicht">
-            <Bild class="lightbox-bild" src={bild} alt="" widths={breiten} sizes="100vw" loading="lazy" />
+            {/* Auch im Vollbild derselbe Zuschnitt — es gibt kein „ungeschnittenes
+                Original" zu sehen, die zwei Formate gelten überall. */}
+            <Bild
+              class="lightbox-bild"
+              src={bild}
+              alt=""
+              widths={breiten}
+              verhaeltnis={zielVerhaeltnis(bild.width, bild.height)}
+              sizes="100vw"
+              loading="lazy"
+            />
             {/* Blätter-Flächen liegen INNERHALB der Ansicht, also im scrollbaren
                 Streifen. Nur so wischt der Finger auf ihnen den Streifen weiter —
                 lagen sie darüber (Kind der Lightbox), verschluckten sie den Wisch,

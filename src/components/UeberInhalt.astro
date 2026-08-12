@@ -1,11 +1,14 @@
 ---
 import Bild from './Bild.astro';
 import type { ImageMetadata } from 'astro';
+import { zielVerhaeltnis } from '../lib/format';
 
 // Inhalt der About-Seiten. Jedes Bild steht in einer eigenen Reihe zusammen mit
 // seinem (optionalen) Text daneben; die Reihen wechseln sich ab: erstes Bild
 // rechts / Text links, zweites Bild links / Text rechts, usw. Ohne Text bleibt
-// die Textseite einfach leer. Format der Bilder dynamisch (echtes Seitenverhältnis).
+// die Textseite einfach leer. Die Bilder laufen in denselben zwei Formaten wie
+// die Serien (5:4 quer, 4:5 hoch, src/lib/format.ts) — auf der ganzen Seite gibt
+// es keine anderen Rahmen.
 // spotify: nur die düstere Seite bekommt zusätzlich den Spotify-API-Platzhalter.
 interface Props {
   eintraege: { bild: ImageMetadata; text?: string }[];
@@ -33,6 +36,7 @@ const breiten = [640, 960, 1280];
                 src={e.bild}
                 alt=""
                 widths={breiten}
+                verhaeltnis={zielVerhaeltnis(e.bild.width, e.bild.height)}
                 sizes="(max-width: 768px) 100vw, 45vw"
                 loading="lazy"
               />

@@ -31,10 +31,12 @@ const n = bilder.length;
 const breiten = [640, 960, 1280, 1600, 2000];
 ---
 
-<section class="serie" data-serie={slug}>
+{/* id am Abschnitt: das Öffnen einer Serie läuft über :target, also über einen
+    Link auf genau diese id — reines CSS, kein JavaScript (CLAUDE.md Regel 2).
+    Kollidiert nicht mit `lb-<slug>` (Vollbild) und `k-<slug>-<i>` (Karussell). */}
+<section class="serie" id={slug} data-serie={slug}>
   <div class="serie-kopf">
     <span class="serie-titel">{titel}</span>
-    <span class="serie-jahr">{jahr}</span>
   </div>
 
   <div class="karussell">
@@ -81,11 +83,24 @@ const breiten = [640, 960, 1280, 1600, 2000];
                   <button class="blaettern blaettern-next" type="button" data-richtung="1" aria-label="Nächstes Bild" />
                 </>
               )}
+              {/* Solange die Serie zu ist, liegt diese Fläche über allem: ein Klick
+                  irgendwo aufs Titelbild öffnet die Serie. Ist sie offen, wird die
+                  Fläche durchlässig — dann gelten wieder Blättern und Vollbild.
+                  Nur beim ersten Bild, das ist das Titelbild der Serie. */}
+              {i === 0 && (
+                <a href={`#${slug}`} class="serie-oeffnen" aria-label={`Serie ${titel} öffnen`} />
+              )}
             </div>
           </li>
         ))
       }
     </ul>
+  </div>
+
+  {/* Jahr unter dem Bild, rechtsbündig — Gegenstück zum Titel oben links. Fährt
+      beim Öffnen nach links aus dem Bild, während der Titel nach rechts geht. */}
+  <div class="serie-fuss">
+    <span class="serie-jahr">{jahr}</span>
   </div>
 
   {
@@ -377,6 +392,88 @@ const breiten = [640, 960, 1280, 1600, 2000];
     margin-block-start: calc(
       -1 * (var(--serientitel-groesse) * var(--zeilenhoehe-1-4) + var(--abstand-24))
     );
+  }
+
+  /* --- Portfolio-Ansicht: geschlossene und offene Serie -------------------
+     Eine Serie ist zu, bis man ihr Titelbild anklickt. Der Klick setzt per
+     :target die offene Fassung: der Titel fährt nach rechts, das Jahr nach
+     links, beide aus dem sichtbaren Bereich — und im selben Zug wächst das
+     Bild. Weil alle drei dieselbe Dauer und Kurve haben, laufen sie synchron:
+     je weiter der Text draussen ist, desto grösser steht das Bild.
+     Reines CSS über :target, kein JavaScript — dieselbe Technik wie beim
+     Vollbild. Ohne JavaScript funktioniert die Seite also unverändert. */
+  .serie-kopf,
+  .serie-fuss {
+    /* Der Text darf seitlich hinauslaufen, ohne die Seite breiter zu machen.
+       Bis an den Seitenrand ziehen, damit die Plakatschrift bündig mit dem Rand
+       steht und nicht im Raster des Bildes klebt. */
+    overflow: clip;
+    margin-inline: calc(-1 * var(--rand));
+    padding-inline: var(--rand);
+    font-family: var(--schrift-beschriftung);
+    font-size: var(--portfolio-titel);
+    line-height: var(--zeilenhoehe-1-2);
+    font-variant-ligatures: none;
+  }
+  .serie-kopf {
+    /* Überschreibt die alte, kleine Zeile: der Titel steht jetzt als Plakat über
+       dem Bild, das Jahr als Gegenstück darunter.
+       KEIN negativer Aussenabstand mehr: die alte Formel zog den Titel aus der
+       Zentrierung heraus, damit nur der Bildstreifen mittig sass. Mit Plakatgrösse
+       rutschte er damit unter die sticky Kopfzeile. Titel und Jahr gehören jetzt
+       zum Block und werden mitzentriert — dafür ist das Bild im geschlossenen
+       Zustand etwas flacher (--serie-hoehe-zu). */
+    font-size: var(--portfolio-titel);
+    margin-block-end: var(--abstand-16);
+    margin-block-start: 0;
+  }
+  .serie-fuss {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-start: var(--abstand-16);
+  }
+  .serie-titel,
+  .serie-jahr {
+    display: inline-block;
+    transition:
+      transform var(--serie-oeffnen-tempo) var(--serie-oeffnen-kurve),
+      opacity var(--serie-oeffnen-tempo) var(--serie-oeffnen-kurve);
+  }
+  .serie:target .serie-titel {
+    transform: translateX(var(--serie-text-weg));
+    opacity: 0;
+  }
+  .serie:target .serie-jahr {
+    transform: translateX(calc(-1 * var(--serie-text-weg)));
+    opacity: 0;
+  }
+
+  /* Das Bild wächst um --serie-zuwachs. Bewusst über die Höhe (dieselbe Grösse,
+     die auch sonst das Bild deckelt) statt über transform: scale — ein skaliertes
+     Bild würde unscharf und liefe über den Seitenrand hinaus. So bleibt es
+     gestochen und die Blätter-Zonen sitzen weiter exakt an den Bildkanten. */
+  .karussell-foto {
+    transition: max-height var(--serie-oeffnen-tempo) var(--serie-oeffnen-kurve);
+  }
+
+  /* Die Fläche, die im geschlossenen Zustand den Klick abfängt. Liegt über den
+     Blätter-Zonen (z-index 2) und dem Bild-Link; sobald die Serie offen ist,
+     wird sie durchlässig und stört nichts mehr. */
+  .serie-oeffnen {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+  }
+  .serie:target .serie-oeffnen {
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .serie-titel,
+    .serie-jahr,
+    .karussell-foto {
+      transition: none;
+    }
   }
 
   /* Kein eigener Font-Override für die Farbseite mehr: dort ist --schrift-beschriftung

@@ -160,6 +160,26 @@
      ausdrücklich auf. Gilt in BEIDEN Modi gleich, damit die Geometrie identisch
      bleibt; auf der Farbseite ist der Rahmen nur farblich unsichtbar. */
   --polaroid-fuss: var(--abstand-32);
+
+  /* --- Portfolio: Öffnen einer Serie (Serie.astro, :target) ---
+     Titel und Jahr fahren seitlich hinaus, das Bild wächst dabei. Alle drei
+     Bewegungen teilen sich Dauer und Kurve, damit sie synchron laufen — das ist
+     der Kern des Effekts: je weiter der Text draussen ist, desto grösser das Bild.
+     --serie-text-weg ist bewusst in vw: der Text muss den sichtbaren Bereich
+     verlassen, unabhängig davon, wie lang er ist. */
+  --serie-oeffnen-tempo: 620ms;
+  --serie-oeffnen-kurve: cubic-bezier(0.22, 1, 0.36, 1);
+  --serie-text-weg: 100vw;
+  /* Höhe des Bildes im geschlossenen und im offenen Zustand. Der Unterschied ist
+     absichtlich klein — das Bild soll „etwas grösser" werden, nicht springen. */
+  --serie-hoehe-zu: 56vh;
+  --serie-hoehe-offen: 68vh;
+  /* Titel und Jahr in der Portfolio-Ansicht laufen als Plakatschrift — das ist
+     der Bruch zur früheren, sehr leeren Fassung. Bewusst fliessend (clamp) statt
+     einer festen Stufe: die Zeile soll auf jedem Gerät ähnlich viel Breite
+     einnehmen. Das ist die EINZIGE Stelle mit fliessender Typografie; überall
+     sonst gelten die festen Stufen aus der Skala. */
+  --portfolio-titel: clamp(40px, 9vw, 128px);
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
   --vorschau-max-hoehe: 72vh; /* Deckel für Titelbilder der Startseite (Hochformat) */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */

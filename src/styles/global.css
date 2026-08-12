@@ -312,12 +312,20 @@ picture > source {
      nur breitenbegrenzt würden und überliefen. So passt jedes Bild ganz in die
      Ansicht: Querformate bleiben breit, Hochformate werden schmaler, aber immer
      vollständig sichtbar (kein Beschnitt, kein Scrollen). */
-  max-height: var(--karussell-hoehe);
+  /* Geschlossene Serie: etwas kleiner als früher, damit Titel und Jahr darüber
+     und darunter Platz haben. Beim Öffnen wächst der Wert auf --serie-hoehe-offen
+     (Regel unten) — das ist das „Bild wird grösser" aus der Portfolio-Idee. */
+  max-height: var(--serie-hoehe-zu);
   max-width: 100%;
   width: auto;
   height: auto;
   background-color: var(--farbe-rahmen);
   padding: var(--rahmen-breite);
+}
+/* Offene Serie. Steht global, weil das <img> aus Bild.astro kommt und den Scope
+   von Serie.astro nicht erbt; der Übergang selbst ist dort definiert. */
+.serie:target .karussell-foto {
+  max-height: var(--serie-hoehe-offen);
 }
 
 /* Polaroid: nur UNTEN wächst der Rahmen, damit die Aufnahmedaten darin Platz

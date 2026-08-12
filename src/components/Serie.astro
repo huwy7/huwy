@@ -492,13 +492,27 @@ const breiten = [640, 960, 1280, 1600, 2000];
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0 var(--abstand-16);
+    gap: 0 var(--daten-abstand);
     margin: 0;
     font-family: var(--schrift-daten);
     font-size: var(--groesse-12);
     font-weight: var(--gewicht-400);
     line-height: var(--zeilenhoehe-1-5);
     color: var(--farbe-daten);
+  }
+
+  /* Die Daten sitzen in der RECHTEN HÄLFTE des Rahmens, dort mittig: der Kasten
+     beginnt bei 50 % und läuft bis zur Rahmenkante, `justify-content: center`
+     zentriert die Zeile darin. Damit liegt ihre Mitte auf 75 % der Rahmenbreite.
+     Erst ab dem Breakpoint — auf dem Smartphone ist eine halbe Rahmenbreite zu
+     schmal für vier Angaben, die Zeile würde umbrechen und aus dem Fuss laufen
+     (seine Höhe ist mit --polaroid-fuss fest). Dort bleibt sie über die volle
+     Breite zentriert. */
+  @media (min-width: 768px) {
+    .aufnahmedaten {
+      left: 50%;
+      right: 0;
+    }
   }
 
   /* Unsichtbare Blätter-Flächen an den Bildkanten — kein sichtbarer Pfeil mehr,

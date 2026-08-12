@@ -160,6 +160,11 @@
      ausdrücklich auf. Gilt in BEIDEN Modi gleich, damit die Geometrie identisch
      bleibt; auf der Farbseite ist der Rahmen nur farblich unsichtbar. */
   --polaroid-fuss: var(--abstand-32);
+  /* Abstand zwischen den Aufnahmedaten im Polaroid-Fuss (Blende, Zeit, ISO,
+     Brennweite). Eigener Token, weil er sich unabhängig von den Layout-Abständen
+     bewegt: die vier Angaben sollen als lose Reihe lesbar sein, nicht als Block.
+     Nächste Stufe der Skala nach oben gegenüber vorher (16). */
+  --daten-abstand: var(--abstand-24);
   --bild-max-hoehe: 78vh; /* 5.1 Höhennormierung der Serienbilder */
   --vorschau-max-hoehe: 72vh; /* Deckel für Titelbilder der Startseite (Hochformat) */
   --rhythmus-serie: 15vh; /* 6.1 Abstand zwischen Serien auf der Startseite */

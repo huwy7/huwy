@@ -208,7 +208,11 @@
   /* --- 4a. Invertierter Cursor (bewusste Ausnahme, siehe CLAUDE.md) --- */
   --cursor-groesse: 36px; /* Durchmesser des Frei-Kreises (Radius +50% ggü. 24px) */
   --cursor-skala-aktiv: 1.8; /* Vergrösserung über interaktiven Elementen */
-  --cursor-skala-bild: 0.28; /* kleiner Punkt über Fotos */
+  /* Über Fotos wächst der Ball leicht — gerade genug, dass man merkt „hier kann
+     ich klicken", ohne dass es aufdringlich wird. Bewusst weit unter
+     --cursor-skala-aktiv (1.8): das Bild soll die Bühne behalten.
+     (Vorher 0.28, also ein kleiner Punkt. Entscheidung des Betreibers.) */
+  --cursor-skala-bild: 1.15;
   --cursor-skala-druck: 0.7; /* beim Klicken */
   --cursor-uebergang: 200ms; /* weicher Übergang der Grösse (Skala) */
   --cursor-morph: 260ms; /* Übergang beim Umschliessen eines Elements (Box-Modus) */

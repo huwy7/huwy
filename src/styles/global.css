@@ -590,6 +590,14 @@ a {
   --cursor-skala: var(--cursor-skala-druck);
 }
 
+/* Über einem Foto: der Ball wächst leicht. Er zeigt damit an, dass man klicken
+   kann — links blättert zurück, in der Mitte öffnet das Vollbild, rechts blättert
+   weiter (die Drittel stecken in Serie.astro). Das Foto selbst bleibt unangetastet
+   (CLAUDE.md Regel 5): kein Invert, kein Filter. */
+.cursor--bild .cursor__punkt {
+  --cursor-skala: var(--cursor-skala-bild);
+}
+
 /* Box-Modus: der Punkt legt sich als abgerundetes Rechteck um das überfahrene
    Element (Grösse und Radius setzt das Skript inline). Keine Skalierung — die
    Grösse kommt aus width/height. Der backdrop-filter: invert(1) des Punkts wirkt

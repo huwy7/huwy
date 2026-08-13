@@ -523,7 +523,10 @@ const breiten = [640, 960, 1280, 1600, 2000];
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 22%;
+    /* Ein Drittel je Seite. Damit teilt sich das Bild in drei gleiche Zonen:
+       links zurückblättern, MITTE Vollbild (das ist der Link darunter, den die
+       Flächen hier freilassen), rechts weiterblättern. */
+    width: 33.333%;
     z-index: 2;
     padding: 0;
     border: none;

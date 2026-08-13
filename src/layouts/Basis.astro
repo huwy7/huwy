@@ -543,13 +543,15 @@ const name = 'nicolas huwyler - portfolio';
         // Ausgenommen ist NUR `.lightbox-zone` — die Blätter-Flächen im Vollbild
         // sind je eine halbe Bildschirmseite gross; dort soll gar kein Effekt
         // auftreten, sonst wird der Cursor zu einem bildschirmgrossen Kasten.
-        // In der Portfolio-Ansicht bleiben die Blätter-Flächen am Bild
-        // (`.blaettern`) BEWUSST mit Effekt — so war es und so soll es bleiben.
-        // Ebenso ausgenommen: Serienkarten (.serien-link), dort wirkt der Bild-Invert.
+        // Die Blätter-Flächen am Bild (`.blaettern`) sind ausgenommen: als
+        // <button> lösten sie den Box-Modus aus, und weil sie nur einen Streifen
+        // des Bildes breit sind, legte sich eine grosse Kapsel quer übers Foto.
+        // Über Fotos gilt jetzt einheitlich `cursor--bild` — der Ball wächst nur
+        // leicht. Ebenso ausgenommen: Serienkarten (.serien-link).
         // ACHTUNG: Die Flächen sind <button>, nicht <a> — der Ausschluss muss
         // deshalb am button-Teil des Selektors stehen (stand er nur beim a, entstand
         // im Vollbild wieder eine bildschirmgrosse Box).
-        const OHNE = ':not(.lightbox-zone)';
+        const OHNE = ':not(.lightbox-zone):not(.blaettern)';
         const BOX_SELEKTOR =
           `a:not(.serien-link):not(.lightbox-flaeche), button${OHNE}, [role="button"]${OHNE}, input, label, summary`;
         const INTERAKTIV_SELEKTOR = `a, button${OHNE}, [role="button"]${OHNE}, input, label, summary`;
@@ -607,14 +609,21 @@ const name = 'nicolas huwyler - portfolio';
         // so bleibt die Box dort, wo die Maus ist, statt beim Blättern mit dem
         // wegscrollenden Element mitzuwandern.
         const aktualisiere = (ziel: Element | null) => {
-          // Über einem Foto: kein Box-Modus (der Cursor legt sich nicht um das
-          // ganze Bild) — es bleibt der normale, lokal invertierende Kreis unter
-          // dem Zeiger. Das Bild selbst wird nicht mehr komplett invertiert.
-          const ueberBild = !!(ziel && ziel.closest('img, picture'));
+          // Über einem Foto: kein Box-Modus, sondern ein leicht grösserer Ball
+          // (`cursor--bild`). Er signalisiert „hier kann ich klicken", ohne dem
+          // Bild die Schau zu stehlen. Das Bild selbst bleibt unangetastet.
+          // Geprüft wird der ganze BILDBEREICH, nicht nur das <img>: darüber
+          // liegen die Blätter-Flächen, und dort soll derselbe Zustand gelten —
+          // sonst spränge der Ball beim Wandern über das Foto hin und her.
+          const ueberBild = !!(
+            ziel && ziel.closest('.karussell-buehne, .lightbox-ansicht, img, picture')
+          );
           const boxZiel = ueberBild ? null : (ziel?.closest(BOX_SELEKTOR) ?? null);
 
           // Box-Modus: der Cursor schwappt in die Umrandung des Elements.
           cursor.classList.toggle('cursor--box', !!boxZiel);
+          // Über Fotos: leichte Vergrösserung statt Box.
+          cursor.classList.toggle('cursor--bild', ueberBild);
           // Fallback-Vergrösserung nur für interaktive Elemente ohne Box/Bild.
           cursor.classList.toggle(
             'cursor--aktiv',
@@ -691,6 +700,13 @@ const name = 'nicolas huwyler - portfolio';
           const QUETSCH = 0.4; // seitliche Stauchung (Volumen-Anmutung)
           const VORNE = 0.32; // Versatz der Spitze Richtung Zeiger
           const DRUCK = 0.7; // Verkleinerung beim Klicken (wie --cursor-skala-druck)
+          // Über Fotos wächst der Ball leicht — das Signal „hier kann ich klicken".
+          // Der Wert spiegelt --cursor-skala-bild; er muss HIER stehen, weil der
+          // Freimodus `transform` inline schreibt und die CSS-Skala damit
+          // überschreibt (dieselbe Doppelung wie bei DRUCK oben).
+          const BILD = 1.15;
+          const SKALA_NACHLAUF = 0.18; // Wachsen/Schrumpfen weich, nicht springend
+          let skalaIst = 1;
           const schritt = () => {
             // Box beim Scrollen an das Element gebunden halten; verschwindet das
             // Element (aus dem DOM entfernt ODER ausgeblendet, z. B. das Tor nach
@@ -707,7 +723,14 @@ const name = 'nicolas huwyler - portfolio';
               const dx = mausX - istX;
               const dy = mausY - istY;
               const dist = Math.hypot(dx, dy);
-              const druck = cursor.classList.contains('cursor--druck') ? DRUCK : 1;
+              // Zielgrösse aus dem Zustand: über Fotos etwas grösser, beim
+              // Klicken kleiner. Beides multipliziert sich, damit ein Klick auf
+              // dem Foto weiterhin sichtbar nachgibt.
+              const zielSkala =
+                (cursor.classList.contains('cursor--bild') ? BILD : 1) *
+                (cursor.classList.contains('cursor--druck') ? DRUCK : 1);
+              skalaIst = lerp(skalaIst, zielSkala, SKALA_NACHLAUF);
+              const druck = skalaIst;
               if (performance.now() < morphEnde) {
                 // Während des Rück-Morphs: sauberer Kreis, keine Verformung.
                 punkt.style.transform = `translate(-50%, -50%) scale(${druck})`;

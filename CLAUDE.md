@@ -69,6 +69,8 @@ Konkret:
   nicht geschönt.
 - **Interaktion** unterstreicht ihn: invertierender Cursor bzw. invertierender
   Touch-Kreis, harte Schwarzweiss-Umkehr statt weicher, gefälliger Effekte.
+  Über den **Fotos** invertiert dagegen nichts mehr — dort wächst der Ball nur
+  leicht (siehe 4a).
 - **Typografie**: Monospace als kantiger, technischer, „old school"-Bruch.
 - **Nichts Dekoratives, nichts Liebliches.** Reduktion, Härte, Rohheit,
   industrielle/techno Kälte.
@@ -77,9 +79,9 @@ Konkret:
 Seite und Interaktion, **nicht** die Fotos. Die Bilder sind die eigenen, vom
 Betreiber **vor dem Hochladen selbst bearbeiteten Originale** und werden
 **unverändert** übernommen — kein Effekt, kein Filter, keine Stil-Verarbeitung,
-kein Korn-Overlay, keine Anpassung an die Mood. Einzige, bewusst gewollte und nur
-**temporäre** Ausnahme: die interaktive Invertierung unter Cursor/Touch
-(Abschnitt 4a). Damit die dunklen, körnigen Bilder sich vom Hintergrund abheben,
+kein Korn-Overlay, keine Anpassung an die Mood. Eine frühere Ausnahme — die kurzzeitige Invertierung des Fotos unter dem Cursor —
+ist **aufgehoben** (Entscheidung des Betreibers): über Fotos liegt kein Filter
+mehr, der Cursor wird dort nur etwas grösser (Abschnitt 4a). Damit die dunklen, körnigen Bilder sich vom Hintergrund abheben,
 liegt ein **weisser Rahmen (Passepartout)** um jedes Bild — der Rahmen ist Chrome
 *um* das Bild, kein Eingriff *in* den Bildinhalt (auch kein Polaroid-/Filmrand,
 der bleibt Nicht-Ziel).
@@ -144,16 +146,15 @@ eigenmächtig ersetzen.
    gefüllten Alt-Text") zugunsten von Aufwand/Flexibilität beim Upload; der
    Zugänglichkeits-Nachteil (fehlende Bildbeschreibung für Screenreader) ist dem
    Betreiber bekannt und in Kauf genommen.
-5. **Keine dauerhaften Effekte auf dem Bildinhalt — eine Ausnahme.** Kein Hover-Zoom,
+5. **Keine Effekte auf dem Bildinhalt.** Kein Hover-Zoom,
    kein Schatten, kein `border-radius`, kein Ken-Burns-Effekt, kein Fade-in
    beim Scrollen, kein dauerhafter Filter (`grayscale()`, `contrast()`, `sepia()`) —
    die Bilder sind bereits so, wie der Betreiber sie hochlädt. (Der weisse
    Passepartout-Rahmen aus Abschnitt 1a ist gewollt: er umschliesst das Bild, ohne
-   den Bildinhalt anzutasten.) **Einzige Ausnahme:** Beim Hovern invertiert
-   das Bild unter dem Zeiger kurzzeitig (`filter: invert(1)`) als Teil des
-   Cursor-Effekts (Abschnitt 4a). Nur mit JavaScript und feinem Zeiger; ohne
-   JavaScript bleiben die Bilder unangetastet. Die Invertierung ist bewusst und
-   temporär — kein dauerhafter Farbstich.
+   den Bildinhalt anzutasten.) Auch **keine** Invertierung mehr beim Hovern: die
+   frühere Ausnahme ist aufgehoben. Über einem Foto wächst nur der Cursor-Ball
+   um rund 15 % (Abschnitt 4a), das Bild selbst bleibt in jedem Zustand
+   unangetastet.
 6. **Der raue Ton kommt aus den Bildern, nicht aus dem Layout.** Die Seite ist
    weiss, ruhig und diszipliniert. Der einzige gestalterische Bruch ist die
    Monospace für Beschriftungen (Spezifikation 3.1). Diesen Bruch nicht an weiteren
@@ -185,8 +186,10 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
   einem abgerundeten Kasten, der sich um das Element legt (Box-Modus) und es per
   `backdrop-filter: invert(1)` invertiert — der Text bleibt lesbar (kein deckender
   Block). Ohne JavaScript invertieren Textlinks stattdessen per reinem CSS-Hover.
-- Über Fotos schrumpft der Ball zu einem kleinen Punkt, und das Bild unter dem
-  Zeiger invertiert kurz (`filter: invert(1)`) — angelehnt an die Referenzseite.
+- Über Fotos wächst der Ball leicht (rund 15 %, `--cursor-skala-bild`) und zeigt
+  damit „hier kann ich klicken". Das Bild selbst bleibt unangetastet — kein
+  Filter, keine Invertierung. Der Bildbereich ist in **Drittel** geteilt: links
+  zurückblättern, Mitte Vollbild, rechts weiterblättern.
 - Auf Touch-Geräten (kein Cursor) folgt derselbe Effekt der Berührung: ein
   **einzelner** transparenter Kreis mit `backdrop-filter: invert(1)`, der der
   Berührung mit etwas Verzögerung nachzieht und beim Loslassen verschwindet — kein
@@ -197,9 +200,8 @@ JavaScript. Er ist eine Zutat, kein Fundament — alles andere bleibt wie gehabt
 - **Progressive Enhancement.** Ohne JavaScript ist die Seite vollständig und
   unverändert bedienbar; der Cursor ist optional. Kein Framework, keine Astro-Island —
   ein einzelnes Vanilla-Skript, das das Element selbst erzeugt.
-- **Über Fotos** (Regel 5, Ausnahme): der grosse Ball schrumpft zu einem kleinen
-  Punkt, das Bild unter dem Zeiger invertiert kurz (`filter: invert(1)`). Nur mit
-  JavaScript und feinem Zeiger — ohne JavaScript bleiben die Bilder unangetastet.
+- **Über Fotos**: der Ball wächst leicht, mehr nicht. Kein Box-Modus (eine Kapsel
+  quer über dem Foto war zu wuchtig) und kein Filter auf dem Bild.
 - **Nur bei feinem Zeiger** (`pointer: fine`). Auf Touch-Geräten passiert nichts,
   der native Zeiger wird dort nie versteckt.
 - **`prefers-reduced-motion`:** kein Nachlauf/Lerp, der Cursor folgt sofort.

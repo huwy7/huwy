@@ -1,38 +1,23 @@
 ---
-import { getCollection } from 'astro:content';
 import Basis from '../layouts/Basis.astro';
 import Galerie from '../components/Galerie.astro';
-import { ladeAufnahmedaten } from '../lib/aufnahmedaten';
+import { ladeSerien, serieUrl } from '../lib/serien';
 
-// Startseite (düsterer Standard-Modus). Kein Untermenü mehr: jede Serie liegt als
-// inline-Karussell direkt auf der Seite, gestapelt (neueste oben — der Betreiber
-// steuert die Reihenfolge über `reihenfolge`, 1 = zuoberst). Blättern und Vollbild
-// stecken in Serie.astro (reines CSS).
-//
-// Flaches Bild-Modell: Serien (Metadaten) nach reihenfolge sortiert; die Bilder je
-// Serie aus der bilder-Sammlung gefiltert und sortiert. Leere Serien fallen weg.
-const serienMeta = (await getCollection('serien')).sort(
-  (a, b) => a.data.reihenfolge - b.data.reihenfolge,
-);
-const alleBilder = await getCollection('serienbilder');
-// Aufnahmedaten (Blende/Zeit/ISO/Brennweite) zur Bauzeit aus den Bilddateien, für
-// den Polaroid-Streifen unter dem Foto. Bilder ohne EXIF bekommen `undefined` und
-// zeigen keinen Streifen.
-const daten = ladeAufnahmedaten('serienbilder');
-const serien = serienMeta
-  .map((serie) => ({
-    serie,
-    bilder: alleBilder
-      .filter((b) => b.data.serie === serie.id)
-      .sort((a, b) => a.data.reihenfolge - b.data.reihenfolge)
-      .map((b) => ({ bild: b.data.bild, daten: daten.get(b.id) })),
-  }))
-  .filter((s) => s.bilder.length > 0);
+// Portfolio, düsterer Modus. Zeigt die oberste Serie (der Betreiber steuert die
+// Reihenfolge über `reihenfolge`, 1 = zuoberst) — inhaltlich dasselbe wie
+// /serie/<erste>. Darum verweist die Kanonik dorthin: die Serie hat ihre eigene
+// Adresse, diese hier ist nur der Einstieg. Ändert sich die Reihenfolge, ändert
+// sich der Einstieg, aber keine Serien-Adresse.
+const serien = await ladeSerien('duester');
+const erste = serien[0];
 ---
 
-<Basis titel="nicolas huwyler - portfolio" vollhoehe>
+<Basis
+  titel="nicolas huwyler - portfolio"
+  vollhoehe
+  aktiv={erste?.slug}
+  kanonisch={erste ? serieUrl('duester', erste.slug) : undefined}
+>
   <h1 class="visuell-versteckt">nicolas huwyler - portfolio</h1>
-
-  <Galerie serien={serien} />
+  <Galerie serien={serien} aktiv={erste?.slug ?? ''} />
 </Basis>
-

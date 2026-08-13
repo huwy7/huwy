@@ -1,0 +1,153 @@
+---
+import Navigation from './Navigation.astro';
+import { ladeSerien, serieUrl, type Modus } from '../lib/serien';
+
+// Das Menüband im rechten Viertel — auf JEDER Seite dasselbe (Entscheidung des
+// Betreibers). Aufbau von oben nach unten:
+//
+//   Modus-Umschalter      auf der Höhe, auf der früher die Kopfzeile stand
+//   Serien                mittig, gross — die eigentliche Navigation der Seite
+//   Seitenwechsel         unten; zeigt immer das Ziel, nicht den Ort
+//
+// Es lädt seine Serien SELBST statt sie als Prop zu bekommen. Sonst müsste jede
+// Seite die Liste durchreichen, auch About me, das mit Serien sonst nichts zu
+// tun hat — und jede neue Seite müsste daran denken.
+//
+// Ab dem Breakpoint (768px) sichtbar. Darunter gibt es das Band nicht: die
+// Breite reicht nicht, dort bleibt die Kopfzeile die Navigation.
+interface Props {
+  modus?: Modus;
+  /** Slug der gerade gezeigten Serie, oder nichts (z. B. auf About me). */
+  aktiv?: string;
+}
+const { modus = 'duester', aktiv } = Astro.props;
+const serien = await ladeSerien(modus);
+---
+
+<nav class="menuband" aria-label="Hauptnavigation">
+  <div class="menu-kopf">
+    <Navigation modus={modus} teil="umschalter" />
+  </div>
+
+  <ul class="menu-serien">
+    {
+      serien.map((s) => (
+        <li>
+          <a
+            class:list={['menu-serie', { 'ist-aktiv': s.slug === aktiv }]}
+            href={serieUrl(modus, s.slug)}
+            aria-current={s.slug === aktiv ? 'page' : undefined}
+          >
+            {s.titel}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="menu-fuss">
+    <Navigation modus={modus} teil="seitenwechsel" />
+  </div>
+</nav>
+
+<style>
+  /* Unter 768px kein Band — die Kopfzeile trägt dort die Navigation. */
+  .menuband {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .menuband {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: var(--menu-breite);
+      flex: none;
+      background-color: var(--menu-grund);
+      padding-inline: var(--menu-innenrand);
+      padding-block-end: var(--abstand-32);
+      /* Bleibt stehen, wenn der Seiteninhalt scrollt (About me ist eine lange
+         Seite; die Galerie scrollt nicht). Volle Bildschirmhöhe, damit die
+         schwarze Fläche nie abreisst. */
+      position: sticky;
+      top: 0;
+      height: 100svh;
+    }
+
+    /* Der Umschalter steht auf derselben Höhe, auf der früher die Kopfzeile
+       stand — die Zeile liest sich weiter als Kopfzeile, nur eben im Band. */
+    .menu-kopf {
+      display: flex;
+      align-items: baseline;
+      min-height: var(--header-hoehe);
+      padding-block-start: var(--abstand-32);
+      flex: none;
+    }
+
+    /* Die Serienliste nimmt den ganzen Rest und zentriert sich darin. Scrollt
+       für sich, falls einmal mehr Serien da sind, als ins Band passen — dann
+       läuft die Liste über, nicht die Seite. */
+    .menu-serien {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: var(--menu-abstand);
+      list-style: none;
+      width: 100%;
+    }
+
+    .menu-fuss {
+      flex: none;
+    }
+
+    .menu-serie {
+      /* inline-block, NICHT block: der invertierende Cursor-Kasten legt sich um
+         das Element. Über die volle Bandbreite ergäbe das einen Balken quer
+         durch die Fläche; so umschliesst er das Wort — wie in der Kopfzeile. */
+      display: inline-block;
+      font-family: var(--schrift-beschriftung);
+      font-size: var(--menu-groesse);
+      line-height: var(--zeilenhoehe-1-2);
+      font-variant-ligatures: none;
+      color: var(--menu-text);
+      text-decoration: none;
+      /* Die nicht gezeigten Serien treten zurück, ohne zu verschwinden. Auf
+         About me ist keine aktiv — dort stehen alle gleich leise, was stimmt:
+         man ist in keiner Serie. */
+      opacity: 0.45;
+      transition: opacity var(--zaehler-tempo) ease;
+    }
+    .menu-serie.ist-aktiv {
+      opacity: 1;
+    }
+
+    /* Beide Knöpfe stehen auf der Menüfläche, tragen also deren Schriftfarbe —
+       nicht die der Seite. Ohne das wären sie im Farbmodus unsichtbar: dort ist
+       die Fläche genau --farbe-text. */
+    .menu-kopf :global(.nav-knopf),
+    .menu-fuss :global(.nav-knopf) {
+      color: var(--menu-text);
+    }
+
+    /* Ohne JavaScript kein invertierender Cursor — dann übernimmt der Hover die
+       Umkehr selbst, wie bei den Textlinks (global.css). Mit aktivem Cursor
+       bleibt es aus, sonst invertiert es doppelt. */
+    @media (hover: hover) and (pointer: fine) {
+      html:not(.cursor-aktiv) .menu-serie:hover {
+        background-color: var(--menu-text);
+        color: var(--menu-grund);
+        opacity: 1;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-serie {
+      transition: none;
+    }
+  }
+</style>

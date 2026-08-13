@@ -21,18 +21,20 @@ import { zielVerhaeltnis } from '../lib/format';
 // stehen im Polaroid-Fuss unter dem Foto. Fehlen sie, bleibt der Rahmen ringsum
 // gleich breit — es gibt dann keinen leeren Fuss.
 interface Props {
+  /** Zusatzklassen von aussen (die Galerie markiert damit die gezeigte Serie). */
+  class?: string;
   slug: string;
   titel: string;
   jahr: number;
   bilder: { bild: ImageMetadata; daten?: Aufnahmedaten }[];
 }
-const { slug, titel, jahr, bilder } = Astro.props;
+const { slug, titel, jahr, bilder, class: klasse } = Astro.props;
 const n = bilder.length;
 
 const breiten = [640, 960, 1280, 1600, 2000];
 ---
 
-<section class="serie" data-serie={slug}>
+<section class:list={['serie', klasse]} data-serie={slug}>
   <div class="serie-kopf">
     <span class="serie-titel">{titel}</span>
     <span class="serie-jahr">{jahr}</span>

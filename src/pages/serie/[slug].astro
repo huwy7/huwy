@@ -1,0 +1,26 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import Galerie from '../../components/Galerie.astro';
+import { ladeSerien } from '../../lib/serien';
+
+// Eine Serie unter eigener Adresse (/serie/<slug>), düsterer Modus.
+// Seit das Menüband auf jeder Seite steht, MUSS jede Serie verlinkbar sein —
+// sonst könnte das Band von About me aus nicht auf eine Serie zeigen. Nebenbei
+// löst das ein altes Manko: vorher liess sich keine Serie teilen, die Startseite
+// zeigte immer dieselbe.
+//
+// Die Seite rendert ALLE Serien und markiert nur eine als aktiv: unter 768px
+// gibt es kein Band, dort scrollt man weiterhin durch alle (Galerie.astro).
+export async function getStaticPaths() {
+  const serien = await ladeSerien('duester');
+  return serien.map((s) => ({ params: { slug: s.slug }, props: { aktiv: s.slug, titel: s.titel } }));
+}
+
+const { aktiv, titel } = Astro.props;
+const serien = await ladeSerien('duester');
+---
+
+<Basis titel={`${titel} — nicolas huwyler - portfolio`} vollhoehe aktiv={aktiv}>
+  <h1 class="visuell-versteckt">{titel} — nicolas huwyler - portfolio</h1>
+  <Galerie serien={serien} aktiv={aktiv} />
+</Basis>

@@ -4,6 +4,7 @@ import '../styles/schriften.css';
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import Navigation from '../components/Navigation.astro';
+import Menuband from '../components/Menuband.astro';
 import torBild from '../assets/tor.jpeg';
 
 interface Props {
@@ -18,9 +19,27 @@ interface Props {
   // dann ohne zusätzlichen vertikalen Innenabstand, damit das erste Bild nicht
   // knapp abgeschnitten wird.
   vollhoehe?: boolean;
+  // Menüband rechts. Steht auf JEDER Seite (Entscheidung des Betreibers) — ab
+  // dem Breakpoint sichtbar, darunter trägt die Kopfzeile die Navigation.
+  // Nur das Zugangs-Tor und die 404-Seite kommen ohne aus.
+  band?: boolean;
+  // Slug der gerade gezeigten Serie, damit das Band sie hervorheben kann.
+  aktiv?: string;
+  // Abweichende Kanonik. Die beiden Portfolio-Startseiten zeigen denselben
+  // Inhalt wie die Seite ihrer ersten Serie und verweisen darum dorthin.
+  kanonisch?: string;
 }
 
-const { titel, beschreibung, ogBild, modus = 'duester', vollhoehe = false } = Astro.props;
+const {
+  titel,
+  beschreibung,
+  ogBild,
+  modus = 'duester',
+  vollhoehe = false,
+  band = true,
+  aktiv,
+  kanonisch: kanonischProp,
+} = Astro.props;
 
 // Alle internen Ziele über die Astro-Basis aufbauen, damit die /feature-Vorschau
 // in sich navigiert und main ('/') unverändert bleibt. BASE_URL kann mit oder ohne
@@ -41,7 +60,7 @@ const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url(
 const bodyStil = `--tor-bg: ${torHintergrund}`;
 
 // Absolute URLs für Kanonik und Open Graph.
-const kanonisch = new URL(Astro.url.pathname, Astro.site);
+const kanonisch = new URL(kanonischProp ?? Astro.url.pathname, Astro.site);
 const ogBildAbsolut = ogBild ? new URL(ogBild, Astro.site) : undefined;
 
 // Nur für Meta (og:site_name), auf der Seite selbst nicht sichtbar — die Kopfzeile
@@ -110,11 +129,10 @@ const name = 'nicolas huwyler - portfolio';
 
     <!-- Kopfzeile: Modus-Umschalter und Seitenwechsel. Reihenfolge gespiegelt je
          Modus (düster: Wechsel links / Umschalter rechts; farbig umgekehrt).
-         Auf Galerie-Seiten ab dem Breakpoint sitzen beide Knöpfe stattdessen im
-         Menüband rechts (Galerie.astro) — die Kopfzeile ist dort leer und wird
-         ausgeblendet. Auf dem Smartphone und auf Seiten ohne Serienmenü bleibt
-         sie die einzige Navigation. -->
-    <header class:list={['kopf', { 'kopf--galerie': vollhoehe }]}>
+         Sie ist die Navigation für alles UNTER dem Breakpoint und für Seiten ohne
+         Band. Sobald das Band steht, trägt es dieselben zwei Knöpfe — dann wird
+         die Kopfzeile ausgeblendet, statt sie doppelt zu zeigen. -->
+    <header class:list={['kopf', { 'kopf--band': band }]}>
       {
         farbe ? (
           <>
@@ -130,9 +148,15 @@ const name = 'nicolas huwyler - portfolio';
       }
     </header>
 
-    <main class:list={['inhalt', { 'inhalt--voll': vollhoehe }]}>
-      <slot />
-    </main>
+    {/* Inhalt und Menüband liegen nebeneinander. Das Band ist ein GESCHWISTER
+        des Inhalts, kein Teil davon: so steht es auf jeder Seite an derselben
+        Stelle, und der Inhalt muss nichts davon wissen. */}
+    <div class:list={['rumpf', { 'rumpf--band': band }]}>
+      <main class:list={['inhalt', { 'inhalt--voll': vollhoehe }]}>
+        <slot />
+      </main>
+      {band && <Menuband modus={modus} aktiv={aktiv} />}
+    </div>
 
     <style>
       /* Kopfzeile: gleicher Rasterrahmen wie der Inhalt, schlicht und mono. Menü und
@@ -184,12 +208,11 @@ const name = 'nicolas huwyler - portfolio';
          (Ausbruch in Galerie.astro). Sonst stünde die Kopfzeile auf einem anderen
          Raster als der Serientitel darunter. */
       @media (min-width: 768px) {
-        .kopf--galerie {
-          /* Beide Knöpfe sitzen ab hier im Menüband (Galerie.astro): der
-             Umschalter oben, der Seitenwechsel unten. Die Kopfzeile hat damit
-             keinen Inhalt mehr und verschwindet — der Platz bleibt aber
-             reserviert, weil die Serien mit --header-hoehe rechnen und der
-             Umschalter im Band auf derselben Höhe stehen soll. */
+        .kopf--band {
+          /* Beide Knöpfe sitzen ab hier im Menüband (Menuband.astro): der
+             Umschalter oben, der Seitenwechsel unten. Die Kopfzeile hätte damit
+             denselben Inhalt ein zweites Mal — also weg. Die Höhe, auf der sie
+             stand, hält .menu-kopf im Band. */
           display: none;
         }
       }
@@ -218,6 +241,28 @@ const name = 'nicolas huwyler - portfolio';
         }
       }
 
+      /* Der Rumpf trägt die Aufteilung Inhalt | Band. Er muss die volle Höhe
+         füllen, damit das Band (sticky, 100svh) etwas hat, woran es klebt. */
+      .rumpf {
+        flex: 1 0 auto;
+        display: flex;
+        min-height: 0;
+      }
+      /* Der Inhalt nimmt den Rest NEBEN dem Band.
+         `flex: 1 1 auto` statt des geerbten `1 0 auto`: mit Schrumpffaktor 0
+         bestand der Inhalt auf seiner vollen Breite und schob das Band aus dem
+         Fenster (gemessen 480px waagerechter Überlauf). Die Null stammt aus der
+         Zeit, als .inhalt senkrecht im Body lag und dort die Höhe füllen sollte —
+         waagerecht ist sie falsch.
+         `min-width: 0` dazu, sonst weigert sich ein Flex-Kind, unter die Breite
+         seines Inhalts zu schrumpfen. `width: auto` hebt die 100% auf, die
+         dasselbe noch einmal erzwungen hätten. */
+      .rumpf > .inhalt {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+      }
+
       .inhalt {
         flex: 1 0 auto;
         max-width: var(--container);
@@ -227,9 +272,18 @@ const name = 'nicolas huwyler - portfolio';
         padding-block: var(--abstand-64);
       }
       /* Galerie-Seiten: kein vertikaler Innenabstand — jede Serie ist eine volle
-         Bildschirmhöhe hoch und zentriert sich selbst. */
+         Bildschirmhöhe hoch und zentriert sich selbst. Ab dem Breakpoint zudem
+         ohne Container-Deckel: die Bühne soll den ganzen Platz neben dem Band
+         bekommen, sonst hängt das Foto an der Breite statt an der Höhe. */
       .inhalt--voll {
         padding-block: 0;
+      }
+      @media (min-width: 768px) {
+        .inhalt--voll {
+          max-width: none;
+          margin-inline: 0;
+          padding-inline-end: 0;
+        }
       }
 
       /* Zugangs-Tor: das raue Schwarzweiss-Foto füllt den Bildschirm (cover),

@@ -81,7 +81,7 @@ Standardantwort und begegnet Besuchern auf jeder zweiten Portfolio-Seite.
 ```
 
 > **Überholt.** Beide Modi tragen inzwischen je eine eigene Display-Schrift, die
-> die gesamte Beschriftung stellt: **Bebas Neue** auf der düsteren Seite,
+> die gesamte Beschriftung stellt: **Anton** auf der düsteren Seite,
 > **Caprasimo** auf der farbigen (`--schrift-display`, pro Modus überschrieben).
 > Die Familien-Token heissen heute `--schrift-beschriftung` und `--schrift-text`
 > und zeigen beide auf `--schrift-display`. `--schrift-mono` gibt es nicht mehr;

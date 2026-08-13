@@ -42,29 +42,31 @@ und kommerziell einsetzbar. **Kein Blocker.**
   Haus aus fett.
 - **Einsatz:** trägt im Farbmodus die **gesamte** Beschriftung — Kopfzeile,
   Serientitel, Seitentitel, Fliesstext. Auf der düsteren Seite kommt sie nicht
-  vor; dort steht Bebas Neue.
+  vor; dort steht Anton.
 
-## Bebas Neue — Display-Schrift der düsteren Seite (CLAUDE.md 1a)
+## Anton — Display-Schrift der düsteren Seite (CLAUDE.md 1a)
 
 - **Lizenz:** SIL Open Font License, Version 1.1 (OFL-1.1)
-- **Urheber:** Dharma Type (Ryoichi Tsunekawa), 2010
-- **Verifiziert an:** der `OFL.txt` im offiziellen Google-Fonts-Repository
-  (<https://raw.githubusercontent.com/google/fonts/main/ofl/bebasneue/OFL.txt>).
+- **Urheber:** The Anton Project Authors, 2020 (Vernon Adams, Kimberly Geswein,
+  Cyreal); gepflegt im Google-Fonts-Repository
+- **Verifiziert an:** der `LICENSE` des Fontsource-Pakets `@fontsource/anton`
+  (v5.3.0), die den vollständigen OFL-1.1-Text samt Copyright-Zeile enthält.
   Die Datei wurde heruntergeladen und liegt im Repo, nicht nur referenziert.
-- **Lizenztext im Repo:** `public/fonts/bebas-neue-OFL.txt`
+- **Lizenztext im Repo:** `public/fonts/anton-OFL.txt`
 - **Subsets:** `latin` und `latin-ext`.
-- **Schnitte:** nur 400 — die Google-Fonts-Fassung hat keinen weiteren.
+- **Schnitte:** nur 400 — die Familie hat keinen weiteren, sie ist von Haus aus
+  fett.
 - **Einsatz:** trägt im düsteren Modus die **gesamte** Beschriftung, spiegelbildlich
   zu Caprasimo auf der Farbseite.
-- **Besonderheit:** keine Kleinbuchstaben. Gemeine werden als Versalien
-  gezeichnet. Das Markup bleibt in Sentence case (Regel 8), es gibt kein
-  `text-transform` — die Grossschreibung kommt allein aus der Schrift.
-
-### Verworfen: Protest Revolution
-
-Ein erster Versuch für die düstere Seite (OFL-1.1, Octavio Pardo) wurde vom
-Betreiber abgelehnt. Schriftdateien und Lizenztext sind wieder aus dem Repo
-entfernt.
+- **Vorgeschichte:** löst **Bebas Neue** ab (ebenfalls OFL-1.1, Dharma Type). Dem
+  Betreiber war Bebas Neue zu schmal und zu hoch; Anton setzt denselben Text rund
+  27 % breiter (nachgemessen an „CDMX 2026" in gleicher Schriftgrösse) und ist
+  dabei deutlich fetter. Die Bebas-Dateien und ihr Lizenztext wurden aus
+  `public/fonts/` entfernt.
+- **Besonderheit:** Anton HAT Kleinbuchstaben — anders als Bebas Neue, das keine
+  Gemeinen kennt und alles als Versalien zeichnete. Beschriftungen stehen im
+  Markup weiterhin in Sentence case (Regel 8) und erscheinen seit dem Wechsel
+  auch so: „Portfolio" statt „PORTFOLIO". Es gibt weiterhin kein `text-transform`.
 
 ## Commit Mono — heute nur noch das Zugangs-Tor
 
@@ -80,7 +82,7 @@ Schrift bleibt deshalb im Repo und in `schriften.css`.
 - Nur Schnitt 400 und 500 je Familie, `font-display: swap`
   (`src/styles/schriften.css`).
 - Bezugsquelle der WOFF2-Dateien: die oben genannten Fontsource-npm-Pakete
-  (identische OFL-Dateien), bei Caprasimo und Bebas Neue direkt die
+  (identische OFL-Dateien), bei Caprasimo und Anton direkt die
   WOFF2-Auslieferung von Google Fonts. Die Pakete selbst sind **keine**
   Projekt-Dependency — die WOFF2-Dateien wurden entnommen und liegen direkt im
   Repo.

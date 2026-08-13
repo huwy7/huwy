@@ -517,19 +517,16 @@ const breiten = [640, 960, 1280, 1600, 2000];
      schmal für vier Angaben, die Zeile würde umbrechen und aus dem Fuss laufen
      (seine Höhe ist mit --polaroid-fuss fest). Dort bleibt sie über die volle
      Breite zentriert. */
+  /* Ab dem Breakpoint steht die Zeile rechtsbündig statt mittig. Der Kasten
+     spannt weiter über die volle Rahmenbreite (Basisregel oben, links wie rechts
+     eine Rahmenbreite Abstand) — nur der Inhalt darin rückt nach rechts. So kann
+     die Zeile nie beschnitten werden, auch nicht in einem schmalen Hochformat,
+     und der Rahmenabstand bleibt in jedem Bildformat gewahrt.
+     Die Lücken sind fest (--daten-abstand), nicht mehr über die Breite verteilt:
+     die Reihe soll überall gleich dicht stehen. */
   @media (min-width: 768px) {
     .aufnahmedaten {
-      left: 50%;
-      /* Bis zur Rahmenkante, NICHT bis zum äusseren Rand: der Innenabstand des
-         Passepartouts gilt auch für den Datenstreifen, sonst klebte die letzte
-         Angabe am Bildrand. */
-      right: var(--rahmen-breite);
-      /* Über die ganze Hälfte verteilt statt als Klumpen in deren Mitte. Damit
-         füllt die Zeile in JEDEM Bildformat gleich aus: bei einem schmalen
-         Hochformat rücken die Angaben zusammen, bei einem breiten Querformat
-         auseinander — der Rhythmus bleibt derselbe. --daten-abstand wirkt dabei
-         als Mindestabstand, die Angaben können also nie zusammenstossen. */
-      justify-content: space-between;
+      justify-content: flex-end;
     }
   }
 

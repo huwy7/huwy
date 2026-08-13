@@ -265,6 +265,10 @@ picture > source {
 @media (max-width: 768px) {
   :root {
     --nav-groesse: var(--groesse-15);
+    /* Die Aufnahmedaten rücken mobil wieder zusammen. Der Rahmen ist dort nur
+       rund 327px breit (gemessen); mit den 56px vom Desktop brach die Zeile um
+       und lief aus dem Polaroid-Fuss, dessen Höhe fest ist. */
+    --daten-abstand: var(--abstand-24);
   }
 }
 

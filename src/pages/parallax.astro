@@ -1,0 +1,254 @@
+---
+// EIGENSTÄNDIGE TESTSEITE — gehört (noch) nicht zur Website.
+//
+// Sie liegt bewusst auf dem Branch `parallax`, nicht auf main oder feature, und
+// benutzt WEDER das Basis-Layout NOCH die Komponenten der Seite. Nichts an der
+// bestehenden Website wird berührt; die Seite lässt sich jederzeit ersatzlos
+// löschen.
+//
+// Ziel: dieselbe Bewegung wie die GSAP/Lenis-Vorlage (Osmo), aber ohne
+// Abhängigkeit und ohne clientseitiges JavaScript — also verträglich mit
+// CLAUDE.md Regel 1 und 2. Gebaut mit scroll-getriebenen CSS-Animationen
+// (`view-timeline` + `animation-timeline`).
+//
+// So bildet CSS die Vorlage ab:
+//
+//   GSAP                              CSS
+//   trigger: .parallax__layers        view-timeline-name auf demselben Element
+//   start: "0% 0%"                    animation-range-start: exit 0%
+//     (Oberkante Element = Oberkante Fenster)
+//   end: "100% 0%"                    animation-range-end: exit 100%
+//     (Unterkante Element = Oberkante Fenster)
+//   scrub: 0                          scroll-getriebene Zeitachse (1:1 am Scroll)
+//   ease: "none"                      animation-timing-function: linear
+//   yPercent: 70 / 55 / 40 / 10       translateY(70% / 55% / 40% / 10%)
+//
+// `exit 0%` bis `exit 100%` ist per Spezifikation exakt der Bereich, in dem das
+// Element oben aus dem Fenster läuft — dieselben zwei Punkte, die GSAP mit
+// „0% 0%" und „100% 0%" meint. Und `translateY` in Prozent bezieht sich in CSS
+// wie in GSAP auf die EIGENE Höhe des Elements, die Zahlen stimmen also 1:1.
+//
+// Lenis (Smooth Scrolling) ist bewusst NICHT nachgebaut: es würde das native
+// Scrollen der ganzen Seite kapern und damit die scroll-snap-Streifen von
+// Karussell und Vollbild stören.
+const ebenen = [
+  { nr: 1, weg: '70%', bild: '/parallax-demo/ebene-1.png' },
+  { nr: 2, weg: '55%', bild: '/parallax-demo/ebene-2.png' },
+  { nr: 3, weg: '40%', titel: true },
+  { nr: 4, weg: '10%', bild: '/parallax-demo/ebene-3.png' },
+];
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Parallax — Test</title>
+    <meta name="robots" content="noindex" />
+    {/* is:inline — WICHTIG, nicht kosmetisch.
+        Ohne das fasst der CSS-Minifier des Builds die drei Langformen
+        `animation`, `animation-timeline` und `animation-range` zur Kurzform
+        zusammen und schreibt den Zeitachsen-Namen mit hinein:
+          animation: linear both ebene-wandert --ebenen;
+        Die `animation`-Kurzform darf `animation-timeline` laut Spezifikation
+        aber NICHT enthalten (sie setzt ihn nur zurück). Die Deklaration ist
+        damit ungültig und fällt komplett weg — im Browser stand danach
+        `animation-name: none`, und die Ebenen bewegten sich nicht (nachgemessen).
+        `is:inline` reicht den Stil unverändert durch. */}
+    <style is:inline>
+      @font-face {
+        font-family: 'Anton';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('/fonts/anton-latin-400.woff2') format('woff2');
+      }
+
+      :root {
+        --grund: #0d0d0d;
+        --text: #ececec;
+        /* Wie weit die Ebenen wandern — je Ebene gesetzt (siehe Markup). */
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--grund);
+        color: var(--text);
+        font-family: 'Anton', 'Arial Black', Impact, sans-serif;
+      }
+
+      /* --- Der Kopfbereich ---------------------------------------------------
+         Genau eine Fensterhöhe, NICHT sticky. Das ist wichtig: ein erster
+         Versuch hatte die Visuals oben festgeklebt — dann verlässt das
+         Trägerelement das Fenster nie, die `exit`-Strecke läuft nicht und die
+         Ebenen standen still (nachgemessen: 0px Versatz auf der ganzen Strecke).
+         Die Vorlage pinnt ebenfalls nichts; der Kopf scrollt normal weg,
+         während sich die Ebenen unterschiedlich schnell mitbewegen. */
+      .parallax__header {
+        position: relative;
+        height: 100vh;
+      }
+
+      .parallax__visuals {
+        position: relative;
+        height: 100vh;
+        /* `clip`, NICHT `hidden`: `overflow: hidden` macht das Element zu einem
+           Scroll-Container. Die view-timeline darin misst dann die Sichtbarkeit
+           INNERHALB dieses Kastens statt im Fenster — und weil die Ebenen ihn
+           genau ausfüllen, lief die Strecke nie los (nachgemessen: 0px Versatz
+           über den ganzen Scroll). `clip` schneidet ab, ohne scrollbar zu sein. */
+        overflow: clip;
+      }
+
+      /* Trägerelement der Zeitachse. Es ist zugleich das, was GSAP als `trigger`
+         benutzt — dadurch stimmen Start- und Endpunkt überein. */
+      .parallax__layers {
+        position: relative;
+        height: 100vh;
+        view-timeline-name: --ebenen;
+        view-timeline-axis: block;
+      }
+
+      /* Alle Ebenen liegen deckungsgleich übereinander und sitzen unten auf. */
+      .parallax__layer-img,
+      .parallax__layer-title {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        width: 100%;
+        display: block;
+        will-change: transform;
+      }
+
+      .parallax__layer-title {
+        bottom: 42%;
+        text-align: center;
+      }
+      .parallax__title {
+        font-size: clamp(48px, 12vw, 190px);
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+
+      /* --- Die Bewegung ------------------------------------------------------
+         Nur wo der Browser scroll-getriebene Animationen kennt. Fehlt die
+         Unterstützung, stehen die Ebenen einfach still — die Seite bleibt
+         benutzbar, es fehlt nur der Effekt (Progressive Enhancement). */
+      @supports (animation-timeline: view()) {
+        .parallax__layer-img,
+        .parallax__layer-title {
+          animation: ebene-wandert linear both;
+          animation-timeline: --ebenen;
+          /* Exakt der Bereich, in dem das Trägerelement oben aus dem Fenster
+             läuft — die CSS-Entsprechung zu GSAPs "0% 0%" bis "100% 0%". */
+          animation-range: exit 0% exit 100%;
+        }
+      }
+
+      @keyframes ebene-wandert {
+        to {
+          transform: translateY(var(--weg));
+        }
+      }
+
+      /* Wer reduzierte Bewegung eingestellt hat, bekommt keine Verschiebung. */
+      @media (prefers-reduced-motion: reduce) {
+        .parallax__layer-img,
+        .parallax__layer-title {
+          animation: none;
+        }
+      }
+
+      /* Weicher Übergang vom Bild in den Seitengrund, wie in der Vorlage. */
+      .parallax__fade {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        height: 24vh;
+        pointer-events: none;
+        background-image: linear-gradient(to bottom, transparent, var(--grund) 88%);
+      }
+
+      /* Deckt oben ab, was die vorderste Ebene beim Wandern freigibt. */
+      .parallax__black-line-overflow {
+        position: absolute;
+        inset-inline: 0;
+        top: 0;
+        height: 8vh;
+        z-index: 2;
+        pointer-events: none;
+        background-color: var(--grund);
+      }
+
+      .parallax__content {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 96px 24px;
+      }
+      .hinweis {
+        max-width: 60ch;
+        text-align: center;
+        font-family: system-ui, sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #8a8a8a;
+      }
+      .hinweis strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="parallax">
+      <section class="parallax__header">
+        <div class="parallax__visuals">
+          <div class="parallax__black-line-overflow"></div>
+          <div class="parallax__layers" data-parallax-layers>
+            {
+              ebenen.map((e) =>
+                e.titel ? (
+                  <div
+                    class="parallax__layer-title"
+                    data-parallax-layer={e.nr}
+                    style={`--weg: ${e.weg}`}
+                  >
+                    <h2 class="parallax__title">Parallax</h2>
+                  </div>
+                ) : (
+                  <img
+                    class="parallax__layer-img"
+                    data-parallax-layer={e.nr}
+                    style={`--weg: ${e.weg}`}
+                    src={e.bild}
+                    width="1600"
+                    height="900"
+                    loading="eager"
+                    alt=""
+                  />
+                ),
+              )
+            }
+          </div>
+          <div class="parallax__fade"></div>
+        </div>
+      </section>
+
+      <section class="parallax__content">
+        <p class="hinweis">
+          <strong>Testseite.</strong> Dieselbe Bewegung wie die GSAP-Vorlage, gebaut mit
+          scroll-getriebenen CSS-Animationen — ohne gsap, ohne Lenis, ohne React, ohne
+          clientseitiges JavaScript. Diese Seite gehört noch nicht zur Website.
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

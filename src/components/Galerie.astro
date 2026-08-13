@@ -110,8 +110,16 @@ ${serien
     .galerie {
       display: flex;
       align-items: stretch;
-      gap: var(--rand);
-      padding-inline-end: var(--rand);
+      /* Ausbruch aus dem zentrierten Seiten-Container (.inhalt, max-width 1280px
+         plus --rand). Ohne das säse die Galerie in einem 1280er-Kasten: das Menü
+         käme nie an die Fensterkante („rechtes Viertel des Screens" wäre nicht
+         wahr) und der Bühne bliebe so wenig Breite, dass die Fotos deutlich
+         kleiner ausfielen als auf den Serienseiten — dort deckelt die Höhe
+         (--karussell-hoehe, 72vh), hier hätte die Breite gedeckelt.
+         `50%` bezieht sich auf den Container, der mittig steht; der Versatz
+         schiebt die Galerie also exakt auf Fensterbreite. */
+      width: 100vw;
+      margin-inline: calc(50% - 50vw);
     }
     .serien-buehne {
       /* `min-width: 0` ist Pflicht: ohne das weigert sich ein Flex-Kind, unter
@@ -119,6 +127,9 @@ ${serien
          aus dem Fenster. */
       flex: 1;
       min-width: 0;
+      /* Der Seitenrand, den die Galerie beim Ausbruch verloren hat — aber nur
+         links: rechts schliesst die schwarze Menüfläche bündig ans Fenster an. */
+      padding-inline-start: var(--rand);
     }
 
     /* Nur die gewählte Serie steht auf der Bühne. Sichtbar gemacht wird sie von
@@ -136,6 +147,8 @@ ${serien
       padding-block-end: 0;
     }
 
+    /* Das rechte Viertel: eigene schwarze Fläche über die volle Höhe, die
+       Einträge darin senkrecht zentriert. */
     .serien-menu {
       display: flex;
       flex-direction: column;
@@ -144,31 +157,34 @@ ${serien
       gap: var(--menu-abstand);
       width: var(--menu-breite);
       flex: none;
+      background-color: var(--menu-grund);
+      padding-inline: var(--menu-innenrand);
     }
     .serien-eintrag {
       /* --eintrag-aktiv wird von den erzeugten Regeln auf 1 gesetzt; darüber
-         hängen Deckkraft und der Balken links, ohne dass eine zweite Klasse
-         nötig wäre. */
+         hängt die Deckkraft, ohne dass eine zweite Klasse nötig wäre. */
       --eintrag-aktiv: 0;
-      display: block;
-      width: 100%;
+      /* inline-block, NICHT block: der invertierende Cursor-Kasten legt sich um
+         das Element. Über die volle Menübreite ergäbe das einen Balken quer
+         durch die Fläche; so umschliesst er das Wort — genau wie bei den
+         Links in der Kopfzeile. */
+      display: inline-block;
       font-family: var(--schrift-beschriftung);
       font-size: var(--menu-groesse);
       line-height: var(--zeilenhoehe-1-2);
       font-variant-ligatures: none;
-      color: var(--farbe-text);
+      color: var(--menu-text);
       /* Die nicht gewählten Titel treten zurück, ohne zu verschwinden. */
       opacity: calc(0.45 + 0.55 * var(--eintrag-aktiv));
-      padding-block: var(--abstand-8);
       transition: opacity var(--zaehler-tempo) ease;
     }
-    .serien-eintrag-text {
-      display: block;
-    }
 
-    /* Fokusring am ganzen Eintrag, weil das Radio selbst unsichtbar ist. */
-    .serien-eintrag:focus-within {
-      outline: var(--fokus-breite) solid var(--farbe-text);
+    /* Fokusring nur bei TASTATUR-Fokus. `:focus-within` griff auch nach einem
+       Mausklick — dann blieb ein Rahmen um den gewählten Eintrag stehen.
+       `:focus-visible` am Radio überlässt dem Browser die Entscheidung, und
+       :has() trägt sie auf den Eintrag, weil das Radio selbst unsichtbar ist. */
+    .serien-eintrag:has(.serien-wahl:focus-visible) {
+      outline: var(--fokus-breite) solid var(--menu-text);
       outline-offset: var(--fokus-offset);
     }
 
@@ -177,8 +193,8 @@ ${serien
        bleibt es aus, sonst invertiert es doppelt. */
     @media (hover: hover) and (pointer: fine) {
       html:not(.cursor-aktiv) .serien-eintrag:hover {
-        background-color: var(--farbe-text);
-        color: var(--farbe-hintergrund);
+        background-color: var(--menu-text);
+        color: var(--menu-grund);
         opacity: 1;
       }
     }

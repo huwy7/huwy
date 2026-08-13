@@ -459,6 +459,12 @@ const name = 'nicolas huwyler - portfolio';
           erledigt = true;
           wurzel.dataset.tor = 'auf';
           wurzel.classList.add('weich');
+          // Auftakt-Szene freischalten (IntroParallax.astro). Sie läuft NUR jetzt,
+          // direkt nach der Code-Eingabe — nicht beim Hin- und Herschalten
+          // zwischen farbig und düster und nicht beim Aufruf einer anderen Seite:
+          // dort wird das Merkmal nie gesetzt, und ohne es blendet die Szene aus.
+          // Entscheidung des Betreibers.
+          wurzel.dataset.intro = 'an';
           // Klasse nach dem Einblenden wieder entfernen. Die Animation läuft mit
           // fill-mode „both" und bliebe sonst dauerhaft in Kraft — ein Element mit
           // filternder/animierter Deckkraft bildet einen eigenen Stacking-Context,

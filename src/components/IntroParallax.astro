@@ -1,0 +1,214 @@
+---
+// Der Auftakt der Startseite: eine Parallax-Szene, durch die man nach unten ins
+// Dunkle scrollt. Danach steht die Seite so da, wie sie sonst aussieht — Foto und
+// Menüband.
+//
+// WANN sie läuft (Entscheidung des Betreibers):
+//   · nur im düsteren Modus
+//   · nur direkt nach der Eingabe des Zugangscodes, nicht beim Hin- und
+//     Herschalten zwischen farbig und düster
+// Das steuert ein Merker in der Sitzung (`intro` in sessionStorage), den das
+// Tor-Skript in Basis.astro beim Entsperren setzt. Fehlt er, blendet die Szene
+// aus, BEVOR etwas gezeichnet wird (`data-intro="aus"` am <html>), und die Seite
+// beginnt direkt bei der Galerie.
+//
+// Die Bewegung selbst ist reines CSS (scroll-getriebene Animation) — keine
+// Abhängigkeit, kein Framework, kein Skript. Sie hängt 1:1 an der echten
+// Scroll-Position: das Mausrad rastet, also rastet die Animation mit; wer schnell
+// scrollt, sieht sie schnell, wer langsam scrollt, langsam. Genau das war
+// gewünscht. Lenis (Smooth Scrolling) ist damit unnötig — es hätte ohnehin das
+// native Scrollen der ganzen Seite gekapert und die scroll-snap-Streifen von
+// Karussell und Vollbild gestört.
+//
+// Die vier Ebenen wandern unterschiedlich weit (70/55/40/10 % ihrer eigenen
+// Höhe) — dieselben Werte wie in der Vorlage. Je weiter hinten, desto weiter
+// wandert die Ebene, dadurch entsteht Tiefe.
+const ebenen = [
+  { nr: 1, weg: '70%', bild: '/parallax-demo/ebene-1.png' },
+  { nr: 2, weg: '55%', bild: '/parallax-demo/ebene-2.png' },
+  { nr: 3, weg: '40%', titel: true },
+  { nr: 4, weg: '10%', bild: '/parallax-demo/ebene-3.png' },
+];
+---
+
+<section class="intro" aria-hidden="true">
+  <div class="intro-buehne">
+    <div class="intro-ebenen">
+      {
+        ebenen.map((e) =>
+          e.titel ? (
+            <div class="intro-ebene intro-ebene--titel" style={`--weg: ${e.weg}`}>
+              <span class="intro-titel">nicolas huwyler</span>
+            </div>
+          ) : (
+            <img
+              class="intro-ebene"
+              style={`--weg: ${e.weg}`}
+              src={e.bild}
+              width="1600"
+              height="900"
+              alt=""
+              loading="eager"
+            />
+          ),
+        )
+      }
+    </div>
+    {/* Zieht die Szene zum Ende hin ins Dunkle — der Übergang in die Galerie. */}
+    <div class="intro-dunkel"></div>
+  </div>
+</section>
+
+{/*
+  is:inline — NICHT kosmetisch, sondern nötig.
+  Der CSS-Minifier des Builds fasst `animation`, `animation-timeline` und
+  `animation-range` zur `animation`-Kurzform zusammen und schreibt den
+  Zeitachsen-Namen mit hinein. Die Kurzform darf `animation-timeline` laut
+  Spezifikation aber nicht enthalten — die Deklaration wird ungültig und komplett
+  verworfen. Im Browser stand danach `animation-name: none` und nichts bewegte
+  sich (nachgemessen). `is:inline` reicht den Stil unverändert durch.
+  Deshalb sind hier auch die Klassennamen bewusst eindeutig (`intro-…`): ohne
+  Astro-Scoping trägt der Stil keine Bereichsgrenze.
+*/}
+<style is:inline>
+  /* Die Zeitachse dokumentweit bekanntmachen.
+     PFLICHT: ein benannter view-timeline ist sonst nur für NACHFAHREN des
+     Elements sichtbar, das ihn deklariert. Verdunkelung, Galerie und Menüband
+     liegen aber daneben bzw. ganz woanders im Baum — ohne diese Zeile fanden sie
+     die Achse nicht, ihre Animation war inaktiv und hing im Endzustand fest
+     (gemessen: Verdunkelung sofort auf Deckkraft 1, also schwarz von Anfang an). */
+  :root {
+    timeline-scope: --intro;
+  }
+
+  /* Die Szene ist genau eine Bildschirmhöhe hoch. Über diese Strecke läuft die
+     Animation — das entspricht der Vorlage (Start: Oberkante am Fensterrand,
+     Ende: Unterkante am Fensterrand). */
+  .intro {
+    position: relative;
+    height: 100svh;
+  }
+
+  /* `clip`, NICHT `hidden`: `overflow: hidden` macht das Element zu einem
+     Scroll-Container, und die view-timeline darin misst dann die Sichtbarkeit
+     INNERHALB dieses Kastens statt im Fenster — die Strecke liefe nie los
+     (nachgemessen: 0px Versatz über den ganzen Scroll). */
+  .intro-buehne {
+    position: relative;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  /* Trägerelement der Zeitachse. */
+  .intro-ebenen {
+    position: relative;
+    height: 100svh;
+    view-timeline-name: --intro;
+    view-timeline-axis: block;
+  }
+
+  .intro-ebene {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    width: 100%;
+    display: block;
+    will-change: transform;
+  }
+
+  .intro-ebene--titel {
+    bottom: 44%;
+    text-align: center;
+  }
+  .intro-titel {
+    font-family: var(--schrift-beschriftung);
+    font-size: clamp(40px, min(9vw, 14vh), 160px);
+    line-height: 1;
+    color: var(--farbe-text);
+  }
+
+  /* Der Weg ins Dunkle: eine Fläche in der Grundfarbe, die über die zweite
+     Hälfte der Strecke aufzieht. */
+  .intro-dunkel {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: var(--farbe-hintergrund);
+    opacity: 0;
+  }
+
+  @supports (animation-timeline: view()) {
+    .intro-ebene {
+      animation: intro-ebene linear both;
+      animation-timeline: --intro;
+      /* `exit 0%` bis `exit 100%` ist per Spezifikation genau der Bereich, in dem
+         das Trägerelement oben aus dem Fenster läuft — die CSS-Entsprechung zu
+         den Punkten "0% 0%" und "100% 0%" der Vorlage. */
+      animation-range: exit 0% exit 100%;
+    }
+    .intro-dunkel {
+      animation: intro-dunkel linear both;
+      animation-timeline: --intro;
+      animation-range: exit 45% exit 100%;
+    }
+    /* Foto und Menüband treten auf, während die Szene geht. Beide hängen an
+       derselben Zeitachse, kommen also im Gleichschritt. */
+    /* `:has(.intro)` ist Pflicht: das Merkmal `data-intro` steht am <html> und
+       gilt damit für JEDE Seite. Ohne die Bedingung griffe die Regel auch auf
+       About me — dort gibt es die Zeitachse `--intro` nicht, die Animation wäre
+       inaktiv, und mit `both` bliebe der Anfangszustand stehen: das Menüband
+       wäre unsichtbar. So greift sie nur, wo die Szene wirklich steht. */
+    :root[data-intro='an']:has(.intro) .galerie,
+    :root[data-intro='an']:has(.intro) .menuband {
+      animation: intro-auftritt linear both;
+      animation-timeline: --intro;
+      animation-range: exit 60% exit 100%;
+    }
+  }
+
+  @keyframes intro-ebene {
+    to {
+      transform: translateY(var(--weg));
+    }
+  }
+  @keyframes intro-dunkel {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes intro-auftritt {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Wer reduzierte Bewegung eingestellt hat, bekommt die Szene ohne Wanderung —
+     sie bleibt sichtbar und scrollt schlicht weg. */
+  @media (prefers-reduced-motion: reduce) {
+    .intro-ebene,
+    .intro-dunkel,
+    :root[data-intro='an']:has(.intro) .galerie,
+    :root[data-intro='an']:has(.intro) .menuband {
+      animation: none;
+    }
+  }
+
+  /* Ohne fälligen Merker gibt es die Szene gar nicht — die Seite beginnt direkt
+     bei der Galerie. Das Tor-Skript setzt `data-intro` noch im <head>, also
+     bevor irgendetwas gezeichnet wird: kein Aufblitzen. */
+  :root:not([data-intro='an']) .intro {
+    display: none;
+  }
+
+  /* Unter dem Breakpoint gibt es kein Menüband und die Galerie scrollt ohnehin
+     durch alle Serien. Die Szene bliebe dort ein zusätzlicher Block vor einer
+     langen Seite — bewusst nur auf dem Desktop. */
+  @media (max-width: 768px) {
+    .intro {
+      display: none;
+    }
+  }
+</style>

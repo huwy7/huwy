@@ -1,6 +1,7 @@
 ---
 import Basis from '../layouts/Basis.astro';
 import Galerie from '../components/Galerie.astro';
+import IntroParallax from '../components/IntroParallax.astro';
 import { ladeSerien, serieUrl } from '../lib/serien';
 
 // Portfolio, düsterer Modus. Zeigt die oberste Serie (der Betreiber steuert die
@@ -19,5 +20,9 @@ const erste = serien[0];
   kanonisch={erste ? serieUrl('duester', erste.slug) : undefined}
 >
   <h1 class="visuell-versteckt">nicolas huwyler - portfolio</h1>
+  {/* Auftakt-Szene: nur hier (düsteres Portfolio) und nur direkt nach der
+      Code-Eingabe. Ohne fälligen Merker blendet sie sich selbst aus, die Seite
+      beginnt dann wie gewohnt bei der Galerie. */}
+  <IntroParallax />
   <Galerie serien={serien} aktiv={erste?.slug ?? ''} />
 </Basis>

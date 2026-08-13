@@ -1,5 +1,6 @@
 ---
 import Serie from './Serie.astro';
+import Navigation from './Navigation.astro';
 import type { ImageMetadata } from 'astro';
 import type { Aufnahmedaten } from '../lib/exif';
 
@@ -21,12 +22,13 @@ import type { Aufnahmedaten } from '../lib/exif';
 // Hash-Sprung und bringen die Tastaturbedienung (Pfeiltasten in der Gruppe) mit.
 // Der erste Radio trägt `checked` — damit steht die oberste Serie beim Laden.
 interface Props {
+  modus?: 'duester' | 'farbe';
   serien: {
     serie: { id: string; data: { titel: string; jahr: number } };
     bilder: { bild: ImageMetadata; daten?: Aufnahmedaten }[];
   }[];
 }
-const { serien } = Astro.props;
+const { serien, modus = 'duester' } = Astro.props;
 
 // Welche Serie zu welchem Radio gehört, lässt sich nicht mit EINER statischen
 // Regel ausdrücken — jedes Paar braucht seine eigene. Darum hier erzeugt statt
@@ -56,6 +58,14 @@ ${serien
   {/* Das Menü steht im Markup NACH der Bühne, damit die Tastatur zuerst durchs
       Bild läuft. Optisch sitzt es rechts (order in der CSS-Regel unten). */}
   <nav class="serien-menu" aria-label="Serien">
+    {/* Oben im Band: der Modus-Umschalter. Er sieht weiter aus wie in der
+        Kopfzeile (gleiche Grösse, gleiche Schrift) und steht auch auf gleicher
+        Höhe — nur eben im Band statt darüber. */}
+    <div class="menu-kopf">
+      <Navigation modus={modus} teil="umschalter" />
+    </div>
+
+    <div class="menu-serien">
     {
       serien.map(({ serie }, i) => (
         <label class="serien-eintrag" data-fuer={serie.id}>
@@ -73,6 +83,14 @@ ${serien
         </label>
       ))
     }
+    </div>
+
+    {/* Unten im Band: der Seitenwechsel. Er zeigt immer das ANDERE Ziel — im
+        Portfolio steht dort „About me", bei About me steht dort „Portfolio".
+        Die Logik dazu steckt in Navigation.astro. */}
+    <div class="menu-fuss">
+      <Navigation modus={modus} teil="seitenwechsel" />
+    </div>
   </nav>
 </div>
 
@@ -147,7 +165,11 @@ ${serien
        ERSTEN Serie heraus; hier kann jede Serie die erste sein, also gilt die
        Rechnung für alle. */
     .serien-buehne :global(.serie) {
-      min-height: calc(100svh - var(--header-hoehe));
+      /* Volle Bildschirmhöhe, NICHT minus Kopfzeile: die ist auf dieser Ansicht
+         ausgeblendet (Basis.astro, .kopf--galerie), ihr Platz ist also frei.
+         Serie.astro rechnet die Kopfzeile sonst nur bei der ERSTEN Serie heraus;
+         hier kann jede Serie die erste sein, also gilt dieselbe Rechnung für alle. */
+      min-height: 100svh;
       padding-block-start: 0;
       padding-block-end: 0;
     }
@@ -175,16 +197,48 @@ ${serien
       flex: none;
       background-color: var(--menu-grund);
       padding-inline: var(--menu-innenrand);
-      /* Bis an die Oberkante des Fensters. Die Kopfzeile steht im Fluss über der
-         Galerie und ist --header-hoehe hoch; ohne diesen Zug begänne die Fläche
-         erst darunter und liesse einen Streifen Seitengrund stehen. Der gleich
-         grosse Innenabstand gibt den Platz innen wieder zurück, damit die
-         Einträge weiter in der Fläche UNTER der Kopfzeile mittig stehen.
-         Die Kopfzeile endet ihrerseits vor dieser Fläche (Basis.astro,
-         .kopf--galerie), es überlagert sich also nichts. */
-      margin-block-start: calc(-1 * var(--header-hoehe));
-      padding-block-start: var(--header-hoehe);
+      /* Drei Zonen im Band: Umschalter oben, Serien mittig, Seitenwechsel unten.
+         Die Serienliste bekommt allen Restplatz und zentriert sich darin — so
+         stehen die Titel weiter in der Bandmitte, egal wie hoch das Fenster ist. */
+      justify-content: flex-start;
+      padding-block-end: var(--abstand-32);
+      /* Kein Hochzug mehr nötig: die Kopfzeile ist auf dieser Ansicht ausgeblendet
+         (Basis.astro, .kopf--galerie), die Galerie beginnt also bereits an der
+         Fensterkante. Die Höhe der früheren Kopfzeile steckt jetzt in .menu-kopf —
+         dort steht der Umschalter, auf genau der Höhe, auf der die Kopfzeile
+         vorher stand. */
     }
+    /* Der Umschalter steht auf derselben Höhe wie die Kopfzeile daneben: gleiche
+       Bandhöhe (--header-hoehe) und gleicher oberer Innenabstand. Dadurch liest
+       sich die Zeile weiter als Kopfzeile, nur eben im Band. */
+    .menu-kopf {
+      display: flex;
+      align-items: baseline;
+      min-height: var(--header-hoehe);
+      padding-block-start: var(--abstand-32);
+      flex: none;
+    }
+    /* Die Serienliste nimmt den ganzen Rest und zentriert sich darin. */
+    .menu-serien {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: var(--menu-abstand);
+      min-height: 0;
+    }
+    .menu-fuss {
+      flex: none;
+    }
+    /* Beide Knöpfe stehen auf der Menüfläche, tragen also deren Schriftfarbe —
+       nicht die der Seite. Ohne das wären sie im Farbmodus unsichtbar: dort ist
+       die Fläche genau --farbe-text. */
+    .menu-kopf :global(.nav-knopf),
+    .menu-fuss :global(.nav-knopf) {
+      color: var(--menu-text);
+    }
+
     .serien-eintrag {
       /* --eintrag-aktiv wird von den erzeugten Regeln auf 1 gesetzt; darüber
          hängt die Deckkraft, ohne dass eine zweite Klasse nötig wäre. */

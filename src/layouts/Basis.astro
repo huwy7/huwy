@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/schriften.css';
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
+import Navigation from '../components/Navigation.astro';
 import torBild from '../assets/tor.jpeg';
 
 interface Props {
@@ -21,23 +22,12 @@ interface Props {
 
 const { titel, beschreibung, ogBild, modus = 'duester', vollhoehe = false } = Astro.props;
 
-// Modus-abhängige Navigation. Farbmodus ist gespiegelt (Menü rechts, Umschalt-
-// Button links); Beschriftungen englisch, nur der Umschalt-Button spanisch.
 // Alle internen Ziele über die Astro-Basis aufbauen, damit die /feature-Vorschau
 // in sich navigiert und main ('/') unverändert bleibt. BASE_URL kann mit oder ohne
-// End-Slash kommen ('/' bei main, '/feature' beim Feature-Branch) — darum den
-// End-Slash abziehen und die Pfade mit führendem Slash anhängen.
-const b = import.meta.env.BASE_URL.replace(/\/$/, ''); // '' oder '/feature'
+// End-Slash kommen ('/' bei main, '/feature' beim Feature-Branch).
+// Die Navigation selbst (Umschalter, Seitenwechsel) rechnet ihre Ziele und
+// Beschriftungen eigenständig — siehe components/Navigation.astro.
 const farbe = modus === 'farbe';
-const portfolioZiel = farbe ? `${b}/color` : `${b}/`;
-const aboutZiel = farbe ? `${b}/color/ueber-mich` : `${b}/ueber-mich`;
-const aboutLabel = farbe ? 'More about me' : 'About me';
-const switchZiel = farbe ? `${b}/` : `${b}/color`;
-// Spanisch, augenzwinkernd — als Einladung/Frage. Nur diese Buttons sind spanisch.
-// Bewusst OHNE die im Spanischen übliche einleitende ¡ bzw. ¿: nur das Zeichen am
-// Ende. Entscheidung des Betreibers, typografisch gewollt — nicht als fehlendes
-// Zeichen „korrigieren".
-const switchLabel = farbe ? 'A mí me gusta la noche!' : 'A quién le gusta el sol?';
 
 // Hintergrund des Zugangs-Tors: das raue Schwarzweiss-Foto (grain, düster —
 // CLAUDE.md 1a) füllt den Bildschirm formatunabhängig (cover). Optimiert über
@@ -49,12 +39,6 @@ const torHintergrund = `image-set(url("${torAvif.src}") type("image/avif"), url(
 // --tor-bg trägt den Sperrbildschirm-Hund (beide Modi). Der Farbmodus hat einen
 // schlichten weissen Grund (global.css) — kein eigenes Hintergrundbild mehr.
 const bodyStil = `--tor-bg: ${torHintergrund}`;
-
-// Aktive Navigation (nur aria-current, keine farbliche Hervorhebung mehr). Den
-// Basis-Pfad abziehen, damit die Erkennung auch unter /feature stimmt.
-const rel = (Astro.url.pathname.slice(b.length) || '/').replace(/(.)\/$/, '$1');
-const istPortfolio = farbe ? rel === '/color' : rel === '/';
-const istUeber = farbe ? rel === '/color/ueber-mich' : rel === '/ueber-mich';
 
 // Absolute URLs für Kanonik und Open Graph.
 const kanonisch = new URL(Astro.url.pathname, Astro.site);
@@ -124,38 +108,23 @@ const name = 'nicolas huwyler - portfolio';
       </form>
     </div>
 
-    <!-- Kopfzeile: Portfolio + About me, dazu der Modus-Umschalt-Button. Gespiegelt
-         je Modus (düster: Menü links / Button rechts; farbig: Button links / Menü
-         rechts). Schlicht, mono, Fokus bleibt auf den Bildern. -->
+    <!-- Kopfzeile: Modus-Umschalter und Seitenwechsel. Reihenfolge gespiegelt je
+         Modus (düster: Wechsel links / Umschalter rechts; farbig umgekehrt).
+         Auf Galerie-Seiten ab dem Breakpoint sitzen beide Knöpfe stattdessen im
+         Menüband rechts (Galerie.astro) — die Kopfzeile ist dort leer und wird
+         ausgeblendet. Auf dem Smartphone und auf Seiten ohne Serienmenü bleibt
+         sie die einzige Navigation. -->
     <header class:list={['kopf', { 'kopf--galerie': vollhoehe }]}>
       {
         farbe ? (
           <>
-            <a class="kopf-switch druck-box" href={switchZiel}>
-              {switchLabel}
-            </a>
-            <nav class="kopf-nav" aria-label="Hauptnavigation">
-              <a class="druck-box" href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
-                {aboutLabel}
-              </a>
-              <a class="druck-box" href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
-                Portfolio
-              </a>
-            </nav>
+            <Navigation modus={modus} teil="umschalter" />
+            <Navigation modus={modus} teil="seitenwechsel" />
           </>
         ) : (
           <>
-            <nav class="kopf-nav" aria-label="Hauptnavigation">
-              <a class="druck-box" href={portfolioZiel} aria-current={istPortfolio ? 'page' : undefined}>
-                Portfolio
-              </a>
-              <a class="druck-box" href={aboutZiel} aria-current={istUeber ? 'page' : undefined}>
-                {aboutLabel}
-              </a>
-            </nav>
-            <a class="kopf-switch druck-box" href={switchZiel}>
-              {switchLabel}
-            </a>
+            <Navigation modus={modus} teil="seitenwechsel" />
+            <Navigation modus={modus} teil="umschalter" />
           </>
         )
       }
@@ -216,8 +185,12 @@ const name = 'nicolas huwyler - portfolio';
          Raster als der Serientitel darunter. */
       @media (min-width: 768px) {
         .kopf--galerie {
-          width: calc(100% - var(--menu-breite));
-          padding-inline: var(--rand);
+          /* Beide Knöpfe sitzen ab hier im Menüband (Galerie.astro): der
+             Umschalter oben, der Seitenwechsel unten. Die Kopfzeile hat damit
+             keinen Inhalt mehr und verschwindet — der Platz bleibt aber
+             reserviert, weil die Serien mit --header-hoehe rechnen und der
+             Umschalter im Band auf derselben Höhe stehen soll. */
+          display: none;
         }
       }
 
@@ -230,64 +203,18 @@ const name = 'nicolas huwyler - portfolio';
         margin-inline-start: auto;
       }
 
-      .kopf-nav {
-        display: flex;
-        gap: var(--abstand-24);
-      }
+      /* Aussehen der beiden Knöpfe steht in Navigation.astro (sie werden dort
+         gerendert und tragen den Scope dieser Komponente). Hier bleibt nur, was
+         die KOPFZEILE als Behälter angeht. */
 
-      /* Beschriftungen brechen nicht mitten im Wort/Satz um; lieber die ganze
-         Gruppe in eine neue Zeile (via flex-wrap oben). */
-      .kopf-nav a,
-      .kopf-switch {
-        white-space: nowrap;
-      }
-
-      /* Grösse der Kopfzeile. Gilt in BEIDEN Modi — Entscheidung des Betreibers,
-         damit düster und farbig gleich auftreten. Mobil wird der Token eine Stufe
-         kleiner gesetzt (global.css). Der Serientitel hing früher über ein festes
-         Verhältnis an diesem Wert; seit er als Plakatschrift läuft, rechnet er
-         eigenständig (tokens.css --serientitel-groesse). */
-      .kopf-nav,
-      .kopf-switch {
-        font-family: var(--schrift-beschriftung);
-        font-size: var(--nav-groesse);
-        line-height: var(--zeilenhoehe-1-4);
-        font-variant-ligatures: none;
-      }
-
-      /* Alle Beschriftungen einheitlich weiss (keine unterschiedlichen Töne).
-         Die aktive Seite wird nicht mehr über die Farbe hervorgehoben; das
-         aria-current-Attribut bleibt für Screenreader erhalten. */
-      .kopf-nav a,
-      .kopf-switch {
-        color: var(--farbe-text);
-        text-decoration: none;
-      }
-
-      /* Mobil: alles bleibt in EINER Zeile — der Umschalt-Button steht neben der
-         Navigation, nicht darunter. Damit der lange spanische Text danebenpasst,
-         wird die Kopfzeile hier eine Stufe kleiner gesetzt und die Abstände enger.
-         Anordnung und Spiegelung (düster: Menü links, farbig: Button links) bleiben
-         wie am Desktop. */
+      /* Mobil: beide Knöpfe bleiben in EINER Zeile. Damit der lange spanische
+         Text danebenpasst, wird die Kopfzeile eine Stufe kleiner gesetzt (als
+         Token-Überschreibung in global.css, nicht hier — der Serientitel rechnete
+         früher mit demselben Token) und die Abstände enger. */
       @media (max-width: 768px) {
         .kopf {
           flex-wrap: nowrap;
           gap: var(--abstand-16);
-        }
-        .kopf-nav {
-          gap: var(--abstand-16);
-        }
-        /* Die mobile Grösse steht als Token-Überschreibung in global.css, nicht
-           hier: der Serientitel (Serie.astro) rechnet mit demselben Token und
-           muss mitziehen. Eine Regel nur auf .kopf-nav würde ihn nicht erreichen.
-           Wird der Umschalt-Button zu lang, bricht NUR er auf zwei Zeilen um —
-           bündig an seiner Seite: düster oben rechts, farbig oben links. */
-        .kopf-switch {
-          white-space: normal;
-          text-align: right;
-        }
-        :root[data-modus='farbe'] .kopf-switch {
-          text-align: left;
         }
       }
 

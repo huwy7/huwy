@@ -1,0 +1,100 @@
+---
+// Die Navigation der Seite an EINER Stelle. Sie erscheint an zwei Orten und muss
+// dort gleich rechnen:
+//   · als Kopfzeile (Basis.astro) — auf Seiten ohne Serienmenü, und auf dem
+//     Smartphone, wo es das Menüband nicht gibt
+//   · im Menüband rechts (Galerie.astro) — Umschalter oben, Seitenwechsel unten
+//
+// Sie besteht aus genau zwei Knöpfen:
+//   1. Modus-Umschalter (düster ↔ farbig), spanisch
+//   2. Seitenwechsel — zeigt IMMER das Ziel, nicht den Ort: steht man im
+//      Portfolio, heisst er „About me"; steht man bei About me, heisst er
+//      „Portfolio". Entscheidung des Betreibers. Ein Knopf, der auf die Seite
+//      zeigt, auf der man ohnehin steht, hat keine Funktion — vorher standen
+//      beide nebeneinander und einer davon war immer tot.
+//
+// `teil` wählt aus, welcher der beiden gerendert wird. Die Kopfzeile braucht
+// beide nebeneinander, das Menüband setzt sie an zwei verschiedene Stellen.
+interface Props {
+  modus?: 'duester' | 'farbe';
+  /** 'umschalter' | 'seitenwechsel' | 'beide' (Vorgabe) */
+  teil?: 'umschalter' | 'seitenwechsel' | 'beide';
+  class?: string;
+}
+const { modus = 'duester', teil = 'beide', class: klasse } = Astro.props;
+
+// Ziele über die Astro-Basis, damit die /feature-Vorschau in sich navigiert
+// (BASE_URL ist '/' bei main und '/feature' im Vorschau-Branch).
+const b = import.meta.env.BASE_URL.replace(/\/$/, '');
+const farbe = modus === 'farbe';
+
+const portfolioZiel = farbe ? `${b}/color` : `${b}/`;
+const aboutZiel = farbe ? `${b}/color/ueber-mich` : `${b}/ueber-mich`;
+const aboutLabel = farbe ? 'More about me' : 'About me';
+
+const switchZiel = farbe ? `${b}/` : `${b}/color`;
+// Spanisch, augenzwinkernd — als Einladung/Frage. Nur diese Knöpfe sind spanisch.
+// Bewusst OHNE die im Spanischen übliche einleitende ¡ bzw. ¿: nur das Zeichen am
+// Ende. Entscheidung des Betreibers, typografisch gewollt — nicht als fehlendes
+// Zeichen „korrigieren".
+const switchLabel = farbe ? 'A mí me gusta la noche!' : 'A quién le gusta el sol?';
+
+// Wo stehen wir? Den Basis-Pfad abziehen, damit die Erkennung auch unter
+// /feature stimmt.
+const rel = (Astro.url.pathname.slice(b.length) || '/').replace(/(.)\/$/, '$1');
+const istUeber = farbe ? rel === '/color/ueber-mich' : rel === '/ueber-mich';
+
+// Der Seitenwechsel zeigt das Gegenteil des aktuellen Orts.
+const wechselZiel = istUeber ? portfolioZiel : aboutZiel;
+const wechselLabel = istUeber ? 'Portfolio' : aboutLabel;
+
+const zeigeUmschalter = teil === 'umschalter' || teil === 'beide';
+const zeigeWechsel = teil === 'seitenwechsel' || teil === 'beide';
+---
+
+{
+  zeigeUmschalter && (
+    <a class:list={['nav-knopf', 'nav-umschalter', 'druck-box', klasse]} href={switchZiel}>
+      {switchLabel}
+    </a>
+  )
+}
+{
+  zeigeWechsel && (
+    <a class:list={['nav-knopf', 'nav-wechsel', 'druck-box', klasse]} href={wechselZiel}>
+      {wechselLabel}
+    </a>
+  )
+}
+
+<style>
+  /* Aussehen beider Knöpfe — gilt an BEIDEN Orten (Kopfzeile und Menüband).
+     Wo sie stehen und welche Farbe sie tragen, bestimmt der jeweilige Ort:
+     die Kopfzeile über .kopf (Basis.astro), das Menüband über .menu-kopf /
+     .menu-fuss (Galerie.astro). */
+  .nav-knopf {
+    font-family: var(--schrift-beschriftung);
+    font-size: var(--nav-groesse);
+    line-height: var(--zeilenhoehe-1-4);
+    font-variant-ligatures: none;
+    /* Einheitlich, keine unterschiedlichen Töne. Die aktive Seite wird nicht
+       farblich hervorgehoben — sie ist gar nicht mehr verlinkt (der Knopf zeigt
+       immer aufs Gegenteil). */
+    color: var(--farbe-text);
+    text-decoration: none;
+    /* Bricht nicht mitten im Wort um. */
+    white-space: nowrap;
+  }
+
+  /* Mobil kann der lange spanische Umschalter zweizeilig werden — dann bündig an
+     seiner Seite: düster steht er rechts, farbig links. */
+  @media (max-width: 768px) {
+    .nav-umschalter {
+      white-space: normal;
+      text-align: right;
+    }
+    :root[data-modus='farbe'] .nav-umschalter {
+      text-align: left;
+    }
+  }
+</style>

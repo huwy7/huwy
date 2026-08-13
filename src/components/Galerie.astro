@@ -108,6 +108,11 @@ ${serien
   /* --- ab 768px: Bühne links, Menü rechts ---------------------------------- */
   @media (min-width: 768px) {
     .galerie {
+      /* Der Höhendeckel der Fotos gilt in dieser Ansicht enger als beim Scrollen
+         durch die Serien. Als Token-Überschreibung statt eigener max-height-Regel:
+         so zieht alles mit, was schon mit --karussell-hoehe rechnet (das Bild in
+         global.css, die Streifenhöhe in Serie.astro). */
+      --karussell-hoehe: var(--galerie-foto-hoehe);
       display: flex;
       align-items: stretch;
       /* Ausbruch aus dem zentrierten Seiten-Container (.inhalt, max-width 1280px
@@ -147,6 +152,17 @@ ${serien
       padding-block-end: 0;
     }
 
+    /* Titel und Jahr zählen hier zum zentrierten Block. Serie.astro rechnet sie
+       sonst per negativem Aussenabstand aus der Zentrierung heraus, damit nur der
+       Bildstreifen mittig sitzt — der Titel ragt dann nach OBEN heraus und lief
+       bei Plakatgrösse unter die Kopfzeile. In dieser Ansicht ist der Platz
+       darüber begrenzt und fest (eine Bildschirmhöhe, kein Scrollen), also wird
+       der ganze Block zentriert. Der Preis: die Bildmitte liegt nicht mehr exakt
+       in der Fensterhöhe, sondern etwas tiefer. */
+    .serien-buehne :global(.serie-kopf) {
+      margin-block-start: 0;
+    }
+
     /* Das rechte Viertel: eigene schwarze Fläche über die volle Höhe, die
        Einträge darin senkrecht zentriert. */
     .serien-menu {
@@ -159,6 +175,15 @@ ${serien
       flex: none;
       background-color: var(--menu-grund);
       padding-inline: var(--menu-innenrand);
+      /* Bis an die Oberkante des Fensters. Die Kopfzeile steht im Fluss über der
+         Galerie und ist --header-hoehe hoch; ohne diesen Zug begänne die Fläche
+         erst darunter und liesse einen Streifen Seitengrund stehen. Der gleich
+         grosse Innenabstand gibt den Platz innen wieder zurück, damit die
+         Einträge weiter in der Fläche UNTER der Kopfzeile mittig stehen.
+         Die Kopfzeile endet ihrerseits vor dieser Fläche (Basis.astro,
+         .kopf--galerie), es überlagert sich also nichts. */
+      margin-block-start: calc(-1 * var(--header-hoehe));
+      padding-block-start: var(--header-hoehe);
     }
     .serien-eintrag {
       /* --eintrag-aktiv wird von den erzeugten Regeln auf 1 gesetzt; darüber

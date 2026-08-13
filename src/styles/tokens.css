@@ -68,9 +68,14 @@
      rechnet (`.serie-kopf { margin-block-start }`): wird die Grösse geändert,
      zieht die Formel automatisch mit — sonst sitzt das Bild nicht mehr mittig.
      Beide Modi tragen denselben Wert.
-     (Vorher: calc(--nav-groesse * 22/19), also rund 22px am Desktop. Das feste
-     Verhältnis zur Navigation ist damit aufgegeben.) */
-  --serientitel-groesse: clamp(40px, 9vw, 128px);
+     WARUM min(5vw, 8vh) und nicht nur vw: der Titel steht ÜBER dem Foto und
+     teilt sich die Bildschirmhöhe mit ihm. Hinge er nur an der Breite, würde er
+     in einem breiten, flachen Fenster riesig und das Foto zugleich flach — dann
+     stossen beide zusammen. Über die Höhe mitgerechnet bleibt der Abstand in
+     jedem Fensterformat erhalten.
+     (Vorher: clamp(40px, 9vw, 128px) — lief bei 128px unter die Kopfzeile.
+     Davor: calc(--nav-groesse * 22/19), also rund 22px am Desktop.) */
+  --serientitel-groesse: clamp(36px, min(5vw, 8vh), 96px);
 
   /* Menü der Serien im rechten Viertel des Fensters (Galerie.astro), erst ab dem
      Breakpoint. Es ist die Hauptnavigation der Startseite und tritt entsprechend
@@ -88,6 +93,16 @@
   --menu-grund: #000;
   --menu-text: #fff;
   --menu-innenrand: var(--abstand-48);
+
+  /* Höhe des Fotos in der Menü-Ansicht (Galerie.astro, ab dem Breakpoint).
+     Bewusst NIEDRIGER als --karussell-hoehe (72vh): dort scrollt man durch die
+     Serien, hier steht alles gleichzeitig in EINER Bildschirmhöhe — Titel als
+     Plakatschrift, Foto, Zähler. Bei 72vh blieben nur 8 bis 17 Pixel Luft
+     zwischen Kopfzeile und Titel (nachgemessen), das wirkte gequetscht.
+     65vh ist die kleinste Absenkung, die auf allen geprüften Fensterformaten
+     rund 40 bis 55 Pixel Luft lässt — oben wie unten. Mehr wurde bewusst nicht
+     weggenommen: das Foto soll so gross wie irgend möglich bleiben. */
+  --galerie-foto-hoehe: 65vh;
 
   /* --- 3.4 Schriftgrössen ---
      15 Wortmarke · 14 Navigation/Serientitel Start/Jahr ·

@@ -198,6 +198,13 @@ body::after {
      steht in tokens.css. Einzige Ausnahme bleibt das Eingabefeld am Zugangs-Tor:
      es hängt an --schrift-tor und ist in beiden Modi Mono. */
   --schrift-display: "Caprasimo", Georgia, serif;
+  /* Menüfläche im rechten Viertel (Galerie.astro). Die düstere Seite stellt dort
+     Schwarz gegen Weiss; die Farbseite macht dasselbe mit IHREN Farben, nicht mit
+     Schwarz — die Fläche trägt das Rotbraun der Schrift, die Schrift den warmen
+     Grundton. Also dasselbe Bild, nur in der Palette dieser Seite. Der Kontrast
+     ist derselbe wie umgekehrt (gemessen 7,7:1, AAA). */
+  --menu-grund: #832d24;
+  --menu-text: #f1eee6;
   /* Aufnahmedaten im Polaroid-Fuss: hier ist der Rahmen derselbe Ton wie der
      Grund, also gilt die normale Textfarbe. Auf der düsteren Seite steht der Text
      dagegen auf dem fast weissen Passepartout und braucht die Gegenfarbe
@@ -356,6 +363,18 @@ picture > source {
    sonst die Farbseiten-Regel überschreibt. */
 :root[data-modus='farbe'] .hat-daten .karussell-foto {
   padding-block-end: calc(var(--rahmen-breite) + var(--polaroid-fuss));
+}
+
+/* ABER in der Menü-Ansicht (Galerie.astro) zählt der Rahmen zur Höhe dazu.
+   Sonst steht die Farbseite anders da als die düstere: dort gilt border-box, der
+   Höhendeckel umfasst also Bild PLUS Rahmen; hier käme der Rahmen obendrauf und
+   das Foto würde um genau die Rahmenhöhe grösser (gemessen 64px bei 1080er
+   Fensterhöhe — genug, um die Seite scrollen zu lassen, obwohl in dieser Ansicht
+   nichts scrollen soll). Beide Seiten sollen gleich aufgebaut sein; sichtbar
+   ändert sich auf der Farbseite nichts, weil der Rahmen dort ohnehin die
+   Grundfarbe trägt und unsichtbar ist. */
+:root[data-modus='farbe'] .galerie .karussell-foto {
+  box-sizing: border-box;
 }
 
 /* NUR TELEFON IM HOCHFORMAT: Der Höhendeckel kommt dort nicht mehr aus einem festen

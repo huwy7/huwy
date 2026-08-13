@@ -127,7 +127,7 @@ const name = 'nicolas huwyler - portfolio';
     <!-- Kopfzeile: Portfolio + About me, dazu der Modus-Umschalt-Button. Gespiegelt
          je Modus (düster: Menü links / Button rechts; farbig: Button links / Menü
          rechts). Schlicht, mono, Fokus bleibt auf den Bildern. -->
-    <header class="kopf">
+    <header class:list={['kopf', { 'kopf--galerie': vollhoehe }]}>
       {
         farbe ? (
           <>
@@ -200,6 +200,25 @@ const name = 'nicolas huwyler - portfolio';
            Zeile damit ungefähr mittig in der festen Kopfhöhe, und die zweite Zeile
            des Umschalt-Buttons hat darunter Platz, ohne die Höhe zu verändern. */
         padding-block: var(--abstand-32) var(--abstand-8);
+      }
+
+      /* Galerie-Seiten ab dem Breakpoint: die Kopfzeile ENDET vor der schwarzen
+         Menüfläche im rechten Viertel (Galerie.astro).
+         Das löst zwei Dinge auf einmal:
+         · Die Menüfläche kann bis ganz nach oben laufen, ohne dass der Schleier
+           der Kopfzeile als andersfarbiger Streifen darüber liegt — die Kopfzeile
+           reicht schlicht nicht mehr so weit.
+         · Kein Beschriftungstext landet auf der Fläche. Das wäre im Farbmodus
+           unlesbar geworden: dort ist die Fläche das Rotbraun der Schrift.
+         Zugleich wechselt der Innenabstand vom Container-Raster auf den blossen
+         Seitenrand, weil die Galerie ab hier über die volle Fensterbreite läuft
+         (Ausbruch in Galerie.astro). Sonst stünde die Kopfzeile auf einem anderen
+         Raster als der Serientitel darunter. */
+      @media (min-width: 768px) {
+        .kopf--galerie {
+          width: calc(100% - var(--menu-breite));
+          padding-inline: var(--rand);
+        }
       }
 
       /* Beim Umbruch (schmale Screens) rutscht das zweite Element in eine zweite

@@ -369,16 +369,19 @@ picture > source {
   padding-block-end: calc(var(--rahmen-breite) + var(--polaroid-fuss));
 }
 
-/* ABER in der Menü-Ansicht (Galerie.astro) zählt der Rahmen zur Höhe dazu.
-   Sonst steht die Farbseite anders da als die düstere: dort gilt border-box, der
-   Höhendeckel umfasst also Bild PLUS Rahmen; hier käme der Rahmen obendrauf und
-   das Foto würde um genau die Rahmenhöhe grösser (gemessen 64px bei 1080er
-   Fensterhöhe — genug, um die Seite scrollen zu lassen, obwohl in dieser Ansicht
-   nichts scrollen soll). Beide Seiten sollen gleich aufgebaut sein; sichtbar
-   ändert sich auf der Farbseite nichts, weil der Rahmen dort ohnehin die
-   Grundfarbe trägt und unsichtbar ist. */
-:root[data-modus='farbe'] .galerie .karussell-foto {
-  box-sizing: border-box;
+/* In der Menü-Ansicht (Galerie.astro) muss die Farbseite auf dieselbe GESAMThöhe
+   kommen wie die düstere, sonst scrollt sie, obwohl dort nichts scrollen soll.
+   Weil hier content-box gilt, kommt der Rahmen zur Höhe HINZU — der Deckel wird
+   deshalb um genau die Rahmenhöhe abgesenkt (oben eine Rahmenbreite, unten eine
+   plus der Polaroid-Fuss).
+   NICHT stattdessen auf border-box umstellen: daran hängt die gesamte
+   Abstandsrechnung der Farbseite (sichtbare Kante = das Foto). Ein Versuch damit
+   machte das Foto 32px schmaler als seine Bühne — der Datenstreifen stand
+   dadurch über die Bildkante hinaus und die drei Klickzonen sassen verschoben. */
+:root[data-modus='farbe'] .galerie {
+  --karussell-hoehe: calc(
+    var(--galerie-foto-hoehe) - 2 * var(--rahmen-breite) - var(--polaroid-fuss)
+  );
 }
 
 /* NUR TELEFON IM HOCHFORMAT: Der Höhendeckel kommt dort nicht mehr aus einem festen

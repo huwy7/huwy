@@ -203,6 +203,10 @@ body::after {
      Schwarz — die Fläche trägt das Rotbraun der Schrift, die Schrift den warmen
      Grundton. Also dasselbe Bild, nur in der Palette dieser Seite. Der Kontrast
      ist derselbe wie umgekehrt (gemessen 7,7:1, AAA). */
+  /* Caprasimo zeichnet das ✕ von Haus aus grösser als Anton — hier gilt darum
+     die kleinere Ausgangsgrösse. Beide Modi kommen damit auf dieselbe optische
+     Grösse (gemessen 13×13px Zeichenfläche). */
+  --vollbild-x: var(--groesse-28);
   --menu-grund: #832d24;
   --menu-text: #f1eee6;
   /* Aufnahmedaten im Polaroid-Fuss: hier ist der Rahmen derselbe Ton wie der

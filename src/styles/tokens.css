@@ -114,7 +114,17 @@
   --groesse-16: 16px;
   --groesse-19: 19px;
   --groesse-22: 22px;
-  --groesse-28: 28px; /* nur für das Vollbild-✕ (etwas grösser, leichter zu treffen) */
+  --groesse-28: 28px; /* Ausgangsgrösse des Vollbild-✕ (siehe --vollbild-x) */
+  --groesse-40: 40px; /* Vollbild-✕ in Anton — siehe --vollbild-x */
+
+  /* Grösse des ✕ im Vollbild. Sie ist MODUSABHÄNGIG, weil das Zeichen aus der
+     jeweiligen Display-Schrift kommt und beide es sehr unterschiedlich gross
+     zeichnen: bei gleichen 28px misst die Zeichenfläche in Caprasimo 13×13px, in
+     Anton nur 10×9px (nachgemessen) — auf der düsteren Seite wirkte das ✕ dadurch
+     spürbar kleiner. Anton bei 40px kommt auf 14×13px und damit auf dieselbe
+     optische Grösse. Der Farbmodus setzt den Token in global.css zurück auf 28px.
+     Wer die Display-Schrift wechselt: diesen Wert neu ausmessen, nicht raten. */
+  --vollbild-x: var(--groesse-40);
 
   /* --- 3.4 Schriftschnitte (nur 400 und 500) --- */
   --gewicht-400: 400;

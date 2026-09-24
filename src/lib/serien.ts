@@ -36,9 +36,39 @@ export function portfolioUrl(modus: Modus): string {
  * Bewusst eigene Seiten statt Hash-Links (`/#bern`): der Hash ist bereits vom
  * Vollbild belegt (`#lb-<slug>`), ein zweiter Verwender würde sich damit ins
  * Gehege kommen.
+ * Der Slug kommt aus dem TITEL, nicht aus dem Dateinamen — `/serie/cdmx` statt
+ * `/serie/serie-eins` (siehe `titelSlug`).
  */
 export function serieUrl(modus: Modus, slug: string): string {
   return modus === 'farbe' ? `${basis()}/color/serie/${slug}` : `${basis()}/serie/${slug}`;
+}
+
+/**
+ * Titel → Slug für die Adresse. Aus „CDMX" wird `cdmx`, aus „Beispiel farbserie
+ * zwei" wird `beispiel-farbserie-zwei`.
+ *
+ * Vorher stand der Dateiname der Sammlung in der Adresse (`/serie/serie-eins`).
+ * Das ist eine interne Ordnungsnummer und sagt einem Besucher nichts — im Link,
+ * den man teilt oder in der Adresszeile liest, soll die Serie beim Namen genannt
+ * werden.
+ *
+ * Reihenfolge der Schritte ist wichtig: die deutschen Umlaute werden ZUERST
+ * ausgeschrieben (ü → ue), sonst macht die anschliessende Zerlegung daraus ein
+ * blosses „u". Danach fallen übrige Akzente weg (é → e, í → i), damit auch
+ * „México" oder „Zürich" eine saubere Adresse bekommen.
+ * Ergebnis ist kebab-case ohne Umlaute und Leerzeichen (CLAUDE.md Abschnitt 5).
+ */
+export function titelSlug(titel: string): string {
+  return titel
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /** Alle Serien eines Modus, nach `reihenfolge` sortiert, ohne leere. */
@@ -56,9 +86,25 @@ export async function ladeSerien(modus: Modus): Promise<SerieMitBildern[]> {
   // `undefined` und zeigen keinen Streifen.
   const daten = ladeAufnahmedaten(bilderSammlung);
 
+  // Slug aus dem Titel. Zwei Rückfallebenen, damit der Build nie an einem
+  // ungünstigen Titel scheitert und nie zwei Serien dieselbe Adresse bekommen:
+  //   · ergibt der Titel keinen brauchbaren Slug (z. B. nur Satzzeichen), gilt
+  //     der Dateiname der Sammlung
+  //   · ist der Slug schon vergeben, gilt ebenfalls der Dateiname — der ist von
+  //     Haus aus eindeutig
+  // Kein Durchnummerieren: `…-2` wäre von der Reihenfolge abhängig und würde
+  // Adressen verschieben, sobald der Betreiber Serien umsortiert.
+  const vergeben = new Set<string>();
+  const slugFuer = (id: string, titel: string) => {
+    const aus_titel = titelSlug(titel);
+    const slug = aus_titel && !vergeben.has(aus_titel) ? aus_titel : id;
+    vergeben.add(slug);
+    return slug;
+  };
+
   return meta
     .map((serie) => ({
-      slug: serie.id,
+      slug: slugFuer(serie.id, serie.data.titel),
       titel: serie.data.titel,
       jahr: serie.data.jahr,
       bilder: alleBilder

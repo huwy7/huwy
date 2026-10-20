@@ -4,9 +4,8 @@ bilder:
     text: |
       Der Bass muss drücken. Laut muss er nicht sein.
 
-      Das hat sich bei mir verschoben. Früher zählte, wie weit der Regler
-      aufgeht. Heute zählt, ob der Groove Platz hat — Funk, Soul, old school
-      R&B, Rap. Musik mit Luft drin. Nichts, was einen anschreit.
+      Funk, Soul, old school R&B, Rap. Musik mit Luft drin, mit Platz für
+      den Groove. Nichts, was einen anschreit.
 
       Entweder bouncen oder mitfühlen. Beides braucht denselben Moment: der
       Beat sitzt, und für ein paar Takte muss nichts weiter passieren.
